@@ -1,0 +1,81 @@
+---
+import { Image } from 'astro:assets';
+import heroOffice from '../../assets/img/hero-office.webp';
+
+const topChevrons = Array.from({ length: 6 }, (_, i) => `M${-26 + i * 60} 0h34l50 50-50 50h-34l50-50z`).join('');
+const sideChevrons = Array.from({ length: 8 }, (_, i) => `M0 ${i * 56}l50 40 50-40v28l-50 40-50-40z`).join('');
+---
+
+<section aria-labelledby="hero-title" class="mx-auto w-full max-w-[1320px] px-4 pt-4 md:px-6 md:pt-6">
+  <div class="hero-card relative flex flex-col overflow-hidden rounded-[28px] bg-blue shadow-[0_24px_60px_-32px_rgb(20_45_85/0.45)] md:block md:h-[clamp(440px,40vw,560px)] md:rounded-[40px]">
+    <Image
+      src={heroOffice}
+      alt="Equipo de Integra trabajando con headsets en la oficina"
+      widths={[640, 960, 1280, 1600, 2200]}
+      sizes="(min-width: 768px) 72vw, 100vw"
+      loading="eager"
+      fetchpriority="high"
+      class="h-[200px] w-full object-cover object-[60%_center] md:absolute md:inset-y-0 md:left-[28%] md:h-full md:w-[72%]"
+    />
+
+    <div aria-hidden="true" class="absolute inset-y-0 left-0 hidden w-[34%] overflow-hidden rounded-tr-[170px] bg-lime md:block">
+      <svg viewBox="0 0 400 100" preserveAspectRatio="xMinYMid slice" class="absolute top-0 left-0 block h-[20%] w-full">
+        <defs>
+          <linearGradient id="chev-top" x1="0" y1="0" x2="340" y2="0" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#839F18"></stop>
+            <stop offset="0.55" stop-color="#8BA91B"></stop>
+            <stop offset="1" stop-color="#A3C622"></stop>
+          </linearGradient>
+        </defs>
+        <path fill="url(#chev-top)" d={topChevrons}></path>
+      </svg>
+      <svg viewBox="0 0 100 400" preserveAspectRatio="xMidYMax slice" class="absolute top-[22%] left-[76.5%] block h-[78%] w-[23.5%]">
+        <defs>
+          <linearGradient id="chev-side" x1="0" y1="0" x2="0" y2="400" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#A3C622"></stop>
+            <stop offset="0.3" stop-color="#96B71F"></stop>
+            <stop offset="1" stop-color="#839F18"></stop>
+          </linearGradient>
+        </defs>
+        <path fill="url(#chev-side)" d={sideChevrons}></path>
+      </svg>
+    </div>
+
+    <div class="relative flex flex-col justify-end bg-blue px-6 pt-7 pb-7 md:absolute md:bottom-0 md:left-0 md:h-[80%] md:w-[26%] md:rounded-tr-[92px] md:pt-10 md:pr-7 md:pb-12 md:pl-11">
+      <h1 id="hero-title" class="max-w-[300px] font-display leading-none text-white">
+        <span class="block text-[clamp(30px,2.6vw,38px)] font-bold tracking-[-0.01em]">Equipos</span>
+        <span class="mt-1 block text-[clamp(16px,1.35vw,19px)] font-bold">remotos que hacen</span>
+        <span class="mt-0.5 block text-[clamp(56px,4.9vw,72px)] leading-[0.92] font-bold tracking-[-0.02em]">crecer</span>
+        <span class="mt-1.5 block text-right text-[clamp(16px,1.35vw,19px)] font-bold">tu operación</span>
+      </h1>
+      <a href="/agendar" class="hero-cta mt-8 inline-flex min-h-[52px] items-center justify-center self-stretch rounded-full bg-cream px-7 py-3 font-sans text-lg leading-tight font-bold text-[#5b7410] md:self-start">
+        ¡Agenda una llamada!
+      </a>
+    </div>
+  </div>
+
+  <p class="mx-auto mt-5 max-w-[860px] text-base leading-relaxed font-medium text-body md:mt-6 md:text-center md:text-[clamp(17px,1.4vw,20px)]">
+    Construimos equipos de ventas, soporte y back office para que tu negocio crezca con estructura, calidad y flexibilidad.
+  </p>
+</section>
+
+<style>
+  .hero-cta {
+    transition:
+      transform 0.16s var(--ease-out),
+      box-shadow 0.2s ease;
+  }
+  .hero-cta:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .hero-cta:hover {
+      box-shadow: 0 8px 24px rgb(15 35 70 / 0.25);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-cta:active {
+      transform: none;
+    }
+  }
+</style>

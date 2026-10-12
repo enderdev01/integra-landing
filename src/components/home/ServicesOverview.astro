@@ -1,0 +1,45 @@
+---
+import Icon from '../ui/Icon.astro';
+import ServiceIcon from '../ui/ServiceIcon.astro';
+import { SERVICES } from '../../content/services';
+
+const iconWidth = { ventas: 92, support: 150, web: 92, marketing: 150 } as const;
+---
+
+<section aria-labelledby="services-title" class="relative mt-10 pb-16 md:mt-[72px] md:pb-28">
+  <!-- Lime band with the client's U-curve (desktop only) -->
+  <div aria-hidden="true" class="absolute top-0 right-16 left-0 hidden h-[80%] rounded-tr-[240px] border-t-[112px] border-r-[112px] border-lime xl:block"></div>
+  <div aria-hidden="true" class="absolute top-[calc(80%-1px)] right-0 hidden h-[210px] w-44 rounded-bl-[210px] border-b-[112px] border-l-[112px] border-lime xl:block"></div>
+
+  <div class="relative mx-auto w-full max-w-[1320px] px-4 md:px-6">
+    <h2
+      id="services-title"
+      class="-ml-4 rounded-r-[40px] bg-lime px-6 py-5 font-display text-[clamp(26px,3vw,44px)] leading-tight font-bold tracking-[-0.01em] text-blue-ink uppercase md:-ml-6 xl:ml-0 xl:flex xl:h-28 xl:items-center xl:rounded-none xl:bg-transparent xl:px-0 xl:py-0 xl:pl-[72px]"
+    >
+      ¿Qué podemos ayudarte a hacer crecer?
+    </h2>
+
+    <div class="grid grid-cols-1 gap-14 pt-12 md:grid-cols-2 md:gap-x-[72px] md:gap-y-20 md:pt-24 xl:pr-60 xl:pl-24">
+      {
+        SERVICES.map((service) => (
+          <article class="reveal flex flex-col gap-3.5 md:gap-5">
+            <div class="flex items-center gap-4">
+              <ServiceIcon name={service.id} width={iconWidth[service.id]} class="h-auto w-16 shrink-0 md:w-auto" />
+              <h3 class="font-display text-[30px] leading-none font-bold tracking-[-0.015em] text-blue md:text-[clamp(40px,4vw,58px)]">{service.name}</h3>
+            </div>
+            <p class="max-w-[32ch] text-[19px] leading-normal font-medium text-body">{service.lead}</p>
+            <a href={`/servicios#${service.slug}`} class="btn-primary mt-auto justify-between self-stretch md:justify-center md:self-start">
+              {service.cta}
+              <Icon name="arrow-right" />
+            </a>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<div aria-hidden="true" class="relative h-[112px]">
+  <div class="absolute bottom-0 -left-6 h-[112px] w-[220px] rounded-tr-[220px_112px] bg-lime"></div>
+  <div class="absolute bottom-0 left-[29%] h-[88px] w-[176px] rounded-t-[88px] bg-blue"></div>
+</div>

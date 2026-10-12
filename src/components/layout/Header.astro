@@ -1,0 +1,304 @@
+---
+import Logo from '../../assets/brand/integra-logo.svg';
+import Icon from '../ui/Icon.astro';
+import ServiceIcon from '../ui/ServiceIcon.astro';
+import { NAV, type PageId } from '../../config/site';
+import { SERVICES } from '../../content/services';
+
+interface Props {
+  active: PageId;
+}
+
+const { active } = Astro.props;
+const linkState = (id: PageId) =>
+  id === active
+    ? 'font-normal text-blue-ink border-lime-deep'
+    : 'font-light text-muted border-transparent';
+---
+
+<header data-header class="site-header sticky top-0 z-50 border-b border-line-warm bg-cream font-serif text-ink">
+  <div class="mx-auto flex min-h-16 w-full max-w-[1320px] items-center gap-3 py-2 pr-3 pl-4 lg:min-h-[104px] lg:gap-14 lg:px-6 lg:py-[18px]">
+    <a href="/" aria-label="Integra, ir al inicio" class="flex min-h-11 shrink-0 items-center">
+      <Logo width={139} height={42} aria-hidden="true" class="h-9 w-auto lg:h-[42px]" />
+    </a>
+
+    <nav aria-label="Principal" class="hidden flex-1 lg:block">
+      <ul class="flex items-center gap-9">
+        {
+          NAV.map((item) =>
+            item.id === 'servicios' ? (
+              <li class="relative flex items-center" data-dropdown>
+                <a
+                  href={item.href}
+                  aria-current={item.id === active ? 'page' : undefined}
+                  class:list={['nav-link inline-flex min-h-11 items-center border-b-2 px-0.5 text-xl', linkState(item.id)]}
+                >
+                  {item.label}
+                </a>
+                <button
+                  type="button"
+                  class="dd-toggle ml-0.5 grid h-11 w-8 place-items-center rounded-lg text-muted"
+                  aria-label="Ver servicios"
+                  aria-expanded="false"
+                  aria-controls="dd-servicios"
+                  data-dropdown-toggle
+                >
+                  <Icon name="chevron-down" size={18} class="dd-chevron" />
+                </button>
+                <div class="dd-wrap absolute top-full -left-5 z-[70] pt-2.5">
+                  <div id="dd-servicios" class="dd-panel w-[360px] rounded-[18px] border border-[#e3e9ef] bg-white p-2 shadow-[0_24px_48px_-20px_rgb(0_56_92/0.35)]">
+                    <ul>
+                      {SERVICES.map((service) => (
+                        <li>
+                          <a href={`/servicios#${service.slug}`} class="dd-item flex min-h-16 items-center gap-3.5 rounded-xl px-3 py-2.5 text-ink">
+                            <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-lime-soft">
+                              <ServiceIcon name={service.id} width={28} cutout="#F3F8E2" />
+                            </span>
+                            <span class="grid gap-0.5">
+                              <span class="font-display text-[17px] leading-tight font-bold text-blue">{service.name}</span>
+                              <span class="font-sans text-[13px] leading-snug text-muted">{service.short}</span>
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                    <a href="/servicios" class="mt-1 flex min-h-12 items-center justify-between border-t border-[#e3e9ef] px-3 font-sans text-[15px] font-bold text-blue-ink">
+                      Ver todos los servicios <span aria-hidden="true">→</span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            ) : (
+              <li>
+                <a
+                  href={item.href}
+                  aria-current={item.id === active ? 'page' : undefined}
+                  class:list={['nav-link inline-flex min-h-11 items-center border-b-2 px-0.5 text-xl', linkState(item.id)]}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ),
+          )
+        }
+      </ul>
+    </nav>
+
+    <a
+      href="/contacto"
+      class="talk-cta relative ml-auto hidden min-h-11 shrink-0 items-center rounded-xl border-2 border-lime-deep bg-white px-5 py-1.5 text-[19px] font-medium text-[#5b7410] sm:inline-flex lg:ml-0"
+    >
+      ¡Hablemos!
+      <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true" class="absolute right-2.5 -bottom-[11px]">
+        <path d="M1 0H13L14 11Z" fill="#FFFFFF"></path>
+        <path d="M1 0L14 11L13 0" fill="none" stroke="#95B71E" stroke-width="2" stroke-linejoin="round"></path>
+      </svg>
+    </a>
+
+    <button
+      type="button"
+      class="burger ml-auto grid size-12 shrink-0 place-items-center rounded-xl text-ink sm:ml-0 lg:hidden"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+      aria-controls="menu-movil"
+      data-menu-toggle
+    >
+      <Icon name="menu" size={26} class="icon-open" />
+      <Icon name="close" size={26} class="icon-close hidden" />
+    </button>
+  </div>
+
+  <nav id="menu-movil" aria-label="Menú" class="mobile-panel border-t border-line-warm px-6 pt-2 pb-6 lg:hidden" hidden>
+    <ul>
+      {
+        NAV.map((item) =>
+          item.id === 'servicios' ? (
+            <li class="border-b border-line-warm" data-accordion>
+              <div class="flex min-h-14 items-center justify-between">
+                <a
+                  href={item.href}
+                  aria-current={item.id === active ? 'page' : undefined}
+                  class:list={['flex min-h-14 flex-1 items-center text-xl', item.id === active ? 'font-normal text-blue-ink' : 'font-light text-muted']}
+                >
+                  {item.label}
+                </a>
+                <button
+                  type="button"
+                  class="dd-toggle -mr-3 grid size-12 place-items-center rounded-xl text-lime-deep"
+                  aria-label="Ver servicios"
+                  aria-expanded={active === 'servicios' ? 'true' : 'false'}
+                  aria-controls="m-servicios"
+                  data-accordion-toggle
+                >
+                  <Icon name="chevron-down" size={18} class="dd-chevron" />
+                </button>
+              </div>
+              <ul id="m-servicios" class="accordion-panel grid gap-0.5 pb-3" hidden={active !== 'servicios'}>
+                {SERVICES.map((service) => (
+                  <li>
+                    <a href={`/servicios#${service.slug}`} class="flex min-h-[52px] items-center gap-3 py-1 pl-1.5 font-sans text-[17px] font-medium text-ink">
+                      <span class="grid size-9 shrink-0 place-items-center rounded-[10px] bg-lime-soft">
+                        <ServiceIcon name={service.id} width={22} cutout="#F3F8E2" />
+                      </span>
+                      {service.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ) : (
+            <li class="border-b border-line-warm">
+              <a
+                href={item.href}
+                aria-current={item.id === active ? 'page' : undefined}
+                class:list={['flex min-h-14 items-center justify-between text-xl', item.id === active ? 'font-normal text-blue-ink' : 'font-light text-muted']}
+              >
+                {item.label}
+                <Icon name="chevron-right" size={20} class="text-lime-deep" />
+              </a>
+            </li>
+          ),
+        )
+      }
+    </ul>
+    <a href="/agendar" class="btn-primary mt-5 w-full">
+      Agenda una llamada <Icon name="arrow-right" size={20} />
+    </a>
+  </nav>
+</header>
+
+<style>
+  .site-header {
+    transition: box-shadow 0.2s ease;
+  }
+  .site-header[data-scrolled] {
+    box-shadow: 0 6px 24px -12px rgb(15 35 70 / 0.35);
+  }
+  .nav-link {
+    transition: color 0.15s ease;
+  }
+
+  /* Services dropdown: interruptible transitions, origin at the trigger */
+  .dd-panel {
+    transform-origin: top left;
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+    visibility: hidden;
+    transition:
+      opacity 0.18s var(--ease-out),
+      transform 0.18s var(--ease-out),
+      visibility 0s linear 0.18s;
+  }
+  [data-dropdown][data-open] .dd-panel {
+    opacity: 1;
+    transform: none;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  :global(.dd-chevron) {
+    transition: transform 0.2s var(--ease-out);
+  }
+  [aria-expanded='true'] > :global(.dd-chevron) {
+    transform: rotate(180deg);
+  }
+  .dd-item,
+  .dd-toggle,
+  .burger {
+    transition:
+      background-color 0.15s ease,
+      transform 0.16s var(--ease-out);
+  }
+  .burger:active {
+    transform: scale(0.94);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .nav-link:hover {
+      color: var(--color-blue-ink);
+    }
+    .dd-item:hover {
+      background: var(--color-mist);
+    }
+    .dd-toggle:hover {
+      background: #eef2f5;
+    }
+  }
+
+  .mobile-panel:not([hidden]) {
+    animation: panel-in 0.2s var(--ease-out);
+  }
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dd-panel {
+      transform: none;
+    }
+    :global(.dd-chevron),
+    .burger:active {
+      transition: none;
+      transform: none;
+    }
+    .mobile-panel:not([hidden]) {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]');
+
+  // Shadow once the page scrolls under the sticky header
+  const onScroll = () => header?.toggleAttribute('data-scrolled', window.scrollY > 8);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Desktop services dropdown: hover (fine pointers), click and keyboard
+  document.querySelectorAll<HTMLElement>('[data-dropdown]').forEach((dropdown) => {
+    const toggle = dropdown.querySelector<HTMLButtonElement>('[data-dropdown-toggle]');
+    const setOpen = (open: boolean) => {
+      dropdown.toggleAttribute('data-open', open);
+      toggle?.setAttribute('aria-expanded', String(open));
+    };
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+    dropdown.addEventListener('pointerenter', () => finePointer.matches && setOpen(true));
+    dropdown.addEventListener('pointerleave', () => finePointer.matches && setOpen(false));
+    toggle?.addEventListener('click', () => setOpen(!dropdown.hasAttribute('data-open')));
+    dropdown.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && dropdown.hasAttribute('data-open')) {
+        setOpen(false);
+        toggle?.focus();
+      }
+    });
+    dropdown.addEventListener('focusout', (event) => {
+      if (!dropdown.contains(event.relatedTarget as Node | null)) setOpen(false);
+    });
+  });
+
+  // Mobile menu
+  const menuToggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.getElementById('menu-movil');
+  menuToggle?.addEventListener('click', () => {
+    if (!menu) return;
+    const open = menu.hidden;
+    menu.hidden = !open;
+    menuToggle.setAttribute('aria-expanded', String(open));
+    menuToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    menuToggle.querySelector('.icon-open')?.classList.toggle('hidden', open);
+    menuToggle.querySelector('.icon-close')?.classList.toggle('hidden', !open);
+  });
+
+  // Services accordion inside the mobile menu
+  document.querySelectorAll<HTMLButtonElement>('[data-accordion-toggle]').forEach((toggle) => {
+    const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
+    toggle.addEventListener('click', () => {
+      if (!panel) return;
+      const open = panel.hidden;
+      panel.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+  });
+</script>

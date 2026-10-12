@@ -1,0 +1,81 @@
+---
+import Icon from '../ui/Icon.astro';
+import { SITE } from '../../config/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-graphite-dark font-sans text-white">
+  <div class="bg-graphite">
+    <div class="mx-auto flex w-full max-w-[1320px] flex-wrap items-start gap-x-[72px] gap-y-6 px-5 pt-8 pb-7 sm:px-6 sm:pt-11 sm:pb-10">
+      <div class="min-w-0 flex-[1_1_240px]">
+        <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">Contacte con {SITE.legalName}</h2>
+        <address class="text-[15px] leading-[1.65] tracking-[0.02em] text-[#e7e8ea] uppercase not-italic">
+          {SITE.address.display[0]}<br />{SITE.address.display[1]}
+        </address>
+      </div>
+
+      <div class="min-w-0 flex-[1_1_300px]">
+        <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">Servicio de asistencia técnica personal</h2>
+        <p class="text-[15px] leading-[1.65] tracking-[0.02em] text-[#e7e8ea]">
+          <a href={SITE.phone.href} class="text-white no-underline">{SITE.phone.display}</a><br />
+          <strong class="font-bold uppercase">Llame gratis:</strong>
+          <a href={SITE.tollFree.href} class="text-white no-underline">{SITE.tollFree.display}</a>
+        </p>
+      </div>
+
+      <div class="flex flex-col items-start gap-2 sm:ml-auto sm:items-center">
+        <h2 class="text-[17px] font-semibold">Síguenos</h2>
+        <ul class="flex gap-2" style="--icon-cutout: #4B4C50">
+          {
+            SITE.social.map((network) => (
+              <li>
+                <a href={network.href} aria-label={network.label} class="social grid size-12 place-items-center rounded-xl text-white" rel="noopener" target="_blank">
+                  <Icon name={network.icon} size={network.icon === 'youtube' ? 28 : 26} />
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <nav aria-label="Legal" class="border-t border-white/10">
+    <div class="mx-auto flex w-full max-w-[1320px] flex-wrap items-center justify-between gap-x-8 gap-y-3 px-5 pt-5 pb-6 sm:px-6">
+      <ul class="grid grid-cols-2 gap-x-4 sm:flex sm:flex-wrap sm:items-center">
+        {
+          SITE.legal.map((item, index) => (
+            <li class="flex items-center">
+              {index > 0 && (
+                <span aria-hidden="true" class="hidden pr-3.5 text-[#8d9096] sm:inline">
+                  /
+                </span>
+              )}
+              <a href={item.href} class="inline-flex min-h-11 items-center pr-3.5 text-sm font-bold tracking-[0.04em] text-[#e7e8ea] uppercase no-underline">
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="text-[13px] text-[#c9cbcf]">© {year} {SITE.legalName} Todos los derechos reservados.</p>
+    </div>
+  </nav>
+</footer>
+
+<style>
+  .social {
+    transition:
+      background-color 0.15s ease,
+      transform 0.16s var(--ease-out);
+  }
+  .social:active {
+    transform: scale(0.94);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .social:hover {
+      background: rgb(255 255 255 / 0.08);
+    }
+  }
+</style>

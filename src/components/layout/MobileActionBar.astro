@@ -1,0 +1,39 @@
+---
+/**
+ * Thumb-zone action bar shown below 768 px. Pages that already have a
+ * primary action in view (Contacto, Agendar) render their own content or none.
+ */
+import Icon from '../ui/Icon.astro';
+import { SITE } from '../../config/site';
+---
+
+<nav aria-label="Acciones rápidas" class="action-bar fixed inset-x-0 bottom-0 z-[60] flex items-center gap-2.5 border-t border-line-warm px-4 pt-2.5 md:hidden">
+  <slot>
+    <a href={SITE.phone.href} aria-label="Llamar a Integra" class="call grid size-[52px] shrink-0 place-items-center rounded-full border-[1.5px] border-[#c9d3dc] bg-white text-ink">
+      <Icon name="phone" size={22} />
+    </a>
+    <a href="/agendar" class="btn-primary min-h-[52px] flex-1 px-5 text-[17px]">
+      Agenda una llamada <Icon name="arrow-right" size={20} />
+    </a>
+  </slot>
+</nav>
+
+<style>
+  .action-bar {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
+    background: rgb(250 247 246 / 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .call {
+    transition: transform 0.16s var(--ease-out);
+  }
+  .call:active {
+    transform: scale(0.94);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .call:active {
+      transform: none;
+    }
+  }
+</style>

@@ -1,0 +1,151 @@
+@import "tailwindcss";
+
+/* Brand tokens — Integra identity manual (verde lima + azul profundo) */
+@theme {
+  --color-lime: #a3c622;
+  --color-lime-hover: #93b41c;
+  --color-lime-deep: #95b71e;
+  --color-lime-soft: #f3f8e2;
+  --color-lime-light: #d6e98f;
+  --color-blue: #005b94;
+  --color-blue-ink: #004c7d;
+  --color-blue-dark: #003d66;
+  --color-navy: #00385c;
+  --color-ink: #1b2a41;
+  --color-body: #2b3440;
+  --color-muted: #4a5563;
+  --color-subtle: #6b7682;
+  --color-mist: #f4f7f9;
+  --color-cream: #faf7f6;
+  --color-line: #dce3ea;
+  --color-line-warm: #ece6e3;
+  --color-graphite: #4b4c50;
+  --color-graphite-dark: #3e3f43;
+  --color-puzzle: #141b2d;
+  --color-danger: #b42318;
+
+  --font-display: var(--font-quicksand), sans-serif;
+  --font-sans: var(--font-roboto), sans-serif;
+  --font-serif: var(--font-roboto-slab), Georgia, serif;
+
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    @apply bg-mist font-serif text-body;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  a,
+  button {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-blue-ink);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  /* Page background: soft chat-icon pattern from the client design */
+  .bg-pattern {
+    background: var(--color-mist) url("/pattern-chat.svg") repeat;
+    background-size: 280px;
+  }
+
+  /* Primary call to action (lime pill, navy text: 5.5:1 contrast) */
+  .btn-primary {
+    @apply inline-flex min-h-[50px] items-center justify-center gap-3 rounded-full bg-lime px-6 py-3 font-sans text-lg font-bold text-navy no-underline;
+    transition:
+      background-color 0.2s ease,
+      transform 0.16s var(--ease-out);
+  }
+  .btn-primary svg {
+    transition: transform 0.2s var(--ease-out);
+  }
+  .btn-primary:active {
+    transform: scale(0.97);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .btn-primary:hover {
+      background-color: var(--color-lime-hover);
+    }
+    .btn-primary:hover svg {
+      transform: translateX(3px);
+    }
+  }
+
+  /* Form controls */
+  .field {
+    @apply min-h-[52px] w-full appearance-none rounded-xl border-[1.5px] border-[#c2cdd8] bg-white px-4 py-3 font-sans text-base text-ink;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+  .field::placeholder {
+    color: var(--color-subtle);
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--color-blue);
+    box-shadow: 0 0 0 4px rgb(0 91 148 / 0.18);
+  }
+  .field[aria-invalid="true"] {
+    border-color: var(--color-danger);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .field:hover:not(:focus) {
+      border-color: #9fb0c1;
+    }
+  }
+
+  /* Scroll-driven entrance for content blocks (progressive enhancement) */
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .reveal {
+        animation: reveal-up linear both;
+        animation-timeline: view();
+        animation-range: entry 0% entry 35%;
+      }
+    }
+  }
+}
+
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-primary:active {
+    transform: none;
+  }
+  .btn-primary svg {
+    transition: none;
+  }
+}

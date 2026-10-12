@@ -1,0 +1,107 @@
+---
+import { Font } from 'astro:assets';
+import '../styles/global.css';
+import Header from '../components/layout/Header.astro';
+import Footer from '../components/layout/Footer.astro';
+import MobileActionBar from '../components/layout/MobileActionBar.astro';
+import { SEO, SITE, type PageId } from '../config/site';
+import { SERVICES } from '../content/services';
+
+interface Props {
+  page: PageId;
+  /** Show the default thumb-zone bar on mobile. Pages can pass their own via the `mobile-bar` slot. */
+  mobileBar?: boolean;
+  ogImage?: string;
+}
+
+const { page, mobileBar = true, ogImage = '/og-inicio.jpg' } = Astro.props;
+const { title, description } = SEO[page];
+const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
+const ogImageUrl = new URL(ogImage, Astro.site);
+const hasCustomBar = Astro.slots.has('mobile-bar');
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: SITE.legalName,
+  url: Astro.site?.toString(),
+  logo: new URL('/integra-logo.svg', Astro.site).toString(),
+  image: ogImageUrl.toString(),
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: SITE.address.street,
+    addressLocality: SITE.address.city,
+    addressRegion: SITE.address.region,
+    postalCode: SITE.address.postalCode,
+    addressCountry: SITE.address.country,
+  },
+  sameAs: SITE.social.map((network) => network.href),
+  makesOffer: SERVICES.map((service) => ({
+    '@type': 'Offer',
+    itemOffered: { '@type': 'Service', name: service.name },
+  })),
+};
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="es-US" href={canonical} />
+    <link rel="alternate" hreflang="x-default" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#FAF7F6" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <Font cssVariable="--font-quicksand" preload />
+    <Font cssVariable="--font-roboto" />
+    <Font cssVariable="--font-roboto-slab" preload />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <slot name="head" />
+  </head>
+  <body class="bg-pattern">
+    <a href="#contenido" class="skip-link">Saltar al contenido</a>
+    <div class:list={['flex min-h-dvh flex-col', (mobileBar || hasCustomBar) && 'pb-[calc(76px+env(safe-area-inset-bottom))] md:pb-0']}>
+      <Header active={page} />
+      <main id="contenido" class="flex-1">
+        <slot />
+      </main>
+      <Footer />
+    </div>
+    {hasCustomBar ? <slot name="mobile-bar" /> : mobileBar && <MobileActionBar />}
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: -60px;
+    z-index: 100;
+    padding: 12px 18px;
+    border-radius: 12px;
+    background: var(--color-blue);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-weight: 700;
+  }
+  .skip-link:focus {
+    top: 12px;
+  }
+</style>

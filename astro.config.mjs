@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig, envField, fontProviders } from 'astro/config';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
@@ -13,6 +13,17 @@ export default defineConfig({
   trailingSlash: 'never',
   adapter: vercel(),
   integrations: [sitemap()],
+  env: {
+    schema: {
+      // GoHighLevel inbound webhook that receives the contact form (never exposed to the browser)
+      GHL_CONTACT_WEBHOOK_URL: envField.string({ context: 'server', access: 'secret', optional: true, url: true }),
+      // Booking widget URL per service, copied from GoHighLevel → Calendars → Share → Embed
+      PUBLIC_GHL_BOOKING_VENTAS: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
+      PUBLIC_GHL_BOOKING_SUPPORT: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
+      PUBLIC_GHL_BOOKING_WEB: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
+      PUBLIC_GHL_BOOKING_MARKETING: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

@@ -1,3 +1,10 @@
+import {
+  PUBLIC_GHL_BOOKING_MARKETING,
+  PUBLIC_GHL_BOOKING_SUPPORT,
+  PUBLIC_GHL_BOOKING_VENTAS,
+  PUBLIC_GHL_BOOKING_WEB,
+} from 'astro:env/client';
+
 export type ServiceId = 'ventas' | 'support' | 'web' | 'marketing';
 
 export interface Service {
@@ -12,8 +19,8 @@ export interface Service {
   cta: string;
   /** Lead used in the booking summary */
   bookingLead: string;
-  /** GoHighLevel calendar ID (public, embedded in the booking page) */
-  calendarId: string | undefined;
+  /** GoHighLevel booking widget URL (public, embedded on /agendar) */
+  bookingUrl: string | undefined;
 }
 
 export const SERVICES: Service[] = [
@@ -26,7 +33,7 @@ export const SERVICES: Service[] = [
     bullets: ['SDRs / Inside Sales', 'Calificación de leads', 'Appointment setting', 'Seguimiento de pipeline'],
     cta: 'Construir mi equipo de ventas',
     bookingLead: 'Armamos tu equipo comercial para ampliar capacidad y mantener las oportunidades en movimiento.',
-    calendarId: import.meta.env.PUBLIC_GHL_CALENDAR_VENTAS,
+    bookingUrl: PUBLIC_GHL_BOOKING_VENTAS,
   },
   {
     id: 'support',
@@ -37,7 +44,7 @@ export const SERVICES: Service[] = [
     bullets: ['Soporte telefónico', 'Email y chat', 'Atención al cliente', 'Administración / back office'],
     cta: 'Construir mi equipo de soporte',
     bookingLead: 'Definimos la atención profesional en los canales que tus clientes utilizan.',
-    calendarId: import.meta.env.PUBLIC_GHL_CALENDAR_SUPPORT,
+    bookingUrl: PUBLIC_GHL_BOOKING_SUPPORT,
   },
   {
     id: 'web',
@@ -48,7 +55,7 @@ export const SERVICES: Service[] = [
     bullets: ['Diseño de websites', 'Landing pages', 'Rediseño de sitios', 'Layouts para conversión'],
     cta: 'Crear mi website',
     bookingLead: 'Planificamos un website profesional que convierta visitas en oportunidades.',
-    calendarId: import.meta.env.PUBLIC_GHL_CALENDAR_WEB,
+    bookingUrl: PUBLIC_GHL_BOOKING_WEB,
   },
   {
     id: 'marketing',
@@ -59,7 +66,7 @@ export const SERVICES: Service[] = [
     bullets: ['Diseño gráfico', 'Redes sociales', 'Contenido', 'Ejecución de marketing digital'],
     cta: 'Explora soporte de marketing',
     bookingLead: 'Alineamos el soporte creativo y digital con tus objetivos.',
-    calendarId: import.meta.env.PUBLIC_GHL_CALENDAR_MARKETING,
+    bookingUrl: PUBLIC_GHL_BOOKING_MARKETING,
   },
 ];
 

@@ -1,0 +1,272 @@
+---
+import Icon from '../ui/Icon.astro';
+import { SERVICES } from '../../content/services';
+
+const industries = ['Retail y e-commerce', 'Salud', 'Tecnología', 'Servicios financieros', 'Otra'];
+const label = 'text-sm font-semibold text-ink';
+const required = '<span aria-hidden="true" class="text-danger">*</span>';
+const errorText = 'text-[13px] text-danger';
+---
+
+<div class="font-sans" data-contact>
+  <form class="contact-form grid grid-cols-1 content-start gap-[22px] sm:grid-cols-2" novalidate aria-labelledby="ct-title" data-contact-form>
+    <div role="alert" class="col-span-full flex items-start gap-3 rounded-xl border border-[#fecdca] bg-[#fef3f2] px-4 py-3.5 text-[15px] leading-snug text-[#912018]" data-summary hidden>
+      <Icon name="alert" size={20} class="mt-px shrink-0" />
+      <span data-summary-text></span>
+    </div>
+
+    <fieldset class="contents" data-fields>
+      <legend class="sr-only">Datos de contacto</legend>
+
+      <div class="grid content-start gap-2">
+        <label for="f-name" class={label}>Nombre completo <Fragment set:html={required} /></label>
+        <input id="f-name" name="name" type="text" autocomplete="name" required minlength="3" class="field" aria-describedby="f-name-error" />
+        <p id="f-name-error" class={errorText} hidden></p>
+      </div>
+
+      <div class="grid content-start gap-2">
+        <label for="f-email" class={label}>Correo corporativo <Fragment set:html={required} /></label>
+        <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="nombre@empresa.com" class="field" aria-describedby="f-email-error" />
+        <p id="f-email-error" class={errorText} hidden></p>
+      </div>
+
+      <div class="col-span-full grid content-start gap-2">
+        <label for="f-company" class={label}>Empresa <Fragment set:html={required} /></label>
+        <input id="f-company" name="company" type="text" autocomplete="organization" required minlength="2" class="field" aria-describedby="f-company-error" />
+        <p id="f-company-error" class={errorText} hidden></p>
+      </div>
+
+      <div class="grid content-start gap-2">
+        <label for="f-service" class={label}>Servicio de interés <Fragment set:html={required} /></label>
+        <div class="relative">
+          <select id="f-service" name="service" required class="field cursor-pointer pr-11" aria-describedby="f-service-error">
+            <option value="">Seleccionar</option>
+            {SERVICES.map((service) => <option value={service.id}>{service.name}</option>)}
+          </select>
+          <Icon name="chevron-down" size={20} class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-blue" />
+        </div>
+        <p id="f-service-error" class={errorText} hidden></p>
+      </div>
+
+      <div class="grid content-start gap-2">
+        <label for="f-industry" class={label}>Industria</label>
+        <div class="relative">
+          <select id="f-industry" name="industry" class="field cursor-pointer pr-11">
+            <option value="">Seleccionar</option>
+            {industries.map((industry) => <option>{industry}</option>)}
+          </select>
+          <Icon name="chevron-down" size={20} class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-blue" />
+        </div>
+      </div>
+
+      <div class="col-span-full grid content-start gap-2">
+        <label for="f-msg" class={label}>¿Qué necesitas?</label>
+        <textarea id="f-msg" name="message" rows="5" maxlength="2000" placeholder="Cuéntanos sobre tu equipo o proyecto" class="field min-h-[140px] resize-y"></textarea>
+      </div>
+
+      <!-- Honeypot -->
+      <div class="sr-only" aria-hidden="true">
+        <label for="f-website">No completar</label>
+        <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <div class="col-span-full grid gap-1.5">
+        <label for="f-consent" class="flex min-h-11 cursor-pointer items-start gap-3 pt-1 text-sm leading-normal text-[#3b4552]">
+          <input id="f-consent" name="consent" type="checkbox" required class="mt-px size-5 shrink-0 accent-blue" aria-describedby="f-consent-error" />
+          <span>Acepto la <a href="/legal/privacy-policy" class="font-semibold text-blue-ink">política de privacidad</a> y el contacto sobre mi solicitud.</span>
+        </label>
+        <p id="f-consent-error" class:list={[errorText, '-mt-2.5 pl-8']} hidden></p>
+      </div>
+    </fieldset>
+
+    <button type="submit" class="btn-primary submit col-span-full min-h-14 w-full" data-submit>
+      <span class="spinner hidden" aria-hidden="true"></span>
+      <span data-submit-label>Solicitar una propuesta</span>
+      <Icon name="arrow-right" class="submit-arrow" />
+    </button>
+
+    <p class="col-span-full mt-2 text-base text-[#3b4552]">
+      ¿Prefieres conversar? <a href="/agendar" class="inline-flex min-h-11 items-center font-bold text-blue-ink">Agenda una llamada →</a>
+    </p>
+  </form>
+
+  <div role="status" tabindex="-1" class="success flex flex-col items-start gap-[18px] rounded-3xl bg-white px-7 py-10 shadow-[0_24px_60px_-36px_rgb(20_45_85/0.45)] outline-none sm:px-10" data-success hidden>
+    <span aria-hidden="true" class="grid size-16 place-items-center rounded-full bg-lime text-navy">
+      <Icon name="check" size={32} />
+    </span>
+    <h2 class="font-display text-[clamp(26px,3vw,34px)] leading-tight font-bold tracking-[-0.015em] text-blue" data-success-title>¡Gracias! Recibimos tu solicitud.</h2>
+    <p class="font-serif text-lg leading-relaxed text-body">
+      Te escribiremos a <strong class="font-semibold" data-success-email></strong> para coordinar el siguiente paso.
+    </p>
+    <dl class="grid w-full grid-cols-[auto_1fr] gap-x-5 gap-y-2.5 rounded-[14px] bg-mist px-5 py-4 text-[15px]" data-success-summary></dl>
+    <div class="mt-2 flex flex-wrap items-center gap-x-5 gap-y-3">
+      <a href="/agendar" class="btn-primary min-h-14 px-7" data-success-book>Agenda tu llamada ahora <Icon name="arrow-right" /></a>
+      <a href="/" class="inline-flex min-h-12 items-center font-bold text-blue-ink">Volver al inicio</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .submit[aria-busy='true'] {
+    background: #d2e38e;
+    cursor: progress;
+  }
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2.6px solid currentColor;
+    border-right-color: transparent;
+    animation: spin 0.7s linear infinite;
+  }
+  .submit[aria-busy='true'] .spinner {
+    display: inline-block;
+  }
+  .submit[aria-busy='true'] :global(.submit-arrow) {
+    display: none;
+  }
+  .contact-form fieldset:disabled .field {
+    background: #eef2f5;
+    border-color: var(--color-line);
+    color: var(--color-muted);
+  }
+  .success:not([hidden]) {
+    animation: success-in 0.3s var(--ease-out);
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes success-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .spinner {
+      animation-duration: 2s;
+    }
+    .success:not([hidden]) {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  import { actions, isInputError } from 'astro:actions';
+
+  type FieldName = 'name' | 'email' | 'company' | 'service' | 'consent';
+  const MESSAGES: Record<FieldName, string> = {
+    name: 'Escribe tu nombre y apellido.',
+    email: 'Usa un correo válido, por ejemplo nombre@empresa.com.',
+    company: 'Escribe el nombre de tu empresa.',
+    service: 'Elige un servicio.',
+    consent: 'Acepta la política para continuar.',
+  };
+  const SERVICE_SLUGS: Record<string, string> = { ventas: 'ventas', support: 'customer-support', web: 'diseno-web', marketing: 'marketing' };
+
+  const root = document.querySelector<HTMLElement>('[data-contact]');
+  const form = root?.querySelector<HTMLFormElement>('[data-contact-form]');
+  if (root && form) {
+    const fields = form.querySelector<HTMLFieldSetElement>('[data-fields]')!;
+    const summary = form.querySelector<HTMLElement>('[data-summary]')!;
+    const summaryText = form.querySelector<HTMLElement>('[data-summary-text]')!;
+    const submit = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+    const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]')!;
+    const success = root.querySelector<HTMLElement>('[data-success]')!;
+    let attempted = false;
+
+    const control = (name: FieldName) => form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement;
+    const setError = (name: FieldName, message?: string) => {
+      const input = control(name);
+      const error = document.getElementById(`${input.id}-error`);
+      input.setAttribute('aria-invalid', message ? 'true' : 'false');
+      if (error) {
+        error.textContent = message ?? '';
+        error.hidden = !message;
+      }
+    };
+    const validate = (name: FieldName) => {
+      const input = control(name);
+      const valid = input.checkValidity();
+      setError(name, valid ? undefined : MESSAGES[name]);
+      return valid;
+    };
+    const showSummary = (text?: string) => {
+      summaryText.textContent = text ?? '';
+      summary.hidden = !text;
+    };
+    const setSending = (sending: boolean) => {
+      fields.disabled = sending;
+      submit.disabled = sending;
+      submit.setAttribute('aria-busy', String(sending));
+      form.setAttribute('aria-busy', String(sending));
+      submitLabel.textContent = sending ? 'Enviando…' : 'Solicitar una propuesta';
+    };
+
+    // Validate on leaving a field, only after the first submit attempt (never while typing)
+    (Object.keys(MESSAGES) as FieldName[]).forEach((name) => {
+      const input = control(name);
+      const event = input instanceof HTMLInputElement && input.type === 'checkbox' ? 'change' : 'blur';
+      input.addEventListener(event, () => attempted && validate(name));
+    });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      attempted = true;
+      const invalid = (Object.keys(MESSAGES) as FieldName[]).filter((name) => !validate(name));
+      if (invalid.length) {
+        showSummary(`Revisa ${invalid.length} ${invalid.length === 1 ? 'campo' : 'campos'} para enviar tu solicitud.`);
+        control(invalid[0]).focus();
+        return;
+      }
+      showSummary();
+
+      const data = new FormData(form);
+      setSending(true);
+      const { error } = await actions.contact(data);
+      setSending(false);
+
+      if (error) {
+        if (isInputError(error)) {
+          const names = Object.keys(error.fields) as FieldName[];
+          names.forEach((name) => name in MESSAGES && setError(name, error.fields[name]?.[0]));
+          showSummary(`Revisa ${names.length} ${names.length === 1 ? 'campo' : 'campos'} para enviar tu solicitud.`);
+        } else {
+          showSummary(error.message);
+        }
+        return;
+      }
+
+      // Success: echo what was sent and offer the next step
+      const name = String(data.get('name') ?? '').trim().split(/\s+/)[0];
+      const service = control('service') as HTMLSelectElement;
+      const industry = String(data.get('industry') ?? '');
+      success.querySelector('[data-success-title]')!.textContent = `¡Gracias, ${name}! Recibimos tu solicitud.`;
+      success.querySelector('[data-success-email]')!.textContent = String(data.get('email'));
+      const rows: [string, string][] = [
+        ['Servicio', service.selectedOptions[0]?.text ?? ''],
+        ['Empresa', String(data.get('company'))],
+      ];
+      if (industry) rows.push(['Industria', industry]);
+      const list = success.querySelector<HTMLElement>('[data-success-summary]')!;
+      list.replaceChildren(
+        ...rows.flatMap(([term, value]) => {
+          const dt = document.createElement('dt');
+          dt.className = 'text-muted';
+          dt.textContent = term;
+          const dd = document.createElement('dd');
+          dd.className = 'font-bold';
+          dd.textContent = value;
+          return [dt, dd];
+        }),
+      );
+      success.querySelector<HTMLAnchorElement>('[data-success-book]')!.href = `/agendar?servicio=${SERVICE_SLUGS[service.value] ?? ''}`;
+      form.hidden = true;
+      success.hidden = false;
+      success.focus();
+    });
+  }
+</script>

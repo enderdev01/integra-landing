@@ -12,7 +12,8 @@ export default defineConfig({
   site,
   trailingSlash: 'never',
   adapter: vercel(),
-  integrations: [sitemap()],
+  // Legal placeholders are noindex until the client provides the final texts
+  integrations: [sitemap({ filter: (page) => !page.includes('/legal/') })],
   env: {
     schema: {
       // GoHighLevel inbound webhook that receives the contact form (never exposed to the browser)

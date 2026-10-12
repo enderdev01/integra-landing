@@ -1,0 +1,16 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+---
+
+<BaseLayout meta={{ title: 'Página no encontrada | Integra', description: 'La página que buscas no existe o cambió de dirección.' }} noindex>
+  <section class="mx-auto flex w-full max-w-[760px] flex-col items-start px-4 pt-14 pb-24 md:px-6 md:pt-24">
+    <p class="font-sans text-sm font-bold tracking-[0.12em] text-muted uppercase">Error 404</p>
+    <h1 class="mt-3 font-display text-[clamp(34px,4.4vw,56px)] leading-tight font-bold text-blue">No encontramos esta página</h1>
+    <p class="mt-5 max-w-[46ch] text-lg leading-relaxed text-body">Puede que el enlace haya cambiado. Te dejamos los caminos más usados:</p>
+    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+      <a href="/" class="btn-primary">Volver al inicio <Icon name="arrow-right" /></a>
+      <a href="/agendar" class="inline-flex min-h-12 items-center font-sans font-bold text-blue-ink">Agenda una llamada →</a>
+    </div>
+  </section>
+</BaseLayout>

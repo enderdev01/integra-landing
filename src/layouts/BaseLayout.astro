@@ -8,14 +8,18 @@ import { SEO, SITE, type PageId } from '../config/site';
 import { SERVICES } from '../content/services';
 
 interface Props {
-  page: PageId;
+  /** Current section; highlights the menu item. Omit on legal and error pages. */
+  page?: PageId;
+  /** Overrides the page SEO entry (e.g. legal and error pages) */
+  meta?: { title: string; description: string };
+  noindex?: boolean;
   /** Show the default thumb-zone bar on mobile. Pages can pass their own via the `mobile-bar` slot. */
   mobileBar?: boolean;
   ogImage?: string;
 }
 
-const { page, mobileBar = true, ogImage = '/og-inicio.jpg' } = Astro.props;
-const { title, description } = SEO[page];
+const { page, meta, noindex = false, mobileBar = true, ogImage = '/og-integra.jpg' } = Astro.props;
+const { title, description } = meta ?? SEO[page ?? 'inicio'];
 const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
 const hasCustomBar = Astro.slots.has('mobile-bar');
@@ -50,6 +54,7 @@ const jsonLd = {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="alternate" hreflang="es-US" href={canonical} />
     <link rel="alternate" hreflang="x-default" href={canonical} />
@@ -77,7 +82,7 @@ const jsonLd = {
   </head>
   <body class="bg-pattern">
     <a href="#contenido" class="skip-link">Saltar al contenido</a>
-    <div class:list={['flex min-h-dvh flex-col', (mobileBar || hasCustomBar) && 'pb-[calc(76px+env(safe-area-inset-bottom))] md:pb-0']}>
+    <div class:list={['flex min-h-dvh flex-col overflow-x-clip', (mobileBar || hasCustomBar) && 'pb-[calc(76px+env(safe-area-inset-bottom))] md:pb-0']}>
       <Header active={page} />
       <main id="contenido" class="flex-1">
         <slot />

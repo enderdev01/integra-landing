@@ -71,7 +71,12 @@ const year = new Date().getFullYear();
       transform 0.16s var(--ease-out);
   }
   .social:active {
-    transform: scale(0.94);
+    transform: scale(0.95);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .social:active {
+      transform: none;
+    }
   }
   @media (hover: hover) and (pointer: fine) {
     .social:hover {

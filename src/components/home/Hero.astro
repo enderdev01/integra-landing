@@ -1,24 +1,42 @@
 ---
 import { Image } from 'astro:assets';
-import heroOffice from '../../assets/img/hero-office.webp';
+import Icon from '../ui/Icon.astro';
+import { HERO_INTERVAL_MS, HERO_SLIDES } from '../../content/hero';
 
 const topChevrons = Array.from({ length: 6 }, (_, i) => `M${-26 + i * 60} 0h34l50 50-50 50h-34l50-50z`).join('');
 const sideChevrons = Array.from({ length: 8 }, (_, i) => `M0 ${i * 56}l50 40 50-40v28l-50 40-50-40z`).join('');
+const total = HERO_SLIDES.length;
 ---
 
-<section aria-labelledby="hero-title" class="mx-auto w-full max-w-[1320px] px-4 pt-4 md:px-6 md:pt-6">
-  <div class="hero-card relative flex flex-col overflow-hidden rounded-[28px] bg-blue shadow-[0_24px_60px_-32px_rgb(20_45_85/0.45)] md:block md:h-[clamp(440px,40vw,560px)] md:rounded-[40px]">
-    <Image
-      src={heroOffice}
-      alt="Equipo de Integra trabajando con headsets en la oficina"
-      widths={[640, 960, 1280, 1600, 2200]}
-      sizes="(min-width: 768px) 72vw, 100vw"
-      loading="eager"
-      fetchpriority="high"
-      class="h-[200px] w-full object-cover object-[60%_center] md:absolute md:inset-y-0 md:left-[28%] md:h-full md:w-[72%]"
-    />
+<section
+  aria-labelledby="hero-title"
+  aria-roledescription="carrusel"
+  class="mx-auto w-full max-w-[1320px] px-4 pt-4 md:px-6 md:pt-6"
+  style={`--hero-interval: ${HERO_INTERVAL_MS}ms`}
+  data-carousel
+>
+  <div class="hero-card relative flex flex-col overflow-hidden rounded-[28px] bg-blue shadow-[0_24px_60px_-32px_rgb(20_45_85/0.45)] md:block md:h-[clamp(440px,40vw,560px)] md:rounded-[40px]" data-carousel-track>
+    <!-- Photos: decorative, crossfaded underneath the brand shapes -->
+    <div aria-hidden="true" class="stack h-[200px] md:absolute md:inset-y-0 md:left-[28%] md:h-full md:w-[72%]">
+      {
+        HERO_SLIDES.map((slide, index) => (
+          <Image
+            src={slide.image}
+            alt=""
+            widths={[640, 960, 1280, 1600, 2200]}
+            sizes="(min-width: 768px) 72vw, 100vw"
+            loading={index === 0 ? 'eager' : 'lazy'}
+            fetchpriority={index === 0 ? 'high' : 'auto'}
+            class="slide-media h-full w-full object-cover"
+            style={`object-position: ${slide.focus}`}
+            data-active={index === 0 ? '' : undefined}
+          />
+        ))
+      }
+    </div>
 
-    <div aria-hidden="true" class="absolute inset-y-0 left-0 hidden w-[34%] overflow-hidden rounded-tr-[170px] bg-lime md:block">
+    <!-- Brand shapes (static across slides) -->
+    <div aria-hidden="true" class="absolute inset-y-0 left-0 z-[1] hidden w-[34%] overflow-hidden rounded-tr-[170px] bg-lime md:block">
       <svg viewBox="0 0 400 100" preserveAspectRatio="xMinYMid slice" class="absolute top-0 left-0 block h-[20%] w-full">
         <defs>
           <linearGradient id="chev-top" x1="0" y1="0" x2="340" y2="0" gradientUnits="userSpaceOnUse">
@@ -41,25 +59,104 @@ const sideChevrons = Array.from({ length: 8 }, (_, i) => `M0 ${i * 56}l50 40 50-
       </svg>
     </div>
 
-    <div class="relative flex flex-col justify-end bg-blue px-6 pt-7 pb-7 md:absolute md:bottom-0 md:left-0 md:h-[80%] md:w-[26%] md:rounded-tr-[92px] md:pt-10 md:pr-7 md:pb-12 md:pl-11">
-      <h1 id="hero-title" class="max-w-[300px] font-display leading-none text-white">
-        <span class="block text-[clamp(30px,2.6vw,38px)] font-bold tracking-[-0.01em]">Equipos</span>
-        <span class="mt-1 block text-[clamp(16px,1.35vw,19px)] font-bold">remotos que hacen</span>
-        <span class="mt-0.5 block text-[clamp(56px,4.9vw,72px)] leading-[0.92] font-bold tracking-[-0.02em]">crecer</span>
-        <span class="mt-1.5 block text-right text-[clamp(16px,1.35vw,19px)] font-bold">tu operación</span>
-      </h1>
-      <a href="/agendar" class="hero-cta mt-8 inline-flex min-h-[52px] items-center justify-center self-stretch rounded-full bg-cream px-7 py-3 font-sans text-lg leading-tight font-bold text-[#5b7410] md:self-start">
-        ¡Agenda una llamada!
-      </a>
+    <!-- Blue panel with one copy block per slide -->
+    <div class="relative z-[2] bg-blue px-6 pt-7 pb-7 md:absolute md:bottom-0 md:left-0 md:flex md:h-[80%] md:w-[26%] md:flex-col md:justify-end md:rounded-tr-[92px] md:pt-10 md:pr-7 md:pb-12 md:pl-11">
+      <div class="stack" aria-live="off" data-carousel-copies>
+        {
+          HERO_SLIDES.map((slide, index) => {
+            const Heading = index === 0 ? 'h1' : 'h2';
+            return (
+              <div
+                class="slide-copy flex flex-col"
+                role="group"
+                aria-roledescription="diapositiva"
+                aria-label={`${index + 1} de ${total}`}
+                data-slide
+                data-active={index === 0 ? '' : undefined}
+                inert={index !== 0}
+              >
+                <Heading id={index === 0 ? 'hero-title' : undefined} class="max-w-[300px] font-display leading-none text-white">
+                  <span class="block text-[clamp(30px,2.6vw,38px)] font-bold tracking-[-0.01em]">{slide.lockup.kicker}</span>
+                  <span class="mt-1 block text-[clamp(16px,1.35vw,19px)] font-bold">{slide.lockup.connector}</span>
+                  <span class="mt-0.5 block text-[clamp(56px,4.9vw,72px)] leading-[0.92] font-bold tracking-[-0.02em]">{slide.lockup.word}</span>
+                  <span class="mt-1.5 block text-right text-[clamp(16px,1.35vw,19px)] font-bold">{slide.lockup.closing}</span>
+                </Heading>
+                <a href={slide.cta.href} class="hero-cta mt-8 inline-flex min-h-[52px] items-center justify-center self-stretch rounded-full bg-cream px-7 py-3 text-center font-sans text-lg leading-tight font-bold text-[#5b7410] md:self-start">
+                  {slide.cta.label}
+                </a>
+              </div>
+            );
+          })
+        }
+      </div>
     </div>
   </div>
 
-  <p class="mx-auto mt-5 max-w-[860px] text-base leading-relaxed font-medium text-body md:mt-6 md:text-center md:text-[clamp(17px,1.4vw,20px)]">
+  <div class="mt-2 flex items-center justify-center" data-carousel-controls>
+    <div role="group" aria-label="Elegir diapositiva" class="flex items-center">
+      {
+        HERO_SLIDES.map((_, index) => (
+          <button type="button" class="dot grid h-11 w-9 place-items-center" aria-label={`Ir a la diapositiva ${index + 1}`} aria-current={index === 0 ? 'true' : undefined} data-dot={index}>
+            <span class="pill" />
+          </button>
+        ))
+      }
+    </div>
+    <button type="button" class="toggle ml-1 grid size-11 place-items-center rounded-full text-ink" aria-label="Pausar carrusel" data-carousel-toggle>
+      <Icon name="pause" size={16} class="icon-pause" />
+      <Icon name="play" size={16} class="icon-play hidden" />
+    </button>
+  </div>
+
+  <p class="mx-auto mt-3 max-w-[860px] text-base leading-relaxed font-medium text-body md:text-center md:text-[clamp(17px,1.4vw,20px)]">
     Construimos equipos de ventas, soporte y back office para que tu negocio crezca con estructura, calidad y flexibilidad.
   </p>
 </section>
 
 <style>
+  /* Stack every slide in the same grid cell: the tallest one sets the height */
+  .stack {
+    display: grid;
+  }
+  .stack > :global(*) {
+    grid-area: 1 / 1;
+  }
+
+  .hero-card {
+    touch-action: pan-y;
+  }
+
+  /* Photos crossfade; the incoming one settles from a slight zoom */
+  :global(.slide-media) {
+    opacity: 0;
+    transform: scale(1.03);
+    transition:
+      opacity 0.7s ease,
+      transform 1.2s var(--ease-out);
+  }
+  :global(.slide-media[data-active]) {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* Copy: exit fast, enter after a beat (asymmetric timing) */
+  .slide-copy {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(2px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s var(--ease-out),
+      filter 0.2s ease;
+  }
+  .slide-copy[data-active] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+    transition-duration: 0.45s;
+    transition-delay: 0.15s;
+  }
+
   .hero-cta {
     transition:
       transform 0.16s var(--ease-out),
@@ -68,14 +165,175 @@ const sideChevrons = Array.from({ length: 8 }, (_, i) => `M0 ${i * 56}l50 40 50-
   .hero-cta:active {
     transform: scale(0.97);
   }
+
+  /* Dots: navy dot, active slide is a lime line that fills as the timer runs */
+  .pill {
+    position: relative;
+    display: block;
+    width: 10px;
+    height: 10px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--color-ink);
+    transition:
+      width 0.3s var(--ease-out),
+      background-color 0.3s ease;
+  }
+  .dot[aria-current='true'] .pill {
+    width: 28px;
+    background: var(--color-lime-light);
+  }
+  .pill::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--color-lime);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  .dot[aria-current='true'] .pill::after {
+    animation: progress var(--hero-interval) linear forwards;
+  }
+  [data-carousel][data-paused] .dot[aria-current='true'] .pill::after {
+    animation-play-state: paused;
+  }
+  [data-carousel][data-static] .dot[aria-current='true'] .pill::after {
+    animation: none;
+    transform: none;
+  }
+  @keyframes progress {
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  .dot,
+  .toggle {
+    transition: transform 0.16s var(--ease-out);
+  }
+  .dot:active,
+  .toggle:active {
+    transform: scale(0.95);
+  }
   @media (hover: hover) and (pointer: fine) {
     .hero-cta:hover {
       box-shadow: 0 8px 24px rgb(15 35 70 / 0.25);
     }
+    .dot:hover .pill {
+      background-color: var(--color-blue);
+    }
+    .dot[aria-current='true']:hover .pill {
+      background-color: var(--color-lime-light);
+    }
+    .toggle:hover {
+      background: #eef2f5;
+    }
   }
+
   @media (prefers-reduced-motion: reduce) {
-    .hero-cta:active {
+    :global(.slide-media),
+    .slide-copy {
+      transform: none;
+      filter: none;
+      transition: opacity 0.2s ease;
+    }
+    .slide-copy[data-active] {
+      transition-delay: 0s;
+    }
+    .hero-cta:active,
+    .dot:active,
+    .toggle:active {
       transform: none;
     }
   }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((root) => {
+    const track = root.querySelector<HTMLElement>('[data-carousel-track]')!;
+    const media = [...root.querySelectorAll<HTMLElement>('.slide-media')];
+    const copies = [...root.querySelectorAll<HTMLElement>('[data-slide]')];
+    const dots = [...root.querySelectorAll<HTMLButtonElement>('[data-dot]')];
+    const toggle = root.querySelector<HTMLButtonElement>('[data-carousel-toggle]')!;
+    const total = copies.length;
+    let current = 0;
+    let userPaused = false;
+    const holds = new Set<string>();
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+
+    const syncPause = () => {
+      const paused = userPaused || holds.size > 0;
+      root.toggleAttribute('data-paused', paused);
+      toggle.setAttribute('aria-label', userPaused ? 'Reproducir carrusel' : 'Pausar carrusel');
+      toggle.querySelector('.icon-pause')?.classList.toggle('hidden', userPaused);
+      toggle.querySelector('.icon-play')?.classList.toggle('hidden', !userPaused);
+    };
+
+    const go = (index: number) => {
+      current = (index + total) % total;
+      media.forEach((el, i) => el.toggleAttribute('data-active', i === current));
+      copies.forEach((el, i) => {
+        el.toggleAttribute('data-active', i === current);
+        el.inert = i !== current;
+      });
+      dots.forEach((dot, i) => {
+        // Re-attaching aria-current restarts the progress animation
+        dot.removeAttribute('aria-current');
+        if (i === current) {
+          void dot.offsetWidth;
+          dot.setAttribute('aria-current', 'true');
+        }
+      });
+    };
+
+    // The lime progress line is the single clock: when it fills, advance.
+    root.addEventListener('animationend', (event) => {
+      if ((event.target as HTMLElement).closest('[data-dot]') && event.animationName.includes('progress')) go(current + 1);
+    });
+
+    dots.forEach((dot, i) => dot.addEventListener('click', () => go(i)));
+    toggle.addEventListener('click', () => {
+      userPaused = !userPaused;
+      root.removeAttribute('data-static');
+      syncPause();
+    });
+
+    // Hold while the visitor reads (hover), navigates by keyboard, or the tab is hidden
+    root.addEventListener('pointerenter', () => finePointer.matches && (holds.add('hover'), syncPause()));
+    root.addEventListener('pointerleave', () => (holds.delete('hover'), syncPause()));
+    root.addEventListener('focusin', () => (holds.add('focus'), syncPause()));
+    root.addEventListener('focusout', (event) => {
+      if (!root.contains(event.relatedTarget as Node | null)) (holds.delete('focus'), syncPause());
+    });
+    document.addEventListener('visibilitychange', () => {
+      document.hidden ? holds.add('hidden') : holds.delete('hidden');
+      syncPause();
+    });
+
+    // Swipe on touch: distance or a quick flick
+    let startX = 0;
+    let startT = 0;
+    track.addEventListener('pointerdown', (event) => {
+      if (event.pointerType === 'mouse') return;
+      startX = event.clientX;
+      startT = performance.now();
+    });
+    track.addEventListener('pointerup', (event) => {
+      if (event.pointerType === 'mouse' || !startT) return;
+      const dx = event.clientX - startX;
+      const velocity = Math.abs(dx) / (performance.now() - startT);
+      startT = 0;
+      if (Math.abs(dx) > 48 || (Math.abs(dx) > 12 && velocity > 0.11)) go(current + (dx < 0 ? 1 : -1));
+    });
+
+    // Reduced motion: no autoplay until the visitor presses play
+    if (reducedMotion.matches) {
+      userPaused = true;
+      root.setAttribute('data-static', '');
+    }
+    syncPause();
+  });
+</script>

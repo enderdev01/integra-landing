@@ -178,22 +178,30 @@ const linkState = (id: PageId) =>
     transition: color 0.15s ease;
   }
 
-  /* Services dropdown: interruptible transitions, origin at the trigger */
+  /* Services dropdown: interruptible transitions, origin at the trigger.
+     Visibility lives on the wrapper so the closed panel's area never catches
+     the pointer (it sits over the hero and used to open the menu on pass-by). */
+  .dd-wrap {
+    visibility: hidden;
+    pointer-events: none;
+    transition: visibility 0s linear 0.18s;
+  }
+  [data-dropdown][data-open] .dd-wrap {
+    visibility: visible;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
   .dd-panel {
     transform-origin: top left;
     opacity: 0;
     transform: translateY(-4px) scale(0.98);
-    visibility: hidden;
     transition:
       opacity 0.18s var(--ease-out),
-      transform 0.18s var(--ease-out),
-      visibility 0s linear 0.18s;
+      transform 0.18s var(--ease-out);
   }
   [data-dropdown][data-open] .dd-panel {
     opacity: 1;
     transform: none;
-    visibility: visible;
-    transition-delay: 0s;
   }
   :global(.dd-chevron) {
     transition: transform 0.2s var(--ease-out);
@@ -209,7 +217,7 @@ const linkState = (id: PageId) =>
       transform 0.16s var(--ease-out);
   }
   .burger:active {
-    transform: scale(0.94);
+    transform: scale(0.95);
   }
   @media (hover: hover) and (pointer: fine) {
     .nav-link:hover {
@@ -223,11 +231,23 @@ const linkState = (id: PageId) =>
     }
   }
 
-  .mobile-panel:not([hidden]) {
-    animation: panel-in 0.2s var(--ease-out);
+  /* Mobile menu and services accordion: interruptible transitions.
+     Entry uses @starting-style; the menu's exit runs before `hidden` is set
+     (Tailwind's preflight forces display:none !important on [hidden]). */
+  .mobile-panel,
+  .accordion-panel {
+    transition:
+      opacity 0.2s var(--ease-out),
+      transform 0.2s var(--ease-out);
   }
-  @keyframes panel-in {
-    from {
+  .mobile-panel[data-closing] {
+    opacity: 0;
+    transform: translateY(-8px);
+    transition-duration: 0.15s;
+  }
+  @starting-style {
+    .mobile-panel:not([hidden]),
+    .accordion-panel:not([hidden]) {
       opacity: 0;
       transform: translateY(-8px);
     }
@@ -242,8 +262,10 @@ const linkState = (id: PageId) =>
       transition: none;
       transform: none;
     }
-    .mobile-panel:not([hidden]) {
-      animation: none;
+    .mobile-panel,
+    .accordion-panel,
+    .mobile-panel[data-closing] {
+      transform: none;
     }
   }
 </style>
@@ -264,9 +286,19 @@ const linkState = (id: PageId) =>
       toggle?.setAttribute('aria-expanded', String(open));
     };
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
-    dropdown.addEventListener('pointerenter', () => finePointer.matches && setOpen(true));
-    dropdown.addEventListener('pointerleave', () => finePointer.matches && setOpen(false));
-    toggle?.addEventListener('click', () => setOpen(!dropdown.hasAttribute('data-open')));
+    // Hover intent: a short delay to open (passing over the item does nothing)
+    // and a grace period to close (diagonal moves into the panel don't drop it)
+    let timer: number | undefined;
+    const schedule = (open: boolean, delay: number) => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => setOpen(open), delay);
+    };
+    dropdown.addEventListener('pointerenter', () => finePointer.matches && schedule(true, 80));
+    dropdown.addEventListener('pointerleave', () => finePointer.matches && schedule(false, 150));
+    toggle?.addEventListener('click', () => {
+      window.clearTimeout(timer);
+      setOpen(!dropdown.hasAttribute('data-open'));
+    });
     dropdown.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && dropdown.hasAttribute('data-open')) {
         setOpen(false);
@@ -281,10 +313,27 @@ const linkState = (id: PageId) =>
   // Mobile menu
   const menuToggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const menu = document.getElementById('menu-movil');
+  const closeMenu = () => {
+    if (!menu) return;
+    menu.setAttribute('data-closing', '');
+    const finish = () => {
+      if (!menu.hasAttribute('data-closing')) return;
+      menu.hidden = true;
+      menu.removeAttribute('data-closing');
+    };
+    menu.addEventListener('transitionend', finish, { once: true });
+    window.setTimeout(finish, 200);
+  };
   menuToggle?.addEventListener('click', () => {
     if (!menu) return;
-    const open = menu.hidden;
-    menu.hidden = !open;
+    const open = menu.hidden || menu.hasAttribute('data-closing');
+    if (open) {
+      // Reopening mid-exit retargets the running transition
+      menu.removeAttribute('data-closing');
+      menu.hidden = false;
+    } else {
+      closeMenu();
+    }
     menuToggle.setAttribute('aria-expanded', String(open));
     menuToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
     menuToggle.querySelector('.icon-open')?.classList.toggle('hidden', open);

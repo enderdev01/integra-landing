@@ -163,6 +163,15 @@ const first = SERVICES[0];
       display: flex;
     }
   }
+  /* Calendar swap between services: fade the incoming panel in */
+  [data-booking] {
+    transition: opacity 0.2s ease;
+  }
+  @starting-style {
+    [data-booking]:not([hidden]) {
+      opacity: 0;
+    }
+  }
   .booking-bar {
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
     background: rgb(250 247 246 / 0.94);

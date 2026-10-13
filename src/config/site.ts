@@ -16,6 +16,7 @@ export const SITE = {
   // Placeholders from the client design — replace with real numbers before launch.
   phone: { display: '+0 000 000 0000', href: 'tel:+00000000000' },
   tollFree: { display: '+0 000 000 0000', href: 'tel:+00000000000' },
+  // Footer links. Replace with Integra's real profiles; only `profiles` below feed the structured data.
   social: [
     { label: 'Facebook', href: 'https://facebook.com', icon: 'facebook' },
     { label: 'Instagram', href: 'https://instagram.com', icon: 'instagram' },
@@ -23,6 +24,8 @@ export const SITE = {
     { label: 'LinkedIn', href: 'https://linkedin.com', icon: 'linkedin' },
     { label: 'X', href: 'https://x.com', icon: 'x' },
   ],
+  /** Real social profile URLs for schema.org `sameAs` (leave empty until confirmed) */
+  profiles: [] as string[],
   legal: [
     { label: 'Refund policy', href: '/legal/refund-policy' },
     { label: 'Privacy policy', href: '/legal/privacy-policy' },

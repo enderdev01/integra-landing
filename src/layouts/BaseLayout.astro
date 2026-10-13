@@ -39,7 +39,7 @@ const jsonLd = {
     postalCode: SITE.address.postalCode,
     addressCountry: SITE.address.country,
   },
-  sameAs: SITE.social.map((network) => network.href),
+  ...(SITE.profiles.length > 0 && { sameAs: SITE.profiles }),
   makesOffer: SERVICES.map((service) => ({
     '@type': 'Offer',
     itemOffered: { '@type': 'Service', name: service.name },
@@ -59,6 +59,8 @@ const jsonLd = {
     <link rel="alternate" hreflang="es-US" href={canonical} />
     <link rel="alternate" hreflang="x-default" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="theme-color" content="#FAF7F6" />
 
@@ -73,9 +75,10 @@ const jsonLd = {
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <Font cssVariable="--font-quicksand" preload />
+    <!-- Preload only what paints above the fold: hero headline (700) and menu (300) -->
+    <Font cssVariable="--font-quicksand" preload={[{ weight: 700 }]} />
     <Font cssVariable="--font-roboto" />
-    <Font cssVariable="--font-roboto-slab" preload />
+    <Font cssVariable="--font-roboto-slab" preload={[{ weight: 300 }]} />
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
     <slot name="head" />

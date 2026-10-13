@@ -39,4 +39,4 @@ export const HERO_SLIDES: HeroSlide[] = [
 ];
 
 /** Time each slide stays on screen while autoplay runs */
-export const HERO_INTERVAL_MS = 6500;
+export const HERO_INTERVAL_MS = 5000;

@@ -301,9 +301,10 @@ const total = HERO_SLIDES.length;
       syncPause();
     });
 
-    // Hold while the visitor reads (hover), navigates by keyboard, or the tab is hidden
-    root.addEventListener('pointerenter', () => finePointer.matches && (holds.add('hover'), syncPause()));
-    root.addEventListener('pointerleave', () => (holds.delete('hover'), syncPause()));
+    // Hold while the visitor reads the slide (hover on the hero card only),
+    // navigates by keyboard, or the tab is hidden
+    track.addEventListener('pointerenter', () => finePointer.matches && (holds.add('hover'), syncPause()));
+    track.addEventListener('pointerleave', () => (holds.delete('hover'), syncPause()));
     root.addEventListener('focusin', () => (holds.add('focus'), syncPause()));
     root.addEventListener('focusout', (event) => {
       if (!root.contains(event.relatedTarget as Node | null)) (holds.delete('focus'), syncPause());

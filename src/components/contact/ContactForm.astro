@@ -11,7 +11,7 @@ const errorText = 'text-[13px] text-danger';
 
 <div class="font-sans" data-contact>
   <form class="contact-form grid grid-cols-1 content-start gap-[22px] sm:grid-cols-2" novalidate aria-labelledby="ct-title" data-contact-form>
-    <div role="alert" class="col-span-full flex items-start gap-3 rounded-xl border border-[#fecdca] bg-[#fef3f2] px-4 py-3.5 text-[15px] leading-snug text-[#912018]" data-summary hidden>
+    <div role="alert" tabindex="-1" class="col-span-full flex items-start gap-3 rounded-xl border border-[#fecdca] bg-[#fef3f2] px-4 py-3.5 text-[15px] leading-snug text-[#912018]" data-summary hidden>
       <Icon name="alert" size={20} class="mt-px shrink-0" />
       <span data-summary-text></span>
     </div>
@@ -235,16 +235,31 @@ const errorText = 'text-[13px] text-danger';
 
       const data = new FormData(form);
       setSending(true);
-      const { error } = await actions.contact(data);
-      setSending(false);
+      let result: Awaited<ReturnType<typeof actions.contact>>;
+      try {
+        result = await actions.contact(data);
+      } catch {
+        // Offline or a non-JSON error body: the client fetch throws
+        showSummary('No pudimos conectar. Revisa tu conexión e inténtalo de nuevo.');
+        summary.focus();
+        return;
+      } finally {
+        setSending(false);
+      }
+      const { error } = result;
 
       if (error) {
         if (isInputError(error)) {
           const names = Object.keys(error.fields) as FieldName[];
-          names.forEach((name) => name in MESSAGES && setError(name, error.fields[name]?.[0]));
+          const known = names.filter((name) => name in MESSAGES);
+          known.forEach((name) => setError(name, error.fields[name]?.[0]));
           showSummary(`Revisa ${names.length} ${names.length === 1 ? 'campo' : 'campos'} para enviar tu solicitud.`);
+          // Disabling the fieldset dropped focus: land on the first bad field
+          if (known.length) control(known[0]).focus();
+          else summary.focus();
         } else {
           showSummary(error.message);
+          summary.focus();
         }
         return;
       }

@@ -12,8 +12,9 @@ export const contactSchema = z.object({
   industry: z.string().trim().max(80).optional(),
   message: z.string().trim().max(2000, 'Usa como máximo 2000 caracteres.').optional(),
   consent: z.boolean().refine((value) => value, 'Acepta la política para continuar.'),
-  // Honeypot: real people never see or fill this field
-  website: z.string().max(0).optional(),
+  // Honeypot: real people never see or fill this field. Accept any value so a
+  // filled one reaches the handler's silent success instead of a rejection.
+  website: z.string().optional(),
 });
 
 export const server = {

@@ -1,0 +1,71 @@
+---
+import Icon from '../ui/Icon.astro';
+import { INDUSTRIES } from '../../content/industries';
+---
+
+<section id="industrias" aria-labelledby="ind-title" class="relative scroll-mt-24 pb-16 lg:scroll-mt-32 md:pb-[88px]">
+  <div class="mx-auto w-full max-w-[1320px] px-4 md:px-6">
+    <h2 id="ind-title" class="reveal text-center font-display text-[clamp(32px,3.4vw,48px)] leading-[1.05] font-bold tracking-[-0.01em] text-blue-ink">
+      Industrias que apoyamos
+    </h2>
+    <ul class="mt-7 grid grid-cols-1 gap-4 min-[561px]:grid-cols-2 md:mt-10 md:gap-5 min-[1101px]:grid-cols-4">
+      {
+        INDUSTRIES.map((industry) => (
+          <li>
+            <a
+              href={`/servicios#${industry.slug}`}
+              class="ind-card flex h-full flex-col items-start gap-3.5 rounded-[28px] bg-blue px-[22px] pt-[26px] pb-[22px] text-white no-underline shadow-[0_20px_44px_-28px_rgb(0_56_92/0.6)] sm:rounded-[32px] sm:px-[26px] sm:pt-8 sm:pb-[30px]"
+            >
+              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d={industry.icon} />
+              </svg>
+              <h3 class="font-display text-2xl leading-[1.1] font-bold sm:text-[26px]">{industry.name}</h3>
+              <ul class="grid list-disc gap-2 pl-5 font-sans text-base leading-[1.4] font-medium marker:text-lime">
+                {industry.highlights.map((item) => <li>{item}</li>)}
+              </ul>
+              <span class="mt-auto inline-flex min-h-11 items-center gap-2 pt-1.5 font-sans text-[15px] font-bold">
+                Ver más <Icon name="arrow-right" size={18} class="ind-arrow" />
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .ind-card {
+    transition:
+      transform 0.2s var(--ease-out),
+      box-shadow 0.2s ease;
+  }
+  .ind-card:active {
+    transform: scale(0.98);
+  }
+  .ind-card:focus-visible {
+    outline-offset: 4px;
+  }
+  :global(.ind-arrow) {
+    transition: transform 0.2s var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .ind-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 28px 52px -26px rgb(0 56 92 / 0.7);
+    }
+    .ind-card:hover :global(.ind-arrow) {
+      transform: translateX(3px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ind-card,
+    :global(.ind-arrow) {
+      transition: none;
+    }
+    .ind-card:active,
+    .ind-card:hover {
+      transform: none;
+    }
+  }
+</style>

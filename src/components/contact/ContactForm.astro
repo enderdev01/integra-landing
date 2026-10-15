@@ -1,8 +1,9 @@
 ---
 import Icon from '../ui/Icon.astro';
 import { SERVICES } from '../../content/services';
+import { INDUSTRIES } from '../../content/industries';
 
-const industries = ['Retail y e-commerce', 'Salud', 'Tecnología', 'Servicios financieros', 'Otra'];
+const industries = [...INDUSTRIES.map(({ slug, name }) => ({ slug, name })), { slug: 'otra', name: 'Otra' }];
 const label = 'text-sm font-semibold text-ink';
 const required = '<span aria-hidden="true" class="text-danger">*</span>';
 const errorText = 'text-[13px] text-danger';
@@ -25,7 +26,7 @@ const errorText = 'text-[13px] text-danger';
       </div>
 
       <div class="grid content-start gap-2">
-        <label for="f-email" class={label}>Correo corporativo <Fragment set:html={required} /></label>
+        <label for="f-email" class={label}>Correo electrónico <Fragment set:html={required} /></label>
         <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="nombre@empresa.com" class="field" aria-describedby="f-email-error" />
         <p id="f-email-error" class={errorText} hidden></p>
       </div>
@@ -41,7 +42,7 @@ const errorText = 'text-[13px] text-danger';
         <div class="relative">
           <select id="f-service" name="service" required class="field cursor-pointer pr-11" aria-describedby="f-service-error">
             <option value="">Seleccionar</option>
-            {SERVICES.map((service) => <option value={service.id}>{service.name}</option>)}
+            {SERVICES.map((service) => <option value={service.slug}>{service.name}</option>)}
           </select>
           <Icon name="chevron-down" size={20} class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-blue" />
         </div>
@@ -53,7 +54,7 @@ const errorText = 'text-[13px] text-danger';
         <div class="relative">
           <select id="f-industry" name="industry" class="field cursor-pointer pr-11">
             <option value="">Seleccionar</option>
-            {industries.map((industry) => <option>{industry}</option>)}
+            {industries.map((industry) => <option value={industry.slug}>{industry.name}</option>)}
           </select>
           <Icon name="chevron-down" size={20} class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-blue" />
         </div>
@@ -165,7 +166,6 @@ const errorText = 'text-[13px] text-danger';
     service: 'Elige un servicio.',
     consent: 'Acepta la política para continuar.',
   };
-  const SERVICE_SLUGS: Record<string, string> = { ventas: 'ventas', support: 'customer-support', web: 'diseno-web', marketing: 'marketing' };
 
   const root = document.querySelector<HTMLElement>('[data-contact]');
   const form = root?.querySelector<HTMLFormElement>('[data-contact-form]');
@@ -177,6 +177,15 @@ const errorText = 'text-[13px] text-danger';
     const submitLabel = form.querySelector<HTMLElement>('[data-submit-label]')!;
     const success = root.querySelector<HTMLElement>('[data-success]')!;
     let attempted = false;
+
+    // Preselect from links such as /contacto?servicio=ventas or ?industria=salud
+    const params = new URL(window.location.href).searchParams;
+    const preselect = (name: 'service' | 'industry', value: string | null) => {
+      const select = form.elements.namedItem(name) as HTMLSelectElement;
+      if (value && [...select.options].some((option) => option.value === value)) select.value = value;
+    };
+    preselect('service', params.get('servicio'));
+    preselect('industry', params.get('industria'));
 
     const control = (name: FieldName) => form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement;
     const setError = (name: FieldName, message?: string) => {
@@ -243,7 +252,8 @@ const errorText = 'text-[13px] text-danger';
       // Success: echo what was sent and offer the next step
       const name = String(data.get('name') ?? '').trim().split(/\s+/)[0];
       const service = control('service') as HTMLSelectElement;
-      const industry = String(data.get('industry') ?? '');
+      const industrySelect = form.elements.namedItem('industry') as HTMLSelectElement;
+      const industry = industrySelect.value ? (industrySelect.selectedOptions[0]?.text ?? '') : '';
       success.querySelector('[data-success-title]')!.textContent = `¡Gracias, ${name}! Recibimos tu solicitud.`;
       success.querySelector('[data-success-email]')!.textContent = String(data.get('email'));
       const rows: [string, string][] = [
@@ -263,7 +273,7 @@ const errorText = 'text-[13px] text-danger';
           return [dt, dd];
         }),
       );
-      success.querySelector<HTMLAnchorElement>('[data-success-book]')!.href = `/agendar?servicio=${SERVICE_SLUGS[service.value] ?? ''}`;
+      success.querySelector<HTMLAnchorElement>('[data-success-book]')!.href = `/agendar?servicio=${encodeURIComponent(service.value)}`;
       form.hidden = true;
       success.hidden = false;
       success.focus();

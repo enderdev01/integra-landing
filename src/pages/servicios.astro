@@ -1,0 +1,484 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/ui/Icon.astro';
+import ServiceIcon from '../components/ui/ServiceIcon.astro';
+import { SERVICES } from '../content/services';
+import { INDUSTRIES } from '../content/industries';
+
+const icons = {
+  ventas: { width: 80, cutout: '#F4F7F9' },
+  va: { width: 120, cutout: '#FFFFFF' },
+  web: { width: 80, cutout: '#F4F7F9' },
+  marketing: { width: 116, cutout: '#F4F7F9' },
+} as const;
+const chips = [
+  ...SERVICES.map((service) => ({ href: `#${service.slug}`, label: service.id === 'marketing' ? 'Marketing' : service.name })),
+  { href: '#industrias', label: 'Industrias' },
+];
+---
+
+<BaseLayout page="servicios">
+  <nav aria-label="Ir a un servicio" class="chips sticky top-16 z-40 flex gap-2 overflow-x-auto border-b border-[#e3e9ef] px-4 py-2.5 lg:top-[105px] xl:hidden">
+    {
+      chips.map((chip) => (
+        <a href={chip.href} class="chip inline-flex min-h-11 shrink-0 items-center rounded-full border-[1.5px] border-[#d6dee6] bg-white px-4 font-sans text-[15px] font-semibold text-ink no-underline">
+          {chip.label}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="stage relative mx-auto w-full max-w-[1440px] pb-16 sm:pb-24">
+    <header>
+      <div class="sv-band bg-lime">
+        <h1 class="mx-auto max-w-[1320px] font-display text-[clamp(26px,3.1vw,44px)] leading-[1.1] font-bold tracking-[-0.005em] text-navy uppercase">
+          Soluciones que se integran a tu operación
+        </h1>
+      </div>
+      <p class="sv-intro-p mx-auto max-w-[62ch] font-sans font-medium text-ink">
+        Cubrimos las funciones que tu negocio necesita, desde el seguimiento comercial hasta tu presencia digital, con un alcance definido contigo.
+      </p>
+    </header>
+
+    {
+      SERVICES.map((service, index) => {
+        const { detail } = service;
+        const reversed = index % 2 === 1;
+        return (
+          <section id={service.slug} aria-labelledby={`s-${service.slug}`} class:list={['sv-row reveal', reversed && 'rev']}>
+            <div class="sv-media">
+              <div class:list={['sv-frame', reversed ? 'bg-lime' : 'bg-blue']} aria-hidden="true" />
+              <div class="sv-pz bg-[#e3e9ef]">
+                <Image
+                  src={detail.photo.src}
+                  alt={detail.photo.alt}
+                  widths={[480, 720, 960]}
+                  sizes="(max-width: 960px) min(600px, 100vw), 560px"
+                  loading="lazy"
+                  class="block size-full object-cover"
+                  style={`object-position: ${detail.photo.focus}`}
+                />
+              </div>
+            </div>
+            <div class="sv-copy">
+              <div class="flex items-center gap-[18px]">
+                <ServiceIcon name={service.id} width={icons[service.id].width} cutout={icons[service.id].cutout} class="svc-ico h-auto shrink-0" />
+                <h2 id={`s-${service.slug}`} class="sv-h2 font-display font-bold text-blue">
+                  {service.name}
+                </h2>
+              </div>
+              <p class="sv-lead font-sans font-medium text-ink">{detail.lead}</p>
+              <p class="sv-p">{detail.summary}</p>
+              <ul class="sv-points" role="list">
+                {detail.points.map((point) => (
+                  <li class="flex items-start gap-2.5">
+                    <svg class="mt-px shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#95B71E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 12.5l4.5 4.5L19 7.5" />
+                    </svg>
+                    {point}
+                  </li>
+                ))}
+              </ul>
+              <details class="svc-more w-full">
+                <summary class="svc-more-btn">
+                  <span class="label-closed">
+                    Ver todo lo que incluye<span class="sr-only">: {service.name}</span>
+                  </span>
+                  <span class="label-open">
+                    Ver menos<span class="sr-only">: {service.name}</span>
+                  </span>
+                  <Icon name="chevron-down" size={18} class="sv-chev" />
+                </summary>
+                <div class="svc-more-in">
+                  {detail.more.map((paragraph) => (
+                    <p class="sv-p">{paragraph}</p>
+                  ))}
+                  <h3 class="sv-h3">Qué podemos apoyar</h3>
+                  <ul class="sv-list" role="list">
+                    {detail.support.map((item) => (
+                      <li>
+                        {item.label && <strong>{item.label}</strong>} {item.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </details>
+              <a href={`/agendar?servicio=${service.slug}`} class="btn-primary sv-cta mt-2">
+                {service.cta}
+                <Icon name="arrow-right" />
+              </a>
+            </div>
+          </section>
+        );
+      })
+    }
+
+    <section id="industrias" aria-labelledby="s-industrias" class="sv-ind reveal mx-auto w-full max-w-[1320px]">
+      <h2 id="s-industrias" class="sv-h2 font-display font-bold text-blue">Industrias</h2>
+      <p class="sv-ind-lead mt-5 max-w-[62ch] font-sans text-ink">
+        <strong>Cada industria tiene su propio ritmo.</strong> Te ayudamos a integrar apoyo comercial, administrativo y digital según las necesidades de tu negocio.
+      </p>
+      <ul class="mt-8 grid grid-cols-1 gap-4 min-[641px]:mt-12 min-[641px]:grid-cols-2 min-[641px]:gap-6" role="list">
+        {
+          INDUSTRIES.map((industry) => (
+            <li>
+              <article
+                id={industry.slug}
+                class="sv-card flex h-full flex-col items-start gap-3.5 rounded-[28px] bg-blue px-6 py-7 text-white shadow-[0_20px_44px_-28px_rgb(0_56_92/0.6)] min-[641px]:rounded-[32px] min-[641px]:px-8 min-[641px]:py-9"
+              >
+                <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d={industry.icon} />
+                </svg>
+                <h3 class="font-display text-[28px] leading-[1.1] font-bold">{industry.name}</h3>
+                <p class="max-w-[44ch] font-sans text-[17px] leading-normal">{industry.description}</p>
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-12 flex justify-center">
+        <a href="/contacto" class="btn-primary sv-ind-cta min-h-[52px] shadow-[0_10px_24px_-12px_rgb(0_56_92/0.5)]">
+          Hablemos de tu industria <Icon name="arrow-right" />
+        </a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .chips {
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    background: rgb(244 247 249 / 0.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+  .chip {
+    scroll-snap-align: start;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.16s var(--ease-out);
+  }
+  .chip:active {
+    transform: scale(0.96);
+  }
+
+  /* Anchors land below the sticky header (+ chips under 1280 px) */
+  .sv-row,
+  .sv-ind,
+  .sv-card {
+    scroll-margin-top: 152px;
+  }
+  @media (min-width: 1024px) {
+    .sv-row,
+    .sv-ind,
+    .sv-card {
+      scroll-margin-top: 180px;
+    }
+  }
+  @media (min-width: 1280px) {
+    .sv-row,
+    .sv-ind,
+    .sv-card {
+      scroll-margin-top: 128px;
+    }
+  }
+
+  .sv-band {
+    border-bottom-right-radius: 120px;
+    padding: 44px 24px;
+    text-align: center;
+  }
+  .sv-intro-p {
+    margin-top: 48px;
+    padding: 0 24px;
+    font-size: 20px;
+    line-height: 1.55;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  /* Alternating photo / copy rows; copy starts at the top so opening
+     "Ver todo" never re-centres the photo, which stays sticky on desktop. */
+  .sv-row {
+    display: grid;
+    grid-template-columns: 5fr 6fr;
+    column-gap: 96px;
+    align-items: start;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+    padding: 80px 24px 0;
+  }
+  .sv-row.rev {
+    grid-template-columns: 6fr 5fr;
+  }
+  .sv-media {
+    position: sticky;
+    top: 128px;
+    padding: 0 0 16px 16px;
+  }
+  .sv-row.rev .sv-media {
+    order: 2;
+    padding: 0 16px 16px 0;
+  }
+  @media (min-width: 961px) and (max-width: 1279px) {
+    .sv-media {
+      top: 184px;
+    }
+  }
+  .sv-frame,
+  .sv-pz {
+    -webkit-mask: radial-gradient(circle 56px at 50% 100%, #0000 55px, #000 56px);
+    mask: radial-gradient(circle 56px at 50% 100%, #0000 55px, #000 56px);
+    border-radius: 28px;
+  }
+  .sv-frame {
+    position: absolute;
+    left: 0;
+    right: 16px;
+    top: 16px;
+    bottom: 0;
+  }
+  .sv-row.rev .sv-frame {
+    left: 16px;
+    right: 0;
+  }
+  .sv-pz {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+  }
+  .sv-pz :global(img) {
+    transition: scale 0.3s var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .sv-media:hover .sv-pz :global(img) {
+      scale: 1.03;
+    }
+  }
+  .sv-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    min-width: 0;
+  }
+  .sv-h2 {
+    font-size: clamp(40px, 4vw, 58px);
+    line-height: 1;
+    letter-spacing: -0.015em;
+  }
+  .sv-lead {
+    max-width: 32ch;
+    font-size: 20px;
+    line-height: 1.45;
+  }
+  .sv-p {
+    max-width: 56ch;
+    font-family: var(--font-serif);
+    font-size: 17px;
+    line-height: 1.6;
+    color: #3b4552;
+  }
+  .sv-points {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 28px;
+    width: 100%;
+    margin-top: 4px;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.35;
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  /* "Ver todo lo que incluye": native disclosure, crawlable, no JS */
+  .svc-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding-right: 4px;
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-blue-ink);
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.15s ease;
+  }
+  .svc-more-btn::-webkit-details-marker {
+    display: none;
+  }
+  .svc-more .label-open,
+  .svc-more[open] .label-closed {
+    display: none;
+  }
+  .svc-more[open] .label-open {
+    display: inline;
+  }
+  :global(.sv-chev) {
+    transition: transform 0.2s var(--ease-out);
+  }
+  .svc-more[open] :global(.sv-chev) {
+    transform: rotate(180deg);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .svc-more-btn:hover {
+      color: var(--color-blue-dark);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+  }
+  .svc-more-in {
+    display: grid;
+    gap: 14px;
+    padding: 8px 0 12px;
+  }
+  .svc-more[open] .svc-more-in {
+    animation: more-in 0.25s var(--ease-out);
+  }
+  @keyframes more-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+  .sv-h3 {
+    margin-top: 8px;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .sv-list {
+    display: grid;
+    gap: 12px;
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 1.5;
+    color: #3b4552;
+  }
+  .sv-list li {
+    position: relative;
+    padding-left: 26px;
+  }
+  .sv-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.45em;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-lime);
+  }
+  .sv-list strong {
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+
+  .sv-ind {
+    margin-top: 104px;
+    padding: 0 24px;
+  }
+  .sv-ind-lead {
+    font-size: 20px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 960px) {
+    .sv-row,
+    .sv-row.rev {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 32px;
+      padding: 72px 24px 0;
+      justify-items: center;
+    }
+    .sv-row > * {
+      width: 100%;
+      max-width: 600px;
+    }
+    .sv-row .sv-media,
+    .sv-row.rev .sv-media {
+      order: -1;
+      position: relative;
+      top: auto;
+    }
+    .sv-band {
+      border-bottom-right-radius: 64px;
+    }
+    .sv-ind {
+      margin-top: 96px;
+    }
+  }
+  @media (max-width: 560px) {
+    .sv-row,
+    .sv-row.rev {
+      padding: 56px 16px 0;
+      row-gap: 28px;
+    }
+    .sv-pz {
+      aspect-ratio: 16 / 10;
+    }
+    .sv-h2 {
+      font-size: 34px;
+    }
+    .sv-lead {
+      font-size: 19px;
+    }
+    .sv-points {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+    .sv-copy :global(.svc-ico) {
+      width: 64px;
+    }
+    .sv-cta,
+    .sv-ind-cta {
+      align-self: stretch;
+      flex: 1;
+      justify-content: space-between;
+    }
+    .sv-band {
+      padding: 32px 16px;
+      text-align: left;
+      border-bottom-right-radius: 40px;
+    }
+    .sv-intro-p {
+      margin-top: 32px;
+      padding: 0 16px;
+      font-size: 18px;
+      text-align: left;
+    }
+    .sv-ind {
+      margin-top: 80px;
+      padding: 0 16px;
+    }
+    .sv-ind-lead {
+      font-size: 18px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chip:active {
+      transform: none;
+    }
+    :global(.sv-chev) {
+      transition: none;
+    }
+    .svc-more[open] .svc-more-in {
+      animation: none;
+    }
+  }
+</style>

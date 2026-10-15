@@ -27,7 +27,7 @@ Definilas en Vercel (Project → Settings → Environment Variables) o en un arc
 | `SITE_URL` | build | URL pública para canonical, Open Graph y sitemap. Por defecto `https://integrasgp.com` (confirmar dominio). |
 | `GHL_CONTACT_WEBHOOK_URL` | secreta, servidor | Webhook entrante de GoHighLevel que recibe el formulario de Contacto. Sin este valor el formulario muestra un aviso y no envía. |
 | `PUBLIC_GHL_BOOKING_VENTAS` | pública | URL del widget de reservas de la *Cita de Ventas*. |
-| `PUBLIC_GHL_BOOKING_SUPPORT` | pública | URL del widget de la *Cita de Customer Support*. |
+| `PUBLIC_GHL_BOOKING_VA` | pública | URL del widget de la *Cita de Virtual Assistance*. |
 | `PUBLIC_GHL_BOOKING_WEB` | pública | URL del widget de la *Cita de Diseño Web*. |
 | `PUBLIC_GHL_BOOKING_MARKETING` | pública | URL del widget de la *Cita de Marketing Services*. |
 
@@ -37,7 +37,7 @@ Ejemplo de `.env` local:
 SITE_URL=https://integrasgp.com
 GHL_CONTACT_WEBHOOK_URL=<url-del-inbound-webhook-de-gohighlevel>
 PUBLIC_GHL_BOOKING_VENTAS=<url-del-src-del-iframe-del-calendario-de-ventas>
-PUBLIC_GHL_BOOKING_SUPPORT=
+PUBLIC_GHL_BOOKING_VA=
 PUBLIC_GHL_BOOKING_WEB=
 PUBLIC_GHL_BOOKING_MARKETING=
 ```
@@ -48,7 +48,7 @@ Las variables están tipadas y validadas con `astro:env` en `astro.config.mjs`.
 
 ### Formulario de Contacto
 1. En GoHighLevel, crear un *Workflow* con disparador **Inbound Webhook** y copiar su URL en `GHL_CONTACT_WEBHOOK_URL`.
-2. El sitio envía un `POST` JSON con: `name`, `email`, `company`, `service` (`ventas` | `support` | `web` | `marketing`), `industry`, `message`, `consent`, `source` (`web-contacto`) y `submittedAt` (ISO 8601).
+2. El sitio envía un `POST` JSON con: `name`, `email`, `company`, `service` (`ventas` | `virtual-assistance` | `diseno-web` | `marketing`), `industry`, `message`, `consent`, `source` (`web-contacto`) y `submittedAt` (ISO 8601).
 3. En el workflow, mapear esos campos a un contacto/oportunidad.
 
 La validación vive en `src/actions/index.ts` (zod) y se repite en el navegador para mostrar errores por campo.
@@ -56,7 +56,7 @@ La validación vive en `src/actions/index.ts` (zod) y se repite en el navegador 
 ### Calendarios (página Agendar)
 1. En GoHighLevel: **Calendars → (calendario) → Share → Embed** y copiar la URL del `src` del iframe.
 2. Pegarla en la variable `PUBLIC_GHL_BOOKING_*` del servicio correspondiente.
-3. Cada calendario se carga solo cuando el usuario elige ese servicio. `/agendar?servicio=ventas|customer-support|diseno-web|marketing` preselecciona la cita.
+3. Cada calendario se carga solo cuando el usuario elige ese servicio. `/agendar?servicio=ventas|virtual-assistance|diseno-web|marketing` preselecciona la cita; `/contacto?servicio=…&industria=bienes-raices|saas|firmas-legales|salud` preselecciona el formulario.
 4. Sin URL configurada, el servicio muestra un aviso que lleva al formulario de Contacto.
 
 > Verificar el formato del embed directamente en GoHighLevel: no se usó un snippet fijo para no depender de suposiciones.

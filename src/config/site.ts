@@ -1,4 +1,5 @@
-export type PageId = 'inicio' | 'servicios' | 'agendar' | 'contacto';
+export type PageId = 'inicio' | 'servicios' | 'industrias' | 'agendar' | 'contacto';
+export type SeoPageId = Exclude<PageId, 'industrias'>;
 
 export const SITE = {
   name: 'Integra',
@@ -27,39 +28,39 @@ export const SITE = {
   /** Real social profile URLs for schema.org `sameAs` (leave empty until confirmed) */
   profiles: [] as string[],
   legal: [
-    { label: 'Refund policy', href: '/legal/refund-policy' },
-    { label: 'Privacy policy', href: '/legal/privacy-policy' },
-    { label: 'Terms of service', href: '/legal/terms-of-service' },
-    { label: 'Purchase order terms & conditions', href: '/legal/purchase-order-terms' },
+    { label: 'Política de reembolso', href: '/legal/refund-policy' },
+    { label: 'Política de privacidad', href: '/legal/privacy-policy' },
+    { label: 'Términos del servicio', href: '/legal/terms-of-service' },
+    { label: 'Términos de órdenes de compra', href: '/legal/purchase-order-terms' },
   ],
 } as const;
 
 export const NAV: { id: PageId; label: string; href: string }[] = [
   { id: 'inicio', label: 'Inicio', href: '/' },
   { id: 'servicios', label: 'Servicios', href: '/servicios' },
+  { id: 'industrias', label: 'Industrias', href: '/servicios#industrias' },
   { id: 'agendar', label: 'Agendar', href: '/agendar' },
-  { id: 'contacto', label: 'Contacto', href: '/contacto' },
 ];
 
-export const SEO: Record<PageId, { title: string; description: string }> = {
+export const SEO: Record<SeoPageId, { title: string; description: string }> = {
   inicio: {
-    title: 'Integra | Equipos remotos de ventas, soporte y back office',
+    title: 'Integra | Equipos remotos de ventas y Virtual Assistance',
     description:
-      'Construimos equipos remotos de ventas, customer support y back office para que tu negocio crezca con estructura, calidad y flexibilidad.',
+      'Equipos remotos de ventas, Virtual Assistance, diseño web y marketing para bienes raíces, SaaS, firmas legales y salud. Crece con estructura y calidad.',
   },
   servicios: {
-    title: 'Servicios de ventas, soporte, web y marketing | Integra',
+    title: 'Ventas, Virtual Assistance, diseño web y marketing | Integra',
     description:
-      'SDRs e inside sales, customer support, diseño web y marketing digital que se integran a tu operación con el mismo acompañamiento.',
+      'Ventas, Virtual Assistance, diseño web y marketing que se integran a tu operación. Apoyo para bienes raíces, SaaS, firmas legales y salud.',
   },
   agendar: {
     title: 'Agenda una llamada con Integra',
     description:
-      'Elige el servicio —ventas, customer support, diseño web o marketing— y reserva tu cita con el especialista indicado.',
+      'Elige el servicio —ventas, Virtual Assistance, diseño web o marketing— y reserva tu cita con el especialista indicado.',
   },
   contacto: {
     title: 'Contacto | Solicita una propuesta — Integra',
     description:
-      'Cuéntanos dónde necesitas apoyo y te ayudamos a definir el talento, la estructura y el siguiente paso para tu equipo.',
+      'Cuéntanos dónde quieres apoyo y te ayudamos a definir el talento, la estructura y el siguiente paso para tu equipo.',
   },
 };

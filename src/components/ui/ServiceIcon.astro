@@ -16,7 +16,7 @@ const { name, width, cutout = '#F4F7F9', class: className } = Astro.props;
 const lime = '#A3C622';
 const viewBoxes: Record<ServiceId, [number, number]> = {
   ventas: [100, 100],
-  support: [100, 72],
+  va: [100, 72],
   web: [100, 100],
   marketing: [100, 76],
 };
@@ -44,7 +44,7 @@ const height = Math.round((width * vh) / vw);
     )
   }
   {
-    name === 'support' && (
+    name === 'va' && (
       <>
         <path d="M42 4.5H86A6 6 0 0 1 92 10.5V40C92 46 94 51 96 54C90 52 84 48 80 46H42A6 6 0 0 1 36 40V10.5A6 6 0 0 1 42 4.5Z" fill={lime} />
         <path d="M50 19H83M50 26H83M66 35H83" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" />

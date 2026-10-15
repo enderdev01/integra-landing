@@ -2,7 +2,7 @@ import { ActionError, defineAction } from 'astro:actions';
 import { GHL_CONTACT_WEBHOOK_URL } from 'astro:env/server';
 import { z } from 'astro/zod';
 
-const SERVICE_VALUES = ['ventas', 'support', 'web', 'marketing'] as const;
+const SERVICE_VALUES = ['ventas', 'virtual-assistance', 'diseno-web', 'marketing'] as const;
 
 export const contactSchema = z.object({
   name: z.string().trim().min(3, 'Escribe tu nombre y apellido.').max(120),

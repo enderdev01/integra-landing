@@ -4,12 +4,13 @@ import '../styles/global.css';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import MobileActionBar from '../components/layout/MobileActionBar.astro';
-import { SEO, SITE, type PageId } from '../config/site';
+import { SEO, SITE, type SeoPageId } from '../config/site';
 import { SERVICES } from '../content/services';
+import { INDUSTRIES } from '../content/industries';
 
 interface Props {
   /** Current section; highlights the menu item. Omit on legal and error pages. */
-  page?: PageId;
+  page?: SeoPageId;
   /** Overrides the page SEO entry (e.g. legal and error pages) */
   meta?: { title: string; description: string };
   noindex?: boolean;
@@ -42,8 +43,14 @@ const jsonLd = {
   ...(SITE.profiles.length > 0 && { sameAs: SITE.profiles }),
   makesOffer: SERVICES.map((service) => ({
     '@type': 'Offer',
-    itemOffered: { '@type': 'Service', name: service.name },
+    itemOffered: {
+      '@type': 'Service',
+      name: service.id === 'ventas' ? 'Ventas (SDR / Inside Sales)' : service.name,
+      url: new URL(`/servicios#${service.slug}`, Astro.site).toString(),
+    },
   })),
+  areaServed: ['US', 'LATAM'],
+  audience: INDUSTRIES.map((industry) => ({ '@type': 'BusinessAudience', audienceType: industry.name })),
 };
 ---
 

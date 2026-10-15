@@ -34,7 +34,7 @@ export const HERO_SLIDES: HeroSlide[] = [
     image: svcSupport,
     focus: '65% 40%',
     lockup: { kicker: 'Soporte', connector: 'profesional en', word: 'cada', closing: 'canal de tus clientes' },
-    cta: { label: 'Agenda tu cita de soporte', href: '/agendar?servicio=customer-support' },
+    cta: { label: 'Agenda tu cita de Virtual Assistance', href: '/agendar?servicio=virtual-assistance' },
   },
 ];
 

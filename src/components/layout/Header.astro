@@ -10,6 +10,7 @@ interface Props {
 }
 
 const { active } = Astro.props;
+const onContact = active === 'contacto';
 const linkState = (id: PageId) =>
   id === active
     ? 'font-normal text-blue-ink border-lime-deep'
@@ -86,11 +87,15 @@ const linkState = (id: PageId) =>
 
     <a
       href="/contacto"
-      class="talk-cta relative ml-auto hidden min-h-11 shrink-0 items-center rounded-xl border-2 border-lime-deep bg-white px-5 py-1.5 text-[19px] font-medium text-[#5b7410] sm:inline-flex lg:ml-0"
+      aria-current={onContact ? 'page' : undefined}
+      class:list={[
+        'talk-cta relative ml-auto hidden min-h-11 shrink-0 items-center rounded-xl border-2 border-lime-deep px-5 py-1.5 text-[19px] font-medium sm:inline-flex lg:ml-0',
+        onContact ? 'bg-lime text-navy' : 'bg-white text-[#5b7410]',
+      ]}
     >
       ¡Hablemos!
       <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true" class="absolute right-2.5 -bottom-[11px]">
-        <path d="M1 0H13L14 11Z" fill="#FFFFFF"></path>
+        <path class="cta-tail" d="M1 0H13L14 11Z" fill={onContact ? '#A3C622' : '#FFFFFF'}></path>
         <path d="M1 0L14 11L13 0" fill="none" stroke="#95B71E" stroke-width="2" stroke-linejoin="round"></path>
       </svg>
     </a>
@@ -161,8 +166,8 @@ const linkState = (id: PageId) =>
         )
       }
     </ul>
-    <a href="/agendar" class="btn-primary mt-5 w-full">
-      Agenda una llamada <Icon name="arrow-right" size={20} />
+    <a href="/contacto" aria-current={onContact ? 'page' : undefined} class="btn-primary mt-5 w-full">
+      ¡Hablemos! <Icon name="arrow-right" size={20} />
     </a>
   </nav>
 </header>
@@ -175,7 +180,9 @@ const linkState = (id: PageId) =>
     box-shadow: 0 6px 24px -12px rgb(15 35 70 / 0.35);
   }
   .nav-link {
-    transition: color 0.15s ease;
+    transition:
+      color 0.15s ease,
+      border-color 0.2s ease;
   }
 
   /* Services dropdown: interruptible transitions, origin at the trigger.
@@ -219,7 +226,36 @@ const linkState = (id: PageId) =>
   .burger:active {
     transform: scale(0.95);
   }
+  /* ¡Hablemos!: lifts and fills lime on hover, presses in on tap */
+  .talk-cta {
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.16s var(--ease-out);
+  }
+  .talk-cta .cta-tail {
+    transition: fill 0.2s ease;
+  }
+  .talk-cta:active {
+    transform: scale(0.97);
+  }
   @media (hover: hover) and (pointer: fine) {
+    .talk-cta:hover {
+      background: var(--color-lime);
+      color: var(--color-navy);
+      box-shadow: 0 10px 20px -12px rgb(91 116 16 / 0.7);
+      transform: translateY(-2px);
+    }
+    .talk-cta:hover .cta-tail {
+      fill: var(--color-lime);
+    }
+    .talk-cta:hover:active {
+      transform: translateY(0) scale(0.97);
+    }
+    .nav-link:not([aria-current='page']):hover {
+      border-bottom-color: #c9dd7a;
+    }
     .nav-link:hover {
       color: var(--color-blue-ink);
     }
@@ -258,7 +294,10 @@ const linkState = (id: PageId) =>
       transform: none;
     }
     :global(.dd-chevron),
-    .burger:active {
+    .burger:active,
+    .talk-cta,
+    .talk-cta:hover,
+    .talk-cta:active {
       transition: none;
       transform: none;
     }
@@ -338,6 +377,12 @@ const linkState = (id: PageId) =>
     menuToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
     menuToggle.querySelector('.icon-open')?.classList.toggle('hidden', open);
     menuToggle.querySelector('.icon-close')?.classList.toggle('hidden', !open);
+  });
+
+  // Same-page anchors (e.g. /servicios#industrias) don't reload: close the menu
+  menu?.addEventListener('click', (event) => {
+    const link = (event.target as Element).closest('a');
+    if (link && !menu.hidden && link.pathname === window.location.pathname && link.hash) menuToggle?.click();
   });
 
   // Services accordion inside the mobile menu

@@ -9,18 +9,18 @@ const year = new Date().getFullYear();
   <div class="bg-graphite">
     <div class="mx-auto flex w-full max-w-[1320px] flex-wrap items-start gap-x-[72px] gap-y-6 px-5 pt-8 pb-7 sm:px-6 sm:pt-11 sm:pb-10">
       <div class="min-w-0 flex-[1_1_240px]">
-        <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">Contacte con {SITE.legalName}</h2>
+        <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">Contacta a {SITE.legalName}</h2>
         <address class="text-[15px] leading-[1.65] tracking-[0.02em] text-[#e7e8ea] uppercase not-italic">
           {SITE.address.display[0]}<br />{SITE.address.display[1]}
         </address>
       </div>
 
       <div class="min-w-0 flex-[1_1_300px]">
-        <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">Servicio de asistencia técnica personal</h2>
-        <p class="text-[15px] leading-[1.65] tracking-[0.02em] text-[#e7e8ea]">
-          <a href={SITE.phone.href} class="text-white no-underline">{SITE.phone.display}</a><br />
-          <strong class="font-bold uppercase">Llame gratis:</strong>
-          <a href={SITE.tollFree.href} class="text-white no-underline">{SITE.tollFree.display}</a>
+        <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">Atención a clientes</h2>
+        <p class="text-[15px] tracking-[0.02em] text-[#e7e8ea]">
+          <a href={SITE.phone.href} class="inline-flex min-h-11 items-center text-white no-underline">{SITE.phone.display}</a><br />
+          <strong class="font-bold uppercase">Llama gratis:</strong>
+          <a href={SITE.tollFree.href} class="inline-flex min-h-11 items-center text-white no-underline">{SITE.tollFree.display}</a>
         </p>
       </div>
 

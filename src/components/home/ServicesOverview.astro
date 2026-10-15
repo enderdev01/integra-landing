@@ -3,7 +3,7 @@ import Icon from '../ui/Icon.astro';
 import ServiceIcon from '../ui/ServiceIcon.astro';
 import { SERVICES } from '../../content/services';
 
-const iconWidth = { ventas: 92, support: 150, web: 92, marketing: 150 } as const;
+const iconWidth = { ventas: 92, va: 150, web: 92, marketing: 150 } as const;
 ---
 
 <section aria-labelledby="services-title" class="relative mt-10 pb-16 md:mt-[72px] md:pb-28">
@@ -16,7 +16,7 @@ const iconWidth = { ventas: 92, support: 150, web: 92, marketing: 150 } as const
       id="services-title"
       class="-ml-4 rounded-r-[40px] bg-lime px-6 py-5 font-display text-[clamp(26px,3vw,44px)] leading-tight font-bold tracking-[-0.01em] text-blue-ink uppercase md:-ml-6 xl:ml-0 xl:flex xl:h-28 xl:items-center xl:rounded-none xl:bg-transparent xl:px-0 xl:py-0 xl:pl-[72px]"
     >
-      ¿Qué podemos ayudarte a hacer crecer?
+      Servicios para potenciar tu operación
     </h2>
 
     <div class="grid grid-cols-1 gap-14 pt-12 md:grid-cols-2 md:gap-x-[72px] md:gap-y-20 md:pt-24 xl:pr-60 xl:pl-24">
@@ -39,7 +39,3 @@ const iconWidth = { ventas: 92, support: 150, web: 92, marketing: 150 } as const
   </div>
 </section>
 
-<div aria-hidden="true" class="relative h-[112px]">
-  <div class="absolute bottom-0 -left-6 h-[112px] w-[220px] rounded-tr-[220px_112px] bg-lime"></div>
-  <div class="absolute bottom-0 left-[29%] h-[88px] w-[176px] rounded-t-[88px] bg-blue"></div>
-</div>

@@ -17,7 +17,7 @@ const total = HERO_SLIDES.length;
 >
   <div class="hero-card relative flex flex-col overflow-hidden rounded-[28px] bg-blue shadow-[0_24px_60px_-32px_rgb(20_45_85/0.45)] md:block md:h-[clamp(440px,40vw,560px)] md:rounded-[40px]" data-carousel-track>
     <!-- Photos: decorative, crossfaded underneath the brand shapes -->
-    <div aria-hidden="true" class="stack h-[200px] md:absolute md:inset-y-0 md:left-[28%] md:h-full md:w-[72%]">
+    <div aria-hidden="true" class="stack aspect-[16/9] md:absolute md:aspect-auto md:inset-y-0 md:left-[28%] md:h-full md:w-[72%]">
       {
         HERO_SLIDES.map((slide, index) => (
           <Image

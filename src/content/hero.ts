@@ -1,7 +1,7 @@
 import type { ImageMetadata } from 'astro';
 import heroOffice from '../assets/img/hero-office.webp';
-import svcSales from '../assets/img/svc-sales.webp';
-import svcSupport from '../assets/img/svc-support.webp';
+import heroSales from '../assets/img/hero-sales.webp';
+import heroSupport from '../assets/img/hero-support.webp';
 
 export interface HeroSlide {
   id: string;
@@ -24,15 +24,15 @@ export const HERO_SLIDES: HeroSlide[] = [
   },
   {
     id: 'ventas',
-    image: svcSales,
-    focus: '45% 55%',
+    image: heroSales,
+    focus: '60% 35%',
     lockup: { kicker: 'Ventas', connector: 'que mantienen tus', word: 'leads', closing: 'en movimiento' },
     cta: { label: 'Agenda tu cita de ventas', href: '/agendar?servicio=ventas' },
   },
   {
     id: 'soporte',
-    image: svcSupport,
-    focus: '65% 40%',
+    image: heroSupport,
+    focus: '65% 35%',
     lockup: { kicker: 'Soporte', connector: 'profesional en', word: 'cada', closing: 'canal de tus clientes' },
     cta: { label: 'Agenda tu cita de Virtual Assistance', href: '/agendar?servicio=virtual-assistance' },
   },

@@ -7,19 +7,20 @@ const iconWidth = { ventas: 92, va: 150, web: 92, marketing: 150 } as const;
 ---
 
 <section aria-labelledby="services-title" class="relative mt-10 pb-16 md:mt-[72px] md:pb-28">
-  <!-- Lime band with the client's U-curve (desktop only) -->
-  <div aria-hidden="true" class="absolute top-0 right-16 left-0 hidden h-[80%] rounded-tr-[240px] border-t-[112px] border-r-[112px] border-lime xl:block"></div>
-  <div aria-hidden="true" class="absolute top-[calc(80%-1px)] right-0 hidden h-[210px] w-44 rounded-bl-[210px] border-b-[112px] border-l-[112px] border-lime xl:block"></div>
+  <!-- Lime band, same treatment as the /servicios header band -->
+  <div class="mx-auto w-full max-w-[1440px]">
+    <div class="svc-band bg-lime">
+      <h2
+        id="services-title"
+        class="mx-auto max-w-[1320px] font-display text-[clamp(26px,3.1vw,44px)] leading-[1.1] font-bold tracking-[-0.005em] text-navy uppercase"
+      >
+        Servicios para potenciar tu operación
+      </h2>
+    </div>
+  </div>
 
   <div class="relative mx-auto w-full max-w-[1320px] px-4 md:px-6">
-    <h2
-      id="services-title"
-      class="-ml-4 rounded-r-[40px] bg-lime px-6 py-5 font-display text-[clamp(26px,3vw,44px)] leading-tight font-bold tracking-[-0.01em] text-blue-ink uppercase md:-ml-6 xl:ml-0 xl:flex xl:h-28 xl:items-center xl:rounded-none xl:bg-transparent xl:px-0 xl:py-0 xl:pl-[72px]"
-    >
-      Servicios para potenciar tu operación
-    </h2>
-
-    <div class="grid grid-cols-1 gap-14 pt-12 md:grid-cols-2 md:gap-x-[72px] md:gap-y-20 md:pt-24 xl:pr-60 xl:pl-24">
+    <div class="grid grid-cols-1 gap-14 pt-12 md:grid-cols-2 md:gap-x-[72px] md:gap-y-20 md:pt-24 xl:px-24">
       {
         SERVICES.map((service) => (
           <article class="reveal flex flex-col gap-3.5 md:gap-5">
@@ -38,4 +39,24 @@ const iconWidth = { ventas: 92, va: 150, web: 92, marketing: 150 } as const;
     </div>
   </div>
 </section>
+
+<style>
+  .svc-band {
+    border-bottom-right-radius: 120px;
+    padding: 44px 24px;
+    text-align: center;
+  }
+  @media (max-width: 960px) {
+    .svc-band {
+      border-bottom-right-radius: 64px;
+    }
+  }
+  @media (max-width: 560px) {
+    .svc-band {
+      padding: 32px 16px;
+      text-align: left;
+      border-bottom-right-radius: 40px;
+    }
+  }
+</style>
 

@@ -1,4 +1,5 @@
 ---
+import Chevrons from '../ui/Chevrons.astro';
 import Icon from '../ui/Icon.astro';
 import ServiceIcon from '../ui/ServiceIcon.astro';
 import { SERVICES } from '../../content/services';
@@ -7,20 +8,28 @@ const iconWidth = { ventas: 92, va: 150, web: 92, marketing: 150 } as const;
 ---
 
 <section aria-labelledby="services-title" class="relative mt-10 pb-16 md:mt-[72px] md:pb-28">
-  <!-- Lime band, same treatment as the /servicios header band -->
-  <div class="mx-auto w-full max-w-[1440px]">
-    <div class="svc-band bg-lime">
-      <h2
-        id="services-title"
-        class="mx-auto max-w-[1320px] font-display text-[clamp(26px,3.1vw,44px)] leading-[1.1] font-bold tracking-[-0.005em] text-navy uppercase"
-      >
-        Servicios para potenciar tu operación
-      </h2>
-    </div>
+  <!-- Client artwork (desktop), traced from the PDF at 1920 and scaled to 0.75:
+       a 114 px band that turns down 64 px from the right edge (radius 225),
+       runs down as a 120 px stroke, then bends out through the page edge -->
+  <div aria-hidden="true" class="hb-arc hidden xl:block">
+    <Chevrons class="absolute -top-[114px] left-[31px]" />
+    <Chevrons dir="left" class="absolute -top-[114px] right-[105px]" />
+    <Chevrons dir="up" size={106} class="absolute top-[19px] -right-[113px]" />
+    <span class="hb-out"></span>
+  </div>
+
+  <div class="relative mr-4 overflow-hidden rounded-r-[40px] bg-lime md:mr-6 xl:mr-0 xl:flex xl:h-[114px] xl:items-center xl:justify-center xl:overflow-visible xl:rounded-none xl:bg-transparent xl:pr-[289px]">
+    <span aria-hidden="true" class="absolute inset-y-0 right-0 w-[104px] overflow-hidden xl:hidden"><Chevrons dir="left" size={112} class="absolute top-1/2 right-0 -translate-y-1/2" /></span>
+    <h2
+      id="services-title"
+      class="relative py-5 pr-[112px] pl-4 font-display text-[clamp(26px,3vw,44px)] leading-[1.08] font-bold tracking-[-0.01em] text-blue uppercase md:pl-6 xl:p-0 xl:text-center"
+    >
+      ¿Qué <span class="text-white">podemos</span> ayudarte <span class="xl:block">a hacer <span class="text-white">crecer</span>?</span>
+    </h2>
   </div>
 
   <div class="relative mx-auto w-full max-w-[1320px] px-4 md:px-6">
-    <div class="grid grid-cols-1 gap-14 pt-12 md:grid-cols-2 md:gap-x-[72px] md:gap-y-20 md:pt-24 xl:px-24">
+    <div class="grid grid-cols-1 gap-14 pt-12 md:grid-cols-2 md:gap-x-[72px] md:gap-y-20 md:pt-24 xl:pr-60 xl:pl-24">
       {
         SERVICES.map((service) => (
           <article class="reveal flex flex-col gap-3.5 md:gap-5">
@@ -28,7 +37,7 @@ const iconWidth = { ventas: 92, va: 150, web: 92, marketing: 150 } as const;
               <ServiceIcon name={service.id} width={iconWidth[service.id]} class="h-auto w-16 shrink-0 md:w-auto" />
               <h3 class="font-display text-[30px] leading-none font-bold tracking-[-0.015em] text-blue md:text-[clamp(40px,4vw,58px)]">{service.name}</h3>
             </div>
-            <p class="max-w-[32ch] text-[19px] leading-normal font-medium text-body">{service.lead}</p>
+            <p class="max-w-[32ch] text-[19px] leading-normal font-medium text-copy">{service.lead}</p>
             <a href={`/servicios#${service.slug}`} class="btn-primary mt-auto justify-between self-stretch md:justify-center md:self-start">
               {service.cta}
               <Icon name="arrow-right" />
@@ -41,22 +50,28 @@ const iconWidth = { ventas: 92, va: 150, web: 92, marketing: 150 } as const;
 </section>
 
 <style>
-  .svc-band {
-    border-bottom-right-radius: 120px;
-    padding: 44px 24px;
-    text-align: center;
+  .hb-arc {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 64px;
+    height: 542px;
+    border: 0 solid var(--color-lime);
+    border-top-width: 114px;
+    border-right-width: 120px;
+    border-top-right-radius: 225px;
   }
-  @media (max-width: 960px) {
-    .svc-band {
-      border-bottom-right-radius: 64px;
-    }
-  }
-  @media (max-width: 560px) {
-    .svc-band {
-      padding: 32px 16px;
-      text-align: left;
-      border-bottom-right-radius: 40px;
-    }
+  /* Bend out through the right edge: outer (left) radius 190 */
+  /* Overlaps the run by 2 px so no anti-aliasing seam shows at the joint */
+  .hb-out {
+    position: absolute;
+    top: calc(100% - 2px);
+    right: -224px;
+    width: 224px;
+    height: 192px;
+    border: 0 solid var(--color-lime);
+    border-left-width: 120px;
+    border-bottom-width: 114px;
+    border-bottom-left-radius: 190px;
   }
 </style>
-

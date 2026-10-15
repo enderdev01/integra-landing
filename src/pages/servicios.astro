@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Chevrons from '../components/ui/Chevrons.astro';
 import Icon from '../components/ui/Icon.astro';
 import ServiceIcon from '../components/ui/ServiceIcon.astro';
 import { SERVICES } from '../content/services';
@@ -30,13 +31,24 @@ const chips = [
   </nav>
 
   <div class="stage relative mx-auto w-full max-w-[1440px] pb-16 sm:pb-24">
-    <header>
-      <div class="sv-band bg-lime">
-        <h1 class="mx-auto max-w-[1320px] font-display text-[clamp(26px,3.1vw,44px)] leading-[1.1] font-bold tracking-[-0.005em] text-navy uppercase">
-          Soluciones que se integran a tu operación
+    <header class="relative">
+      <!-- Client artwork (desktop), traced from the PDF at 1920 and scaled 0.75:
+           a 115 px band whose right end curves through the page edge (radius
+           211), runs down mostly off-page and bends back out at the bottom -->
+      <div aria-hidden="true" class="sv-arc hidden xl:block">
+        <Chevrons size={115} class="absolute -top-[115px] left-px" />
+        <Chevrons dir="left" size={115} class="absolute -top-[115px] right-[96px]" />
+        <Chevrons dir="up" size={115} class="absolute top-[20px] -right-[115px]" />
+        <span class="sv-arc-end"></span>
+      </div>
+      <div class="sv-band relative overflow-hidden bg-lime">
+        <span aria-hidden="true" class="absolute inset-y-0 left-0 hidden w-[150px] overflow-hidden min-[561px]:block xl:hidden"><Chevrons size={112} class="absolute top-1/2 left-0 -translate-y-1/2" /></span>
+        <span aria-hidden="true" class="absolute inset-y-0 right-0 w-[96px] overflow-hidden min-[561px]:w-[150px] xl:hidden"><Chevrons dir="left" size={112} class="absolute top-1/2 right-0 -translate-y-1/2" /></span>
+        <h1 class="relative mx-auto font-display text-[clamp(26px,3.1vw,44px)] leading-[1.1] font-bold tracking-[-0.005em] text-blue uppercase">
+          <span class="text-white">Soluciones</span> que se <span class="text-white">integran</span> a tu operación
         </h1>
       </div>
-      <p class="sv-intro-p mx-auto max-w-[62ch] font-sans font-medium text-ink">
+      <p class="sv-intro-p relative mx-auto max-w-[62ch] font-sans font-medium text-ink">
         Cubrimos las funciones que tu negocio necesita, desde el seguimiento comercial hasta tu presencia digital, con un alcance definido contigo.
       </p>
     </header>
@@ -48,17 +60,19 @@ const chips = [
         return (
           <section id={service.slug} aria-labelledby={`s-${service.slug}`} class:list={['sv-row reveal', reversed && 'rev']}>
             <div class="sv-media">
-              <div class:list={['sv-frame', reversed ? 'bg-lime' : 'bg-blue']} aria-hidden="true" />
-              <div class="sv-pz bg-[#e3e9ef]">
-                <Image
-                  src={detail.photo.src}
-                  alt={detail.photo.alt}
-                  widths={[480, 720, 960]}
-                  sizes="(max-width: 960px) min(600px, 100vw), 560px"
-                  loading="lazy"
-                  class="block size-full object-cover"
-                  style={`object-position: ${detail.photo.focus}`}
-                />
+              <div class:list={['sv-photo', service.id === 'va' ? 'tone-lime' : 'tone-blue']}>
+                <span class="sv-back" aria-hidden="true" />
+                <div class="sv-pz">
+                  <Image
+                    src={detail.photo.src}
+                    alt={detail.photo.alt}
+                    widths={[480, 720, 960]}
+                    sizes="(max-width: 960px) min(440px, 100vw), 420px"
+                    loading="lazy"
+                    class="block size-full object-cover"
+                    style={`object-position: ${detail.photo.focus}`}
+                  />
+                </div>
               </div>
             </div>
             <div class="sv-copy">
@@ -115,7 +129,7 @@ const chips = [
     }
 
     <section id="industrias" aria-labelledby="s-industrias" class="sv-ind reveal mx-auto w-full max-w-[1320px]">
-      <h2 id="s-industrias" class="sv-h2 font-display font-bold text-blue">Industrias</h2>
+      <h2 id="s-industrias" class="sv-h2 font-display font-bold text-blue"><span class="text-lime">In</span>dustrias</h2>
       <p class="sv-ind-lead mt-5 max-w-[62ch] font-sans text-ink">
         <strong>Cada industria tiene su propio ritmo.</strong> Te ayudamos a integrar apoyo comercial, administrativo y digital según las necesidades de tu negocio.
       </p>
@@ -191,8 +205,45 @@ const chips = [
 
   .sv-band {
     border-bottom-right-radius: 120px;
-    padding: 44px 24px;
+    padding: 44px 168px;
     text-align: center;
+  }
+  /* Desktop: the arc draws the lime, the band only holds the title */
+  /* Anchored to the viewport, not the 1440 px stage, so the band starts at the
+     left edge and turns down the right edge on wide screens too */
+  .sv-arc {
+    position: absolute;
+    top: 0;
+    left: calc(50% - 50vw);
+    right: calc(50% - 50vw - 37px);
+    height: 571px;
+    border: 0 solid var(--color-lime);
+    border-top-width: 115px;
+    border-right-width: 115px;
+    border-top-right-radius: 211px;
+  }
+  /* Bottom of the vertical run bends back out through the right edge */
+  .sv-arc-end {
+    position: absolute;
+    top: calc(100% - 2px);
+    right: -315px;
+    width: 315px;
+    height: 152px;
+    border: 0 solid var(--color-lime);
+    border-left-width: 115px;
+    border-bottom-width: 115px;
+    border-bottom-left-radius: 112px;
+  }
+  @media (min-width: 1280px) {
+    .sv-band {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 115px;
+      padding: 0 24px;
+      overflow: visible;
+      background: transparent;
+    }
   }
   .sv-intro-p {
     margin-top: 48px;
@@ -212,49 +263,75 @@ const chips = [
     align-items: start;
     width: 100%;
     max-width: 1320px;
+    position: relative;
     margin: 0 auto;
     padding: 80px 24px 0;
   }
   .sv-row.rev {
     grid-template-columns: 6fr 5fr;
   }
+  /* Puzzle piece traced from the client artwork (PDF at 288 dpi). One SVG
+     mask — photo rect (100 × 109, rounded only away from the knob) plus a
+     knob (r 15, centred 11.5 outside the edge) minus a socket (r 13.2) that
+     breaks the bottom edge — cuts both the photo and its tone backing. The
+     backing sits up-left and slightly turned, so it peeks out at the top and
+     left and shows as the crescents inside the socket and behind the knob,
+     exactly as in the artwork. Units are cqw of the photo width. */
   .sv-media {
     position: sticky;
     top: 128px;
-    padding: 0 0 16px 16px;
+    padding: 5% 21% 2% 7%;
   }
   .sv-row.rev .sv-media {
     order: 2;
-    padding: 0 16px 16px 0;
+    padding: 5% 7% 2% 21%;
   }
   @media (min-width: 961px) and (max-width: 1279px) {
     .sv-media {
       top: 184px;
     }
   }
-  .sv-frame,
-  .sv-pz {
-    -webkit-mask: radial-gradient(circle 56px at 50% 100%, #0000 55px, #000 56px);
-    mask: radial-gradient(circle 56px at 50% 100%, #0000 55px, #000 56px);
-    border-radius: 28px;
-  }
-  .sv-frame {
-    position: absolute;
-    left: 0;
-    right: 16px;
-    top: 16px;
-    bottom: 0;
-  }
-  .sv-row.rev .sv-frame {
-    left: 16px;
-    right: 0;
-  }
-  .sv-pz {
+  .sv-photo {
+    --tone: var(--color-blue);
+    --piece: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 127 109'%3E%3Cmask id='m'%3E%3Cpath fill='white' d='M7 0H99A1 1 0 0 1 100 1V108A1 1 0 0 1 99 109H6A6 6 0 0 1 0 103V7A7 7 0 0 1 7 0Z'/%3E%3Ccircle fill='white' cx='111.5' cy='53' r='15'/%3E%3Ccircle fill='black' cx='49' cy='96.5' r='13.2'/%3E%3C/mask%3E%3Crect width='127' height='109' fill='white' mask='url%28%23m%29'/%3E%3C/svg%3E");
+    --piece-x: 0cqw;
     position: relative;
-    aspect-ratio: 4 / 3;
+    container-type: inline-size;
+    aspect-ratio: 100 / 109;
+  }
+  .sv-photo.tone-lime {
+    --tone: var(--color-lime);
+  }
+  .sv-row.rev .sv-photo {
+    --piece: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 127 109'%3E%3Cmask id='m'%3E%3Cpath fill='white' d='M28 0H120A7 7 0 0 1 127 7V103A6 6 0 0 1 121 109H28A1 1 0 0 1 27 108V1A1 1 0 0 1 28 0Z'/%3E%3Ccircle fill='white' cx='15.5' cy='53' r='15'/%3E%3Ccircle fill='black' cx='75' cy='96.5' r='13.2'/%3E%3C/mask%3E%3Crect width='127' height='109' fill='white' mask='url%28%23m%29'/%3E%3C/svg%3E");
+    --piece-x: -27cqw;
+  }
+  .sv-back,
+  .sv-pz {
+    position: absolute;
+    top: 0;
+    left: var(--piece-x);
+    width: 127cqw;
+    height: 109cqw;
+    -webkit-mask: var(--piece) 0 0 / 100% 100% no-repeat;
+    mask: var(--piece) 0 0 / 100% 100% no-repeat;
+  }
+  .sv-back {
+    background: var(--tone);
+    translate: -4.5cqw -4cqw;
+    rotate: -1deg;
+  }
+  .sv-pz {
     overflow: hidden;
+    background: #e3e9ef;
   }
   .sv-pz :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    object-fit: cover;
     transition: scale 0.3s var(--ease-out);
   }
   @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
@@ -409,6 +486,9 @@ const chips = [
       width: 100%;
       max-width: 600px;
     }
+    .sv-row > .sv-media {
+      max-width: 440px;
+    }
     .sv-row .sv-media,
     .sv-row.rev .sv-media {
       order: -1;
@@ -427,9 +507,6 @@ const chips = [
     .sv-row.rev {
       padding: 56px 16px 0;
       row-gap: 28px;
-    }
-    .sv-pz {
-      aspect-ratio: 16 / 10;
     }
     .sv-h2 {
       font-size: 34px;
@@ -451,7 +528,7 @@ const chips = [
       justify-content: space-between;
     }
     .sv-band {
-      padding: 32px 16px;
+      padding: 32px 104px 32px 16px;
       text-align: left;
       border-bottom-right-radius: 40px;
     }

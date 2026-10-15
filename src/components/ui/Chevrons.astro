@@ -1,0 +1,47 @@
+---
+/**
+ * Chevron group traced from the client artwork: three dark chevrons nearest the
+ * band's end, then three lighter ones, flat colours, 45° arms. Geometry is in
+ * artwork units (band thickness 152) and scaled to `size`, the band thickness
+ * in px. `right`/`left` lie along a horizontal band, `up` along a vertical one;
+ * the dark trio always sits at the start the chevrons point away from.
+ */
+interface Props {
+  dir?: 'right' | 'left' | 'up';
+  size?: number;
+  class?: string;
+}
+
+const { dir = 'right', size = 114, class: className } = Astro.props;
+
+const H = 152; // band thickness
+const T = 56; // arm thickness
+const S = 84; // tip offset
+const P = 81; // pitch
+const GAP = 31; // extra space between the dark and the light trio
+const DARK = '#7DAE30';
+const LIGHT = '#9BC024';
+
+const starts = Array.from({ length: 6 }, (_, i) => i * P + (i >= 3 ? GAP : 0));
+const L = starts[5] + T + S; // length along the band
+const scale = size / H;
+
+const shape = (a: number) => {
+  if (dir === 'right') return `M${a} 0h${T}l${S} ${H / 2}-${S} ${H / 2}h-${T}l${S}-${H / 2}z`;
+  if (dir === 'left') return `M${L - a} 0h-${T}l-${S} ${H / 2} ${S} ${H / 2}h${T}l-${S}-${H / 2}z`;
+  return `M0 ${L - a}v-${T}l${H / 2}-${S} ${H / 2} ${S}v${T}l-${H / 2}-${S}z`;
+};
+const horizontal = dir !== 'up';
+const width = (horizontal ? L : H) * scale;
+const height = (horizontal ? H : L) * scale;
+---
+
+<svg
+  aria-hidden="true"
+  viewBox={horizontal ? `0 0 ${L} ${H}` : `0 0 ${H} ${L}`}
+  width={width}
+  height={height}
+  class:list={['block max-w-none', className]}
+>
+  {starts.map((a, i) => <path fill={i < 3 ? DARK : LIGHT} d={shape(a)} />)}
+</svg>

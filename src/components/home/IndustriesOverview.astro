@@ -5,10 +5,10 @@ import { INDUSTRIES } from '../../content/industries';
 
 <section id="industrias" aria-labelledby="ind-title" class="relative scroll-mt-24 pb-16 lg:scroll-mt-32 md:pb-[88px]">
   <div class="mx-auto w-full max-w-[1320px] px-4 md:px-6">
-    <h2 id="ind-title" class="reveal text-center font-display text-[clamp(32px,3.4vw,48px)] leading-[1.05] font-bold tracking-[-0.01em] text-blue-ink">
-      Industrias que apoyamos
+    <h2 id="ind-title" class="reveal text-center font-display text-[clamp(32px,3.4vw,48px)] leading-[1.05] font-bold tracking-[-0.01em] text-copy">
+      Industrias
     </h2>
-    <div class="relative mt-7 md:mt-10">
+    <div class="relative mt-7 md:mt-10 xl:mx-auto xl:max-w-[960px]">
       <!-- Lime line that crosses behind the cards (desktop only) -->
       <div aria-hidden="true" class="ind-line hidden xl:block">
         <span class="ind-line-a"></span>
@@ -43,15 +43,13 @@ import { INDUSTRIES } from '../../content/industries';
 </section>
 
 <style>
-  /* Three bordered boxes form one continuous stroke: a curl entering from the
-     left edge, a drop that turns right at the cards' midline, and a run that
-     turns down the right edge to the footer. */
+  /* Traced from the client artwork (PDF at 1920, scaled 0.75). Three bordered
+     boxes: a curl entering from the left edge, a drop that turns right low
+     behind the cards (63–92 % of their height), and a run that starts higher
+     (43–73 %) and turns down the right edge under the footer. Both runs end
+     behind the second card, so the step between them never shows. */
   .ind-line {
-    --w: 112px;
-    --vp-left: calc(50% - 50vw);
-    --vp-right: calc(50% - 50vw);
-    --mid: calc(50% - var(--w) / 2);
-    --turn: calc(var(--vp-left) + 50vw - 120px);
+    --vp: calc(50% - 50vw);
     position: absolute;
     inset: 0;
     pointer-events: none;
@@ -63,31 +61,31 @@ import { INDUSTRIES } from '../../content/industries';
     border: 0 solid var(--color-lime);
   }
   .ind-line-a {
-    top: -380px;
-    left: calc(var(--vp-left) - 60px);
-    width: 160px;
-    height: 180px;
-    border-top-width: var(--w);
-    border-right-width: var(--w);
-    border-top-right-radius: 160px;
+    top: -364px;
+    left: calc(var(--vp) - 66px);
+    width: 220px;
+    height: 200px;
+    border-top-width: 120px;
+    border-right-width: 120px;
+    border-top-right-radius: 200px;
   }
   .ind-line-b {
-    top: -200px;
-    bottom: var(--mid);
-    left: calc(var(--vp-left) - 12px);
-    right: calc(100% - var(--turn));
-    border-left-width: var(--w);
-    border-bottom-width: var(--w);
-    border-bottom-left-radius: 200px;
+    top: -166px; /* 2 px under the curl, no seam at the joint */
+    bottom: 8%;
+    left: calc(var(--vp) + 34px);
+    right: 65%;
+    border-left-width: 120px;
+    border-bottom-width: 112px;
+    border-bottom-left-radius: 225px;
   }
   .ind-line-c {
-    top: var(--mid);
-    bottom: -88px;
-    left: var(--turn);
-    right: calc(var(--vp-right) + 8px);
-    border-top-width: var(--w);
-    border-right-width: var(--w);
-    border-top-right-radius: 200px;
+    top: 43%;
+    bottom: -228px;
+    left: 30%;
+    right: calc(var(--vp) + 4px);
+    border-top-width: 112px;
+    border-right-width: 124px;
+    border-top-right-radius: 225px;
   }
   .ind-card {
     transition:

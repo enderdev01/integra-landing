@@ -80,14 +80,14 @@ const pageTitle = `${kicker} ${connector} ${word} ${closing}`;
                 data-active={index === 0 ? '' : undefined}
                 inert={index !== 0}
               >
-                {/* Mobile: every line shares one left edge, so the closing sits under the
-                    big word the same way on every slide. md+: the closing steps out to
-                    the panel's right edge, as in the client design. */}
-                <h2 class="max-w-[300px] font-display leading-none text-white">
-                  <span class="block text-[clamp(30px,2.6vw,38px)] font-bold tracking-[-0.01em]">{slide.lockup.kicker}</span>
-                  <span class="mt-1 block text-[clamp(16px,1.35vw,19px)] font-bold">{slide.lockup.connector}</span>
-                  <span class="mt-0.5 block text-[clamp(56px,4.9vw,72px)] leading-[0.92] font-bold tracking-[-0.02em]">{slide.lockup.word}</span>
-                  <span class="mt-1.5 block md:text-right text-[clamp(16px,1.35vw,19px)] font-bold">{slide.lockup.closing}</span>
+                {/* Mobile: four stacked lines, all one size. md+: the four-part lockup
+                    from the client design, with the closing stepping out to the
+                    panel's right edge. */}
+                <h2 class="font-display text-[28px] leading-[1.1] font-bold tracking-[-0.01em] text-white md:max-w-[300px] md:leading-none md:tracking-normal">
+                  <span class="block md:text-[clamp(30px,2.6vw,38px)] md:tracking-[-0.01em]">{slide.lockup.kicker}</span>
+                  <span class="block md:mt-1 md:text-[clamp(16px,1.35vw,19px)]">{slide.lockup.connector}</span>
+                  <span class="block md:mt-0.5 md:text-[clamp(56px,4.9vw,72px)] md:leading-[0.92] md:tracking-[-0.02em]">{slide.lockup.word}</span>
+                  <span class="block md:mt-1.5 md:text-right md:text-[clamp(16px,1.35vw,19px)]">{slide.lockup.closing}</span>
                 </h2>
                 <a href={slide.cta.href} class="hero-cta mt-8 inline-flex text-balance min-h-[52px] items-center justify-center self-stretch rounded-full bg-cream px-7 py-3 text-center font-sans text-lg leading-tight font-bold text-[#5b7410] md:self-start">
                   {slide.cta.label}

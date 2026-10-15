@@ -113,7 +113,15 @@ const linkState = (id: PageId) =>
     </button>
   </div>
 
-  <nav id="menu-movil" aria-label="Menú" class="mobile-panel border-t border-line-warm px-6 pt-2 pb-6 lg:hidden" hidden>
+  <!-- Mobile menu: overlays the page (never pushes it), closed state is
+       visibility + inert so open/close are pure compositor transitions -->
+  <div class="menu-scrim absolute inset-x-0 top-full h-dvh bg-ink/40 lg:hidden" aria-hidden="true" data-menu-scrim></div>
+  <nav
+    id="menu-movil"
+    aria-label="Menú"
+    class="mobile-panel absolute inset-x-0 top-full max-h-[calc(100dvh-65px)] overflow-y-auto overscroll-contain border-t border-line-warm bg-cream px-6 pt-2 pb-6 shadow-[0_24px_40px_-24px_rgb(15_35_70/0.45)] lg:hidden"
+    inert
+  >
     <ul>
       {
         NAV.map((item) =>
@@ -138,7 +146,9 @@ const linkState = (id: PageId) =>
                   <Icon name="chevron-down" size={18} class="dd-chevron" />
                 </button>
               </div>
-              <ul id="m-servicios" class="accordion-panel grid gap-0.5 pb-3" hidden={active !== 'servicios'}>
+              <div id="m-servicios" class="accordion-panel grid" data-open={active === 'servicios' ? '' : undefined} inert={active !== 'servicios'}>
+                <div class="min-h-0 overflow-hidden">
+                  <ul class="accordion-list grid gap-0.5 pb-3">
                 {SERVICES.map((service) => (
                   <li>
                     <a href={`/servicios#${service.slug}`} class="flex min-h-[52px] items-center gap-3 py-1 pl-1.5 font-sans text-[17px] font-medium text-ink">
@@ -149,7 +159,9 @@ const linkState = (id: PageId) =>
                     </a>
                   </li>
                 ))}
-              </ul>
+                  </ul>
+                </div>
+              </div>
             </li>
           ) : (
             <li class="border-b border-line-warm">
@@ -267,26 +279,52 @@ const linkState = (id: PageId) =>
     }
   }
 
-  /* Mobile menu and services accordion: interruptible transitions.
-     Entry uses @starting-style; the menu's exit runs before `hidden` is set
-     (Tailwind's preflight forces display:none !important on [hidden]). */
+  /* Mobile menu: an overlay driven by [data-menu-open] on the header.
+     Only opacity/transform animate (compositor), visibility flips at the end
+     of the exit, so every toggle is interruptible and needs no timers. */
   .mobile-panel,
-  .accordion-panel {
-    transition:
-      opacity 0.2s var(--ease-out),
-      transform 0.2s var(--ease-out);
-  }
-  .mobile-panel[data-closing] {
+  .menu-scrim {
+    visibility: hidden;
+    pointer-events: none;
     opacity: 0;
-    transform: translateY(-8px);
-    transition-duration: 0.15s;
+    transition:
+      opacity 0.14s ease,
+      transform 0.14s var(--ease-out),
+      visibility 0s linear 0.14s;
   }
-  @starting-style {
-    .mobile-panel:not([hidden]),
-    .accordion-panel:not([hidden]) {
-      opacity: 0;
-      transform: translateY(-8px);
-    }
+  .mobile-panel {
+    transform: translateY(-6px);
+  }
+  .site-header[data-menu-open] .mobile-panel,
+  .site-header[data-menu-open] .menu-scrim {
+    visibility: visible;
+    pointer-events: auto;
+    opacity: 1;
+    transform: none;
+    transition-duration: 0.2s, 0.2s, 0s;
+    transition-delay: 0s;
+  }
+
+  /* Services accordion: height animates via grid rows (0fr -> 1fr) */
+  .accordion-panel {
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.22s var(--ease-out);
+  }
+  .accordion-panel[data-open] {
+    grid-template-rows: 1fr;
+  }
+  .accordion-list {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+  .accordion-panel[data-open] .accordion-list {
+    opacity: 1;
+    transition-delay: 0.05s;
+  }
+
+  /* Page behind the open menu does not scroll */
+  :global(html[data-menu-open]) {
+    overflow: hidden;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -301,10 +339,11 @@ const linkState = (id: PageId) =>
       transition: none;
       transform: none;
     }
-    .mobile-panel,
-    .accordion-panel,
-    .mobile-panel[data-closing] {
+    .mobile-panel {
       transform: none;
+    }
+    .accordion-panel {
+      transition: none;
     }
   }
 </style>
@@ -349,49 +388,45 @@ const linkState = (id: PageId) =>
     });
   });
 
-  // Mobile menu
+  // Mobile menu: one attribute drives the CSS; state flips synchronously on
+  // tap so the icon and panel answer on the same frame
   const menuToggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const menu = document.getElementById('menu-movil');
-  const closeMenu = () => {
-    if (!menu) return;
-    menu.setAttribute('data-closing', '');
-    const finish = () => {
-      if (!menu.hasAttribute('data-closing')) return;
-      menu.hidden = true;
-      menu.removeAttribute('data-closing');
-    };
-    menu.addEventListener('transitionend', finish, { once: true });
-    window.setTimeout(finish, 200);
-  };
-  menuToggle?.addEventListener('click', () => {
-    if (!menu) return;
-    const open = menu.hidden || menu.hasAttribute('data-closing');
-    if (open) {
-      // Reopening mid-exit retargets the running transition
-      menu.removeAttribute('data-closing');
-      menu.hidden = false;
-    } else {
-      closeMenu();
-    }
+  const setMenu = (open: boolean) => {
+    if (!header || !menu || !menuToggle) return;
+    if (open === header.hasAttribute('data-menu-open')) return;
+    header.toggleAttribute('data-menu-open', open);
+    document.documentElement.toggleAttribute('data-menu-open', open);
+    menu.inert = !open;
     menuToggle.setAttribute('aria-expanded', String(open));
     menuToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
     menuToggle.querySelector('.icon-open')?.classList.toggle('hidden', open);
     menuToggle.querySelector('.icon-close')?.classList.toggle('hidden', !open);
+  };
+  menuToggle?.addEventListener('click', () => setMenu(!header?.hasAttribute('data-menu-open')));
+  document.querySelector('[data-menu-scrim]')?.addEventListener('click', () => setMenu(false));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && header?.hasAttribute('data-menu-open')) {
+      setMenu(false);
+      menuToggle?.focus();
+    }
   });
-
-  // Same-page anchors (e.g. /servicios#industrias) don't reload: close the menu
+  // Any link closes the menu (same-page anchors don't reload the page)
   menu?.addEventListener('click', (event) => {
-    const link = (event.target as Element).closest('a');
-    if (link && !menu.hidden && link.pathname === window.location.pathname && link.hash) menuToggle?.click();
+    if ((event.target as Element).closest('a')) setMenu(false);
   });
+  // Desktop breakpoint hides the burger; back/forward cache restores state
+  window.matchMedia('(min-width: 1024px)').addEventListener('change', (event) => event.matches && setMenu(false));
+  window.addEventListener('pageshow', (event) => event.persisted && setMenu(false));
 
   // Services accordion inside the mobile menu
   document.querySelectorAll<HTMLButtonElement>('[data-accordion-toggle]').forEach((toggle) => {
     const panel = document.getElementById(toggle.getAttribute('aria-controls') ?? '');
     toggle.addEventListener('click', () => {
       if (!panel) return;
-      const open = panel.hidden;
-      panel.hidden = !open;
+      const open = !panel.hasAttribute('data-open');
+      panel.toggleAttribute('data-open', open);
+      panel.inert = !open;
       toggle.setAttribute('aria-expanded', String(open));
     });
   });

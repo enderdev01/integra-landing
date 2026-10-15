@@ -24,6 +24,15 @@ import { SITE } from '../../config/site';
     background: rgb(250 247 246 / 0.94);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    transition:
+      transform 0.2s var(--ease-out),
+      visibility 0s;
+  }
+  /* The open menu carries its own CTA; the bar steps aside */
+  :global(html[data-menu-open]) .action-bar {
+    visibility: hidden;
+    transform: translateY(100%);
+    transition-delay: 0s, 0.2s;
   }
   .call {
     transition: transform 0.16s var(--ease-out);

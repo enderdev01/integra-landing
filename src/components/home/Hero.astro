@@ -6,6 +6,10 @@ import { HERO_INTERVAL_MS, HERO_SLIDES } from '../../content/hero';
 const topChevrons = Array.from({ length: 6 }, (_, i) => `M${-26 + i * 60} 0h34l50 50-50 50h-34l50-50z`).join('');
 const sideChevrons = Array.from({ length: 8 }, (_, i) => `M0 ${i * 56}l50 40 50-40v28l-50 40-50-40z`).join('');
 const total = HERO_SLIDES.length;
+// The page title lives outside the slides: inactive slides are inert, which
+// would otherwise drop the h1 from the accessibility tree
+const { kicker, connector, word, closing } = HERO_SLIDES[0].lockup;
+const pageTitle = `${kicker} ${connector} ${word} ${closing}`;
 ---
 
 <section
@@ -15,9 +19,11 @@ const total = HERO_SLIDES.length;
   style={`--hero-interval: ${HERO_INTERVAL_MS}ms`}
   data-carousel
 >
+  <h1 id="hero-title" class="sr-only">{pageTitle}</h1>
   <div class="hero-card relative flex flex-col overflow-hidden rounded-[28px] bg-blue shadow-[0_24px_60px_-32px_rgb(20_45_85/0.45)] md:block md:h-[clamp(440px,40vw,560px)] md:rounded-[40px]" data-carousel-track>
-    <!-- Photos: decorative, crossfaded underneath the brand shapes -->
-    <div aria-hidden="true" class="stack aspect-[16/9] md:absolute md:aspect-auto md:inset-y-0 md:left-[28%] md:h-full md:w-[72%]">
+    <!-- Photos: decorative, crossfaded underneath the brand shapes. Each one is
+         absolutely filled into the frame so its own ratio never sizes the slot -->
+    <div aria-hidden="true" class="relative aspect-[16/9] md:absolute md:aspect-auto md:inset-y-0 md:left-[calc(var(--hero-panel)+2%)] md:h-full md:w-[calc(98%-var(--hero-panel))]">
       {
         HERO_SLIDES.map((slide, index) => (
           <Image
@@ -27,7 +33,7 @@ const total = HERO_SLIDES.length;
             sizes="(min-width: 768px) 72vw, 100vw"
             loading={index === 0 ? 'eager' : 'lazy'}
             fetchpriority={index === 0 ? 'high' : 'auto'}
-            class="slide-media h-full w-full object-cover"
+            class="slide-media absolute inset-0 h-full w-full object-cover"
             style={`object-position: ${slide.focus}`}
             data-active={index === 0 ? '' : undefined}
           />
@@ -36,7 +42,7 @@ const total = HERO_SLIDES.length;
     </div>
 
     <!-- Brand shapes (static across slides) -->
-    <div aria-hidden="true" class="absolute inset-y-0 left-0 z-[1] hidden w-[34%] overflow-hidden rounded-tr-[170px] bg-lime md:block">
+    <div aria-hidden="true" class="absolute inset-y-0 left-0 z-[1] hidden w-[calc(var(--hero-panel)+8%)] overflow-hidden rounded-tr-[170px] bg-lime md:block">
       <svg viewBox="0 0 400 100" preserveAspectRatio="xMinYMid slice" class="absolute top-0 left-0 block h-[20%] w-full">
         <defs>
           <linearGradient id="chev-top" x1="0" y1="0" x2="340" y2="0" gradientUnits="userSpaceOnUse">
@@ -60,11 +66,10 @@ const total = HERO_SLIDES.length;
     </div>
 
     <!-- Blue panel with one copy block per slide -->
-    <div class="relative z-[2] bg-blue px-6 pt-7 pb-7 md:absolute md:bottom-0 md:left-0 md:flex md:h-[80%] md:w-[26%] md:flex-col md:justify-end md:rounded-tr-[92px] md:pt-10 md:pr-7 md:pb-12 md:pl-11">
+    <div class="relative z-[2] bg-blue px-6 pt-7 pb-7 md:absolute md:bottom-0 md:left-0 md:flex md:h-[80%] md:w-[var(--hero-panel)] md:flex-col md:justify-end md:rounded-tr-[92px] md:pt-10 md:pr-7 md:pb-12 md:pl-11">
       <div class="stack" aria-live="off" data-carousel-copies>
         {
           HERO_SLIDES.map((slide, index) => {
-            const Heading = index === 0 ? 'h1' : 'h2';
             return (
               <div
                 class="slide-copy flex flex-col"
@@ -75,13 +80,13 @@ const total = HERO_SLIDES.length;
                 data-active={index === 0 ? '' : undefined}
                 inert={index !== 0}
               >
-                <Heading id={index === 0 ? 'hero-title' : undefined} class="max-w-[300px] font-display leading-none text-white">
+                <h2 class="max-w-[300px] font-display leading-none text-white">
                   <span class="block text-[clamp(30px,2.6vw,38px)] font-bold tracking-[-0.01em]">{slide.lockup.kicker}</span>
                   <span class="mt-1 block text-[clamp(16px,1.35vw,19px)] font-bold">{slide.lockup.connector}</span>
                   <span class="mt-0.5 block text-[clamp(56px,4.9vw,72px)] leading-[0.92] font-bold tracking-[-0.02em]">{slide.lockup.word}</span>
                   <span class="mt-1.5 block text-right text-[clamp(16px,1.35vw,19px)] font-bold">{slide.lockup.closing}</span>
-                </Heading>
-                <a href={slide.cta.href} class="hero-cta mt-8 inline-flex min-h-[52px] items-center justify-center self-stretch rounded-full bg-cream px-7 py-3 text-center font-sans text-lg leading-tight font-bold text-[#5b7410] md:self-start">
+                </h2>
+                <a href={slide.cta.href} class="hero-cta mt-8 inline-flex text-balance min-h-[52px] items-center justify-center self-stretch rounded-full bg-cream px-7 py-3 text-center font-sans text-lg leading-tight font-bold text-[#5b7410] md:self-start">
                   {slide.cta.label}
                 </a>
               </div>
@@ -124,6 +129,9 @@ const total = HERO_SLIDES.length;
 
   .hero-card {
     touch-action: pan-y;
+    /* Blue panel width: the design's 26%, but never narrower than the
+       headline lockup and CTA need. Lime shape and photo follow from it. */
+    --hero-panel: max(26%, 300px);
   }
 
   /* Photos crossfade; the incoming one settles from a slight zoom */
@@ -139,20 +147,18 @@ const total = HERO_SLIDES.length;
     transform: none;
   }
 
-  /* Copy: exit fast, enter after a beat (asymmetric timing) */
+  /* Copy: exit fast, enter after a beat (asymmetric timing).
+     Opacity + transform only: a blur filter repaints the block every frame */
   .slide-copy {
     opacity: 0;
     transform: translateY(8px);
-    filter: blur(2px);
     transition:
       opacity 0.2s ease,
-      transform 0.2s var(--ease-out),
-      filter 0.2s ease;
+      transform 0.2s var(--ease-out);
   }
   .slide-copy[data-active] {
     opacity: 1;
     transform: none;
-    filter: none;
     transition-duration: 0.3s;
     transition-delay: 0.08s;
   }
@@ -235,7 +241,6 @@ const total = HERO_SLIDES.length;
     :global(.slide-media),
     .slide-copy {
       transform: none;
-      filter: none;
       transition: opacity 0.2s ease;
     }
     .slide-copy[data-active] {

@@ -38,7 +38,7 @@ const first = SERVICES[0];
             SERVICES.map((service, index) => (
               <label class="svc-card relative flex cursor-pointer flex-col items-start gap-2.5 rounded-[14px] border-2 border-[#d6dee6] bg-white/70 px-3 py-3 text-left md:min-h-[196px] md:rounded-[20px] md:px-5 md:py-[22px]">
                 <input type="radio" name="servicio" value={service.slug} checked={index === 0} class="sr-only" />
-                <ServiceIcon name={service.id} width={cardIconWidth[service.id]} cutout="#FFFFFF" class="hidden md:block" />
+                <ServiceIcon name={service.id} width={cardIconWidth[service.id]} class="hidden md:block" />
                 <span class="hidden font-sans text-[13px] font-bold tracking-[0.1em] text-copy uppercase md:block">Cita de</span>
                 <span class="font-sans text-[15px] leading-tight font-semibold text-ink md:-mt-1.5 md:font-display md:text-2xl md:font-bold md:text-blue">{service.name}</span>
                 <span class="hidden font-serif text-[15px] leading-snug text-copy md:block">{service.short}.</span>

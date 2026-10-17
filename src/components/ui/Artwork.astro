@@ -1,0 +1,28 @@
+---
+/** Renders a piece of v3 vector artwork fitted inside a `size`×`size` box. Monochrome paths use `currentColor`. */
+import { ARTWORK, type ArtworkName } from './artwork';
+
+interface Props {
+  name: ArtworkName;
+  size: number;
+  class?: string;
+}
+
+const { name, size, class: className } = Astro.props;
+const art = ARTWORK[name];
+const scale = size / Math.max(art.width, art.height);
+const width = Math.round(art.width * scale * 100) / 100;
+const height = Math.round(art.height * scale * 100) / 100;
+---
+
+<svg
+  class={className}
+  width={width}
+  height={height}
+  viewBox={`0 0 ${art.width} ${art.height}`}
+  fill="currentColor"
+  aria-hidden="true"
+  focusable="false"
+>
+  {art.paths.map((path) => <path d={path.d} fill={'fill' in path ? path.fill : undefined} />)}
+</svg>

@@ -28,6 +28,7 @@
   --font-display: var(--font-quicksand), sans-serif;
   --font-sans: var(--font-roboto), sans-serif;
   --font-serif: var(--font-roboto-slab), Georgia, serif;
+  --font-footer: var(--font-myriad), sans-serif;
 
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }

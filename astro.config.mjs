@@ -58,5 +58,22 @@ export default defineConfig({
       subsets: ['latin'],
       fallbacks: ['Georgia', 'serif'],
     },
+    {
+      // Footer typeface from the client's v3 package (Adobe variable font, wght 300–900, wdth 70–110).
+      name: 'Myriad Variable Concept',
+      cssVariable: '--font-myriad',
+      provider: fontProviders.local(),
+      options: {
+        variants: [
+          {
+            src: ['./src/assets/fonts/MyriadVariableConcept.woff2'],
+            weight: '300 900',
+            stretch: '70% 110%',
+            style: 'normal',
+          },
+        ],
+      },
+      fallbacks: ['sans-serif'],
+    },
   ],
 });

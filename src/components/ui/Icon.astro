@@ -5,7 +5,7 @@
  */
 import Artwork from './Artwork.astro';
 
-const ARTWORK_ICONS = ['arrow-right', 'facebook', 'instagram', 'youtube', 'linkedin', 'x'] as const;
+const ARTWORK_ICONS = ['arrow-right', 'facebook', 'instagram', 'linkedin'] as const;
 type ArtworkIcon = (typeof ARTWORK_ICONS)[number];
 const isArtwork = (value: string): value is ArtworkIcon => (ARTWORK_ICONS as readonly string[]).includes(value);
 
@@ -23,9 +23,7 @@ type IconName =
   | 'play'
   | 'facebook'
   | 'instagram'
-  | 'youtube'
-  | 'linkedin'
-  | 'x';
+  | 'linkedin';
 
 interface Props {
   name: IconName;

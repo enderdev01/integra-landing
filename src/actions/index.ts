@@ -1,6 +1,7 @@
 import { ActionError, defineAction } from 'astro:actions';
-import { CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL, RESEND_API_KEY } from 'astro:env/server';
+import { CONTACT_FROM_EMAIL, RESEND_API_KEY } from 'astro:env/server';
 import { z } from 'astro/zod';
+import { SITE } from '../config/site';
 import { buildContactEmail } from '../lib/contact-email';
 
 const SERVICE_VALUES = ['ventas', 'virtual-assistance', 'diseno-web', 'marketing'] as const;
@@ -25,7 +26,7 @@ export const server = {
     handler: async ({ website, ...lead }) => {
       if (website) return { ok: true };
 
-      if (!RESEND_API_KEY || !CONTACT_TO_EMAIL) {
+      if (!RESEND_API_KEY) {
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'El formulario no está configurado. Escríbenos o agenda una llamada.',
@@ -39,7 +40,7 @@ export const server = {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_API_KEY}` },
         body: JSON.stringify({
           from: CONTACT_FROM_EMAIL ?? 'Integra Web <onboarding@resend.dev>',
-          to: [CONTACT_TO_EMAIL],
+          to: [SITE.email],
           reply_to: lead.email,
           subject,
           html,

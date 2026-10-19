@@ -14,19 +14,23 @@ export const SITE = {
     country: 'US',
     display: ['NW 79th Avenue', 'Doral, Florida 33122, USA'],
   },
+  /** Public contact inbox; also receives the contact form submissions. */
+  email: 'hello@integrasgp.com',
   // Placeholders from the client design — replace with real numbers before launch.
   phone: { display: '+0 000 000 0000', href: 'tel:+00000000000' },
   tollFree: { display: '+0 000 000 0000', href: 'tel:+00000000000' },
-  // Footer links. Replace with Integra's real profiles; only `profiles` below feed the structured data.
+  // Footer links to Integra's real profiles.
   social: [
-    { label: 'Facebook', href: 'https://facebook.com', icon: 'facebook' },
-    { label: 'Instagram', href: 'https://instagram.com', icon: 'instagram' },
-    { label: 'YouTube', href: 'https://youtube.com', icon: 'youtube' },
-    { label: 'LinkedIn', href: 'https://linkedin.com', icon: 'linkedin' },
-    { label: 'X', href: 'https://x.com', icon: 'x' },
+    { label: 'Facebook', href: 'https://www.facebook.com/share/1HbZjYG2Bs/?mibextid=wwXIfr', icon: 'facebook' },
+    { label: 'Instagram', href: 'https://www.instagram.com/integra.bpo', icon: 'instagram' },
+    { label: 'LinkedIn', href: 'https://www.linkedin.com/company/integra-growth-partner/', icon: 'linkedin' },
   ],
-  /** Real social profile URLs for schema.org `sameAs` (leave empty until confirmed) */
-  profiles: [] as string[],
+  /** Real social profile URLs for schema.org `sameAs` */
+  profiles: [
+    'https://www.facebook.com/share/1HbZjYG2Bs/?mibextid=wwXIfr',
+    'https://www.instagram.com/integra.bpo',
+    'https://www.linkedin.com/company/integra-growth-partner/',
+  ] as string[],
   legal: [
     { label: 'Política de reembolso', href: '/legal/refund-policy' },
     { label: 'Política de privacidad', href: '/legal/privacy-policy' },

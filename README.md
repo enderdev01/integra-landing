@@ -25,8 +25,7 @@ Definilas en Vercel (Project → Settings → Environment Variables) o en un arc
 | Variable | Tipo | Uso |
 | --- | --- | --- |
 | `SITE_URL` | build | URL pública para canonical, Open Graph y sitemap. Por defecto `https://integrasgp.com` (confirmar dominio). |
-| `RESEND_API_KEY` | secreta, servidor | API key de Resend que envía por correo el formulario de Contacto. Sin este valor (o sin `CONTACT_TO_EMAIL`) el formulario muestra un aviso y no envía. |
-| `CONTACT_TO_EMAIL` | secreta, servidor | Correo que recibe las solicitudes del formulario. |
+| `RESEND_API_KEY` | secreta, servidor | API key de Resend que envía por correo el formulario de Contacto. Sin este valor el formulario muestra un aviso y no envía. |
 | `CONTACT_FROM_EMAIL` | secreta, servidor | Remitente, por ejemplo `Integra Web <web@integrasgp.com>`. Requiere dominio verificado en Resend. Opcional: sin él usa `onboarding@resend.dev`, que solo entrega al dueño de la cuenta de Resend. |
 | `PUBLIC_GHL_BOOKING_VENTAS` | pública | URL del widget de reservas de la *Cita de Ventas*. |
 | `PUBLIC_GHL_BOOKING_VA` | pública | URL del widget de la *Cita de Virtual Assistance*. |
@@ -38,7 +37,6 @@ Ejemplo de `.env` local:
 ```bash
 SITE_URL=https://integrasgp.com
 RESEND_API_KEY=<api-key-de-resend>
-CONTACT_TO_EMAIL=<correo-que-recibe-las-solicitudes>
 CONTACT_FROM_EMAIL=Integra Web <web@integrasgp.com>
 PUBLIC_GHL_BOOKING_VENTAS=<url-del-src-del-iframe-del-calendario-de-ventas>
 PUBLIC_GHL_BOOKING_VA=
@@ -53,7 +51,7 @@ Las variables están tipadas y validadas con `astro:env` en `astro.config.mjs`.
 ### Formulario de Contacto
 Se envía por correo con Resend (el trigger *Inbound Webhook* de GoHighLevel es premium y cobra por ejecución, por eso no se usa).
 1. En resend.com, crear una API key y copiarla en `RESEND_API_KEY`.
-2. Definir `CONTACT_TO_EMAIL` con la casilla que recibe las solicitudes.
+2. Las solicitudes llegan a `SITE.email` (`src/config/site.ts`, hoy `hello@integrasgp.com`); para cambiar el destinatario se edita ahí.
 3. Para enviar desde un dominio propio, verificarlo en Resend (Domains) y definir `CONTACT_FROM_EMAIL`. Sin eso Resend solo entrega al correo dueño de la cuenta.
 4. El correo llega en texto plano con nombre, correo, empresa, servicio, industria y mensaje; el campo `email` del visitante queda como *reply-to*.
 

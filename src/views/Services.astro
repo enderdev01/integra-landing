@@ -1,0 +1,566 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Chevrons from '../components/ui/Chevrons.astro';
+import Artwork from '../components/ui/Artwork.astro';
+import Icon from '../components/ui/Icon.astro';
+import ServiceIcon from '../components/ui/ServiceIcon.astro';
+import { getServices } from '../content/services';
+import { getIndustries } from '../content/industries';
+import { bookingHref, contactHref, getLocale, useTranslations } from '../i18n';
+
+const locale = getLocale(Astro.url);
+const t = useTranslations(locale).servicesPage;
+const services = getServices(locale);
+const industries = getIndustries(locale);
+
+const icons = {
+  ventas: { width: 80 },
+  va: { width: 120 },
+  web: { width: 80 },
+  marketing: { width: 116 },
+} as const;
+const chips = [
+  ...services.map((service) => ({ href: `#${service.slug}`, label: service.id === 'marketing' ? t.marketingChip : service.name })),
+  { href: '#industrias', label: t.industriesChip },
+];
+---
+
+<BaseLayout page="servicios">
+  <nav aria-label={t.jump} class="chips sticky top-16 z-40 flex gap-2 overflow-x-auto border-b border-[#e3e9ef] px-4 py-2.5 lg:top-[105px] xl:hidden">
+    {
+      chips.map((chip) => (
+        <a href={chip.href} class="chip inline-flex min-h-11 shrink-0 items-center rounded-full border-[1.5px] border-[#d6dee6] bg-white px-4 font-sans text-[15px] font-semibold text-ink no-underline">
+          {chip.label}
+        </a>
+      ))
+    }
+  </nav>
+
+  <div class="stage relative mx-auto w-full max-w-[1440px] pb-16 sm:pb-24">
+    <header class="relative">
+      <!-- Client artwork (desktop), traced from the PDF at 1920 and scaled 0.75:
+           a 115 px band whose right end curves through the page edge (radius
+           211), runs down mostly off-page and bends back out at the bottom -->
+      <div aria-hidden="true" class="sv-arc hidden xl:block">
+        <Chevrons size={115} class="absolute -top-[115px] left-px" />
+        <Chevrons dir="left" size={115} class="absolute -top-[115px] right-[96px]" />
+        <Chevrons dir="up" size={115} class="absolute top-[20px] -right-[115px]" />
+        <span class="sv-arc-end"></span>
+      </div>
+      <div class="sv-band relative overflow-hidden bg-lime">
+        <span aria-hidden="true" class="absolute inset-y-0 left-0 hidden w-[150px] overflow-hidden min-[561px]:block xl:hidden"><Chevrons size={112} class="absolute top-1/2 left-0 -translate-y-1/2" /></span>
+        <span aria-hidden="true" class="absolute inset-y-0 right-0 w-[96px] overflow-hidden min-[561px]:w-[150px] xl:hidden"><Chevrons dir="left" size={112} class="absolute top-1/2 right-0 -translate-y-1/2" /></span>
+        <h1 class="relative mx-auto font-display text-[clamp(26px,3.1vw,44px)] leading-[1.1] font-bold tracking-[-0.005em] text-blue uppercase">
+          <span class="text-white">{t.h1Highlight1}</span>{t.h1Middle}<span class="text-white">{t.h1Highlight2}</span>{t.h1End}
+        </h1>
+      </div>
+      <p class="sv-intro-p relative mx-auto max-w-[62ch] font-sans font-medium text-ink">
+        {t.intro}
+      </p>
+    </header>
+
+    {
+      services.map((service, index) => {
+        const { detail } = service;
+        const reversed = index % 2 === 1;
+        return (
+          <section id={service.slug} aria-labelledby={`s-${service.slug}`} class:list={['sv-row reveal', reversed && 'rev']}>
+            <div class="sv-media">
+              <div class:list={['sv-photo', service.id === 'va' ? 'tone-lime' : 'tone-blue']}>
+                <span class="sv-back" aria-hidden="true" />
+                <div class="sv-pz">
+                  <Image
+                    src={detail.photo.src}
+                    alt={detail.photo.alt}
+                    widths={[480, 720, 960]}
+                    sizes="(max-width: 960px) min(440px, 100vw), 420px"
+                    loading="lazy"
+                    class="block size-full object-cover"
+                    style={`object-position: ${detail.photo.focus}`}
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="sv-copy">
+              <div class="flex items-center gap-[18px]">
+                <ServiceIcon name={service.id} width={icons[service.id].width} class="svc-ico h-auto shrink-0" />
+                <h2 id={`s-${service.slug}`} class="sv-h2 font-display font-bold text-blue">
+                  {service.name}
+                </h2>
+              </div>
+              <p class="sv-lead font-sans font-medium text-ink">{detail.lead}</p>
+              <p class="sv-p">{detail.summary}</p>
+              <ul class="sv-points" role="list">
+                {detail.points.map((point) => (
+                  <li class="flex items-start gap-2.5">
+                    <svg class="mt-px shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#95B71E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 12.5l4.5 4.5L19 7.5" />
+                    </svg>
+                    {point}
+                  </li>
+                ))}
+              </ul>
+              <details class="svc-more w-full">
+                <summary class="svc-more-btn">
+                  <span class="label-closed">
+                    {t.seeAll}<span class="sr-only">: {service.name}</span>
+                  </span>
+                  <span class="label-open">
+                    {t.seeLess}<span class="sr-only">: {service.name}</span>
+                  </span>
+                  <Icon name="chevron-down" size={18} class="sv-chev" />
+                </summary>
+                <div class="svc-more-in">
+                  {detail.more.map((paragraph) => (
+                    <p class="sv-p">{paragraph}</p>
+                  ))}
+                  <h3 class="sv-h3">{t.support}</h3>
+                  <ul class="sv-list" role="list">
+                    {detail.support.map((item) => (
+                      <li>
+                        {item.label && <strong>{item.label}</strong>} {item.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </details>
+              <a href={bookingHref(locale, service.slug)} class="btn-primary sv-cta mt-2">
+                {service.cta}
+                <Icon name="arrow-right" />
+              </a>
+            </div>
+          </section>
+        );
+      })
+    }
+
+    <section id="industrias" aria-labelledby="s-industrias" class="sv-ind reveal mx-auto w-full max-w-[1320px]">
+      <h2 id="s-industrias" class="sv-h2 font-display font-bold text-blue"><span class="text-lime">{t.industriesTitleLime}</span>{t.industriesTitleRest}</h2>
+      <p class="sv-ind-lead mt-5 max-w-[62ch] font-sans text-ink">
+        <strong>{t.industriesLeadStrong}</strong> {t.industriesLead}
+      </p>
+      <ul class="mt-8 grid grid-cols-1 gap-4 min-[641px]:mt-12 min-[641px]:grid-cols-2 min-[641px]:gap-6" role="list">
+        {
+          industries.map((industry) => (
+            <li>
+              <article
+                id={industry.slug}
+                class="sv-card flex h-full flex-col items-start gap-3.5 rounded-[28px] bg-blue px-6 py-7 text-white shadow-[0_20px_44px_-28px_rgb(0_56_92/0.6)] min-[641px]:rounded-[32px] min-[641px]:px-8 min-[641px]:py-9"
+              >
+                <Artwork name={industry.icon} size={60} />
+                <h3 class="font-display text-[28px] leading-[1.1] font-bold">{industry.name}</h3>
+                <p class="max-w-[44ch] font-sans text-[17px] leading-normal">{industry.description}</p>
+              </article>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="mt-12 flex justify-center">
+        <a href={contactHref(locale)} class="btn-primary sv-ind-cta min-h-[52px] shadow-[0_10px_24px_-12px_rgb(0_56_92/0.5)]">
+          {t.industriesCta} <Icon name="arrow-right" />
+        </a>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .chips {
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    background: rgb(244 247 249 / 0.94);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .chips::-webkit-scrollbar {
+    display: none;
+  }
+  .chip {
+    scroll-snap-align: start;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.16s var(--ease-out);
+  }
+  .chip:active {
+    transform: scale(0.96);
+  }
+
+  /* Anchors land below the sticky header (+ chips under 1280 px) */
+  .sv-row,
+  .sv-ind,
+  .sv-card {
+    scroll-margin-top: 152px;
+  }
+  @media (min-width: 1024px) {
+    .sv-row,
+    .sv-ind,
+    .sv-card {
+      scroll-margin-top: 180px;
+    }
+  }
+  @media (min-width: 1280px) {
+    .sv-row,
+    .sv-ind,
+    .sv-card {
+      scroll-margin-top: 128px;
+    }
+  }
+
+  .sv-band {
+    border-bottom-right-radius: 120px;
+    padding: 44px 168px;
+    text-align: center;
+  }
+  /* Desktop: the arc draws the lime, the band only holds the title */
+  /* Anchored to the viewport, not the 1440 px stage, so the band starts at the
+     left edge and turns down the right edge on wide screens too */
+  .sv-arc {
+    position: absolute;
+    top: 0;
+    left: calc(50% - 50vw);
+    right: calc(50% - 50vw - 37px);
+    height: 571px;
+    border: 0 solid var(--color-lime);
+    border-top-width: 115px;
+    border-right-width: 115px;
+    border-top-right-radius: 211px;
+  }
+  /* Bottom of the vertical run bends back out through the right edge */
+  .sv-arc-end {
+    position: absolute;
+    top: calc(100% - 2px);
+    right: -315px;
+    width: 315px;
+    height: 152px;
+    border: 0 solid var(--color-lime);
+    border-left-width: 115px;
+    border-bottom-width: 115px;
+    border-bottom-left-radius: 112px;
+  }
+  @media (min-width: 1280px) {
+    .sv-band {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 115px;
+      padding: 0 24px;
+      overflow: visible;
+      background: transparent;
+    }
+  }
+  .sv-intro-p {
+    margin-top: 48px;
+    padding: 0 24px;
+    font-size: 20px;
+    line-height: 1.55;
+    text-align: center;
+    text-wrap: balance;
+  }
+
+  /* Alternating photo / copy rows; copy starts at the top so opening
+     "Ver todo" never re-centres the photo, which stays sticky on desktop. */
+  .sv-row {
+    display: grid;
+    grid-template-columns: 5fr 6fr;
+    column-gap: 96px;
+    align-items: start;
+    width: 100%;
+    max-width: 1320px;
+    position: relative;
+    margin: 0 auto;
+    padding: 80px 24px 0;
+  }
+  .sv-row.rev {
+    grid-template-columns: 6fr 5fr;
+  }
+  /* Puzzle piece traced from the client artwork (PDF at 288 dpi). One SVG
+     mask — photo rect (100 × 109, rounded only away from the knob) plus a
+     knob (r 15, centred 11.5 outside the edge) minus a socket (r 13.2) that
+     breaks the bottom edge — cuts both the photo and its tone backing. The
+     backing sits up-left and slightly turned, so it peeks out at the top and
+     left and shows as the crescents inside the socket and behind the knob,
+     exactly as in the artwork. Units are cqw of the photo width. */
+  .sv-media {
+    position: sticky;
+    top: 128px;
+    padding: 5% 21% 2% 7%;
+  }
+  .sv-row.rev .sv-media {
+    order: 2;
+    padding: 5% 7% 2% 21%;
+  }
+  @media (min-width: 961px) and (max-width: 1279px) {
+    .sv-media {
+      top: 184px;
+    }
+  }
+  .sv-photo {
+    --tone: var(--color-blue);
+    --piece: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 127 109'%3E%3Cmask id='m'%3E%3Cpath fill='white' d='M7 0H99A1 1 0 0 1 100 1V108A1 1 0 0 1 99 109H6A6 6 0 0 1 0 103V7A7 7 0 0 1 7 0Z'/%3E%3Ccircle fill='white' cx='111.5' cy='53' r='15'/%3E%3Ccircle fill='black' cx='49' cy='96.5' r='13.2'/%3E%3C/mask%3E%3Crect width='127' height='109' fill='white' mask='url%28%23m%29'/%3E%3C/svg%3E");
+    --piece-x: 0cqw;
+    position: relative;
+    container-type: inline-size;
+    aspect-ratio: 100 / 109;
+  }
+  .sv-photo.tone-lime {
+    --tone: var(--color-lime);
+  }
+  .sv-row.rev .sv-photo {
+    --piece: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 127 109'%3E%3Cmask id='m'%3E%3Cpath fill='white' d='M28 0H120A7 7 0 0 1 127 7V103A6 6 0 0 1 121 109H28A1 1 0 0 1 27 108V1A1 1 0 0 1 28 0Z'/%3E%3Ccircle fill='white' cx='15.5' cy='53' r='15'/%3E%3Ccircle fill='black' cx='75' cy='96.5' r='13.2'/%3E%3C/mask%3E%3Crect width='127' height='109' fill='white' mask='url%28%23m%29'/%3E%3C/svg%3E");
+    --piece-x: -27cqw;
+  }
+  .sv-back,
+  .sv-pz {
+    position: absolute;
+    top: 0;
+    left: var(--piece-x);
+    width: 127cqw;
+    height: 109cqw;
+    -webkit-mask: var(--piece) 0 0 / 100% 100% no-repeat;
+    mask: var(--piece) 0 0 / 100% 100% no-repeat;
+  }
+  .sv-back {
+    background: var(--tone);
+    translate: -4.5cqw -4cqw;
+    rotate: -1deg;
+  }
+  .sv-pz {
+    overflow: hidden;
+    background: #e3e9ef;
+  }
+  .sv-pz :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100%;
+    object-fit: cover;
+    transition: scale 0.3s var(--ease-out);
+  }
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    .sv-media:hover .sv-pz :global(img) {
+      scale: 1.03;
+    }
+  }
+  .sv-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    min-width: 0;
+  }
+  .sv-h2 {
+    font-size: clamp(40px, 4vw, 58px);
+    line-height: 1;
+    letter-spacing: -0.015em;
+  }
+  .sv-lead {
+    max-width: 32ch;
+    font-size: 20px;
+    line-height: 1.45;
+  }
+  .sv-p {
+    max-width: 56ch;
+    font-family: var(--font-serif);
+    font-size: 17px;
+    line-height: 1.6;
+    color: #3b4552;
+  }
+  .sv-points {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 28px;
+    width: 100%;
+    margin-top: 4px;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.35;
+    font-weight: 500;
+    color: var(--color-ink);
+  }
+
+  /* "Ver todo lo que incluye": native disclosure, crawlable, no JS */
+  .svc-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding-right: 4px;
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--color-blue-ink);
+    cursor: pointer;
+    list-style: none;
+    transition: color 0.15s ease;
+  }
+  .svc-more-btn::-webkit-details-marker {
+    display: none;
+  }
+  .svc-more .label-open,
+  .svc-more[open] .label-closed {
+    display: none;
+  }
+  .svc-more[open] .label-open {
+    display: inline;
+  }
+  :global(.sv-chev) {
+    transition: transform 0.2s var(--ease-out);
+  }
+  .svc-more[open] :global(.sv-chev) {
+    transform: rotate(180deg);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .svc-more-btn:hover {
+      color: var(--color-blue-dark);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+  }
+  .svc-more-in {
+    display: grid;
+    gap: 14px;
+    padding: 8px 0 12px;
+  }
+  .svc-more[open] .svc-more-in {
+    animation: more-in 0.25s var(--ease-out);
+  }
+  @keyframes more-in {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+  .sv-h3 {
+    margin-top: 8px;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-ink);
+  }
+  .sv-list {
+    display: grid;
+    gap: 12px;
+    font-family: var(--font-serif);
+    font-size: 16px;
+    line-height: 1.5;
+    color: #3b4552;
+  }
+  .sv-list li {
+    position: relative;
+    padding-left: 26px;
+  }
+  .sv-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.45em;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-lime);
+  }
+  .sv-list strong {
+    font-weight: 700;
+    color: var(--color-ink);
+  }
+
+  .sv-ind {
+    margin-top: 104px;
+    padding: 0 24px;
+  }
+  .sv-ind-lead {
+    font-size: 20px;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 960px) {
+    .sv-row,
+    .sv-row.rev {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 32px;
+      padding: 72px 24px 0;
+      justify-items: center;
+    }
+    .sv-row > * {
+      width: 100%;
+      max-width: 600px;
+    }
+    .sv-row > .sv-media {
+      max-width: 440px;
+    }
+    .sv-row .sv-media,
+    .sv-row.rev .sv-media {
+      order: -1;
+      position: relative;
+      top: auto;
+    }
+    .sv-band {
+      border-bottom-right-radius: 64px;
+    }
+    .sv-ind {
+      margin-top: 96px;
+    }
+  }
+  @media (max-width: 560px) {
+    .sv-row,
+    .sv-row.rev {
+      padding: 56px 16px 0;
+      row-gap: 28px;
+    }
+    .sv-h2 {
+      font-size: 34px;
+    }
+    .sv-lead {
+      font-size: 19px;
+    }
+    .sv-points {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+    }
+    .sv-copy :global(.svc-ico) {
+      width: 64px;
+    }
+    .sv-cta,
+    .sv-ind-cta {
+      align-self: stretch;
+      flex: 1;
+      justify-content: space-between;
+    }
+    .sv-band {
+      padding: 32px 104px 32px 16px;
+      text-align: left;
+      border-bottom-right-radius: 40px;
+    }
+    .sv-intro-p {
+      margin-top: 32px;
+      padding: 0 16px;
+      font-size: 18px;
+      text-align: left;
+    }
+    .sv-ind {
+      margin-top: 80px;
+      padding: 0 16px;
+    }
+    .sv-ind-lead {
+      font-size: 18px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chip:active {
+      transform: none;
+    }
+    :global(.sv-chev) {
+      transition: none;
+    }
+    .svc-more[open] .svc-more-in {
+      animation: none;
+    }
+  }
+</style>

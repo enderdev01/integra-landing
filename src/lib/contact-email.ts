@@ -1,4 +1,4 @@
-import { INDUSTRIES } from '../content/industries';
+import { es } from '../i18n/es';
 
 export interface ContactLead {
   name: string;
@@ -19,8 +19,8 @@ const SERVICE_LABELS: Record<string, string> = {
 };
 
 const serviceLabel = (slug: string) => SERVICE_LABELS[slug] ?? slug;
-const industryLabel = (slug?: string) =>
-  slug ? (slug === 'otra' ? 'Otra' : (INDUSTRIES.find((industry) => industry.slug === slug)?.name ?? slug)) : '';
+// The email goes to Integra's own inbox, so it stays in Spanish whatever language the visitor used
+const industryLabel = (slug?: string) => (slug ? (slug === 'otra' ? es.form.otherIndustry : (es.industries[slug]?.name ?? slug)) : '');
 
 const escapeHtml = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');

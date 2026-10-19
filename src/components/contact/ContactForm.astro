@@ -1,15 +1,20 @@
 ---
 import Icon from '../ui/Icon.astro';
-import { SERVICES } from '../../content/services';
-import { INDUSTRIES } from '../../content/industries';
+import { getServices } from '../../content/services';
+import { getIndustries } from '../../content/industries';
+import { bookingHref, getLocale, legalPath, routePath, useTranslations } from '../../i18n';
 
-const industries = [...INDUSTRIES.map(({ slug, name }) => ({ slug, name })), { slug: 'otra', name: 'Otra' }];
+const locale = getLocale(Astro.url);
+const t = useTranslations(locale).form;
+const services = getServices(locale);
+const industries = [...getIndustries(locale).map(({ slug, name }) => ({ slug, name })), { slug: 'otra', name: t.otherIndustry }];
 const label = 'text-sm font-semibold text-ink';
 const required = '<span aria-hidden="true" class="text-danger">*</span>';
 const errorText = 'text-[13px] text-danger';
 ---
 
 <div class="font-sans" data-contact>
+  <script type="application/json" data-contact-i18n set:html={JSON.stringify({ errors: t.errors, reviewOne: t.reviewOne, reviewMany: t.reviewMany, network: t.network, serverError: t.serverError, successTitle: t.successTitle, successTitleNamed: t.successTitleNamed, notConfigured: t.notConfigured, summaryService: t.summaryService, summaryCompany: t.summaryCompany, summaryIndustry: t.summaryIndustry, param: { service: locale === 'en' ? 'service' : 'servicio' } })} />
   <form class="contact-form grid grid-cols-1 content-start gap-[22px] sm:grid-cols-2" novalidate aria-labelledby="ct-title" data-contact-form>
     <div role="alert" tabindex="-1" class="col-span-full flex items-start gap-3 rounded-xl border border-[#fecdca] bg-[#fef3f2] px-4 py-3.5 text-[15px] leading-snug text-[#912018]" data-summary hidden>
       <Icon name="alert" size={20} class="mt-px shrink-0" />
@@ -17,32 +22,32 @@ const errorText = 'text-[13px] text-danger';
     </div>
 
     <fieldset class="contents" data-fields>
-      <legend class="sr-only">Datos de contacto</legend>
+      <legend class="sr-only">{t.legend}</legend>
 
       <div class="grid content-start gap-2">
-        <label for="f-name" class={label}>Nombre completo <Fragment set:html={required} /></label>
+        <label for="f-name" class={label}>{t.name} <Fragment set:html={required} /></label>
         <input id="f-name" name="name" type="text" autocomplete="name" required minlength="3" class="field" aria-describedby="f-name-error" />
         <p id="f-name-error" class={errorText} hidden></p>
       </div>
 
       <div class="grid content-start gap-2">
-        <label for="f-email" class={label}>Correo electrónico <Fragment set:html={required} /></label>
-        <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder="nombre@empresa.com" class="field" aria-describedby="f-email-error" />
+        <label for="f-email" class={label}>{t.email} <Fragment set:html={required} /></label>
+        <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" required placeholder={t.emailPlaceholder} class="field" aria-describedby="f-email-error" />
         <p id="f-email-error" class={errorText} hidden></p>
       </div>
 
       <div class="col-span-full grid content-start gap-2">
-        <label for="f-company" class={label}>Empresa <Fragment set:html={required} /></label>
+        <label for="f-company" class={label}>{t.company} <Fragment set:html={required} /></label>
         <input id="f-company" name="company" type="text" autocomplete="organization" required minlength="2" class="field" aria-describedby="f-company-error" />
         <p id="f-company-error" class={errorText} hidden></p>
       </div>
 
       <div class="grid content-start gap-2">
-        <label for="f-service" class={label}>Servicio de interés <Fragment set:html={required} /></label>
+        <label for="f-service" class={label}>{t.service} <Fragment set:html={required} /></label>
         <div class="relative">
           <select id="f-service" name="service" required class="field cursor-pointer pr-11" aria-describedby="f-service-error">
-            <option value="">Seleccionar</option>
-            {SERVICES.map((service) => <option value={service.slug}>{service.name}</option>)}
+            <option value="">{t.select}</option>
+            {services.map((service) => <option value={service.slug}>{service.name}</option>)}
           </select>
           <Icon name="chevron-down" size={20} class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-blue" />
         </div>
@@ -50,10 +55,10 @@ const errorText = 'text-[13px] text-danger';
       </div>
 
       <div class="grid content-start gap-2">
-        <label for="f-industry" class={label}>Industria</label>
+        <label for="f-industry" class={label}>{t.industry}</label>
         <div class="relative">
           <select id="f-industry" name="industry" class="field cursor-pointer pr-11">
-            <option value="">Seleccionar</option>
+            <option value="">{t.select}</option>
             {industries.map((industry) => <option value={industry.slug}>{industry.name}</option>)}
           </select>
           <Icon name="chevron-down" size={20} class="pointer-events-none absolute top-1/2 right-4 -translate-y-1/2 text-blue" />
@@ -61,20 +66,20 @@ const errorText = 'text-[13px] text-danger';
       </div>
 
       <div class="col-span-full grid content-start gap-2">
-        <label for="f-msg" class={label}>¿Qué necesitas?</label>
-        <textarea id="f-msg" name="message" rows="5" maxlength="2000" placeholder="Cuéntanos sobre tu equipo o proyecto" class="field min-h-[140px] resize-y"></textarea>
+        <label for="f-msg" class={label}>{t.message}</label>
+        <textarea id="f-msg" name="message" rows="5" maxlength="2000" placeholder={t.messagePlaceholder} class="field min-h-[140px] resize-y"></textarea>
       </div>
 
       <!-- Honeypot -->
       <div class="sr-only" aria-hidden="true">
-        <label for="f-website">No completar</label>
+        <label for="f-website">{t.honeypot}</label>
         <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off" />
       </div>
 
       <div class="col-span-full grid gap-1.5">
         <label for="f-consent" class="flex min-h-11 cursor-pointer items-start gap-3 pt-1 text-sm leading-normal text-[#3b4552]">
           <input id="f-consent" name="consent" type="checkbox" required class="mt-px size-5 shrink-0 accent-blue" aria-describedby="f-consent-error" />
-          <span>Acepto la <a href="/legal/privacy-policy" class="font-semibold text-blue-ink">política de privacidad</a> y el contacto sobre mi solicitud.</span>
+          <span>{t.consentStart}<a href={legalPath('privacy-policy', locale)} class="font-semibold text-blue-ink">{t.consentLink}</a>{t.consentEnd}</span>
         </label>
         <p id="f-consent-error" class:list={[errorText, '-mt-2.5 pl-8']} hidden></p>
       </div>
@@ -82,12 +87,12 @@ const errorText = 'text-[13px] text-danger';
 
     <button type="submit" class="btn-primary submit col-span-full min-h-14 w-full" data-submit>
       <span class="spinner hidden" aria-hidden="true"></span>
-      <span data-submit-label>Solicitar una propuesta</span>
+      <span data-submit-label data-label-idle={t.submit} data-label-sending={t.sending}>{t.submit}</span>
       <Icon name="arrow-right" class="submit-arrow" />
     </button>
 
     <p class="col-span-full mt-2 text-base text-[#3b4552]">
-      ¿Prefieres conversar? <a href="/agendar" class="inline-flex min-h-11 items-center font-bold text-blue-ink">Agenda una llamada →</a>
+      {t.prefer} <a href={bookingHref(locale)} class="inline-flex min-h-11 items-center font-bold text-blue-ink">{t.bookLink}</a>
     </p>
   </form>
 
@@ -95,14 +100,14 @@ const errorText = 'text-[13px] text-danger';
     <span aria-hidden="true" class="grid size-16 place-items-center rounded-full bg-lime text-navy">
       <Icon name="check" size={32} />
     </span>
-    <h2 class="font-display text-[clamp(26px,3vw,34px)] leading-tight font-bold tracking-[-0.015em] text-blue" data-success-title>¡Gracias! Recibimos tu solicitud.</h2>
+    <h2 class="font-display text-[clamp(26px,3vw,34px)] leading-tight font-bold tracking-[-0.015em] text-blue" data-success-title>{t.successTitle}</h2>
     <p class="font-serif text-lg leading-relaxed text-body">
-      Te escribiremos a <strong class="font-semibold" data-success-email></strong> para coordinar el siguiente paso.
+      {t.successBodyStart}<strong class="font-semibold" data-success-email></strong>{t.successBodyEnd}
     </p>
     <dl class="grid w-full grid-cols-[auto_1fr] gap-x-5 gap-y-2.5 rounded-[14px] bg-mist px-5 py-4 text-[15px]" data-success-summary></dl>
     <div class="mt-2 flex flex-wrap items-center gap-x-5 gap-y-3">
-      <a href="/agendar" class="btn-primary min-h-14 px-7" data-success-book>Agenda tu llamada ahora <Icon name="arrow-right" /></a>
-      <a href="/" class="inline-flex min-h-12 items-center font-bold text-blue-ink">Volver al inicio</a>
+      <a href={bookingHref(locale)} class="btn-primary min-h-14 px-7" data-success-book data-base={bookingHref(locale)}>{t.bookNow} <Icon name="arrow-right" /></a>
+      <a href={routePath('home', locale)} class="inline-flex min-h-12 items-center font-bold text-blue-ink">{t.backHome}</a>
     </div>
   </div>
 </div>
@@ -159,15 +164,25 @@ const errorText = 'text-[13px] text-danger';
   import { actions, isInputError } from 'astro:actions';
 
   type FieldName = 'name' | 'email' | 'company' | 'service' | 'consent';
-  const MESSAGES: Record<FieldName, string> = {
-    name: 'Escribe tu nombre y apellido.',
-    email: 'Usa un correo válido, por ejemplo nombre@empresa.com.',
-    company: 'Escribe el nombre de tu empresa.',
-    service: 'Elige un servicio.',
-    consent: 'Acepta la política para continuar.',
-  };
+  interface Copy {
+    errors: Record<FieldName, string>;
+    reviewOne: string;
+    reviewMany: string;
+    network: string;
+    serverError: string;
+    notConfigured: string;
+    successTitleNamed: string;
+    summaryService: string;
+    summaryCompany: string;
+    summaryIndustry: string;
+    param: { service: string };
+  }
 
   const root = document.querySelector<HTMLElement>('[data-contact]');
+  // Page copy in the visitor's language, serialized by the component
+  const copy: Copy = JSON.parse(root?.querySelector('[data-contact-i18n]')?.textContent ?? '{}');
+  const MESSAGES = copy.errors;
+  const review = (count: number) => (count === 1 ? copy.reviewOne : copy.reviewMany).replace('{n}', String(count));
   const form = root?.querySelector<HTMLFormElement>('[data-contact-form]');
   if (root && form) {
     const fields = form.querySelector<HTMLFieldSetElement>('[data-fields]')!;
@@ -178,14 +193,15 @@ const errorText = 'text-[13px] text-danger';
     const success = root.querySelector<HTMLElement>('[data-success]')!;
     let attempted = false;
 
-    // Preselect from links such as /contacto?servicio=ventas or ?industria=salud
+    // Preselect from links such as /contacto?servicio=ventas or /en/contact?industry=salud
+    // (both key names work on either page)
     const params = new URL(window.location.href).searchParams;
     const preselect = (name: 'service' | 'industry', value: string | null) => {
       const select = form.elements.namedItem(name) as HTMLSelectElement;
       if (value && [...select.options].some((option) => option.value === value)) select.value = value;
     };
-    preselect('service', params.get('servicio'));
-    preselect('industry', params.get('industria'));
+    preselect('service', params.get('servicio') ?? params.get('service'));
+    preselect('industry', params.get('industria') ?? params.get('industry'));
 
     const control = (name: FieldName) => form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement;
     const setError = (name: FieldName, message?: string) => {
@@ -212,7 +228,7 @@ const errorText = 'text-[13px] text-danger';
       submit.disabled = sending;
       submit.setAttribute('aria-busy', String(sending));
       form.setAttribute('aria-busy', String(sending));
-      submitLabel.textContent = sending ? 'Enviando…' : 'Solicitar una propuesta';
+      submitLabel.textContent = (sending ? submitLabel.dataset.labelSending : submitLabel.dataset.labelIdle) ?? '';
     };
 
     // Validate on leaving a field, only after the first submit attempt (never while typing)
@@ -227,7 +243,7 @@ const errorText = 'text-[13px] text-danger';
       attempted = true;
       const invalid = (Object.keys(MESSAGES) as FieldName[]).filter((name) => !validate(name));
       if (invalid.length) {
-        showSummary(`Revisa ${invalid.length} ${invalid.length === 1 ? 'campo' : 'campos'} para enviar tu solicitud.`);
+        showSummary(review(invalid.length));
         control(invalid[0]).focus();
         return;
       }
@@ -240,7 +256,7 @@ const errorText = 'text-[13px] text-danger';
         result = await actions.contact(data);
       } catch {
         // Offline or a non-JSON error body: the client fetch throws
-        showSummary('No pudimos conectar. Revisa tu conexión e inténtalo de nuevo.');
+        showSummary(copy.network);
         summary.focus();
         return;
       } finally {
@@ -252,13 +268,15 @@ const errorText = 'text-[13px] text-danger';
         if (isInputError(error)) {
           const names = Object.keys(error.fields) as FieldName[];
           const known = names.filter((name) => name in MESSAGES);
-          known.forEach((name) => setError(name, error.fields[name]?.[0]));
-          showSummary(`Revisa ${names.length} ${names.length === 1 ? 'campo' : 'campos'} para enviar tu solicitud.`);
+          // The server validates with Spanish messages; show the page's own language instead
+          known.forEach((name) => setError(name, MESSAGES[name]));
+          showSummary(review(names.length));
           // Disabling the fieldset dropped focus: land on the first bad field
           if (known.length) control(known[0]).focus();
           else summary.focus();
         } else {
-          showSummary(error.message);
+          // Server messages are Spanish: pick the copy by error code
+          showSummary(error.code === 'INTERNAL_SERVER_ERROR' ? copy.notConfigured : copy.serverError);
           summary.focus();
         }
         return;
@@ -269,13 +287,13 @@ const errorText = 'text-[13px] text-danger';
       const service = control('service') as HTMLSelectElement;
       const industrySelect = form.elements.namedItem('industry') as HTMLSelectElement;
       const industry = industrySelect.value ? (industrySelect.selectedOptions[0]?.text ?? '') : '';
-      success.querySelector('[data-success-title]')!.textContent = `¡Gracias, ${name}! Recibimos tu solicitud.`;
+      if (name) success.querySelector('[data-success-title]')!.textContent = copy.successTitleNamed.replace('{name}', name);
       success.querySelector('[data-success-email]')!.textContent = String(data.get('email'));
       const rows: [string, string][] = [
-        ['Servicio', service.selectedOptions[0]?.text ?? ''],
-        ['Empresa', String(data.get('company'))],
+        [copy.summaryService, service.selectedOptions[0]?.text ?? ''],
+        [copy.summaryCompany, String(data.get('company'))],
       ];
-      if (industry) rows.push(['Industria', industry]);
+      if (industry) rows.push([copy.summaryIndustry, industry]);
       const list = success.querySelector<HTMLElement>('[data-success-summary]')!;
       list.replaceChildren(
         ...rows.flatMap(([term, value]) => {
@@ -288,7 +306,8 @@ const errorText = 'text-[13px] text-danger';
           return [dt, dd];
         }),
       );
-      success.querySelector<HTMLAnchorElement>('[data-success-book]')!.href = `/agendar?servicio=${encodeURIComponent(service.value)}`;
+      const book = success.querySelector<HTMLAnchorElement>('[data-success-book]')!;
+      book.href = `${book.dataset.base}?${copy.param.service}=${encodeURIComponent(service.value)}`;
       form.hidden = true;
       success.hidden = false;
       success.focus();

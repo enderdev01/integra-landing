@@ -4,9 +4,10 @@ import '../styles/global.css';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import MobileActionBar from '../components/layout/MobileActionBar.astro';
-import { SEO, SITE, type SeoPageId } from '../config/site';
-import { SERVICES } from '../content/services';
-import { INDUSTRIES } from '../content/industries';
+import { SITE, getSeo, type SeoPageId } from '../config/site';
+import { getServices } from '../content/services';
+import { getIndustries } from '../content/industries';
+import { LOCALE_META, LOCALES, alternates, getLocale, routePath, servicesHref, useTranslations } from '../i18n';
 
 interface Props {
   /** Current section; highlights the menu item. Omit on legal and error pages. */
@@ -20,7 +21,12 @@ interface Props {
 }
 
 const { page, meta, noindex = false, mobileBar = true, ogImage = '/og-integra.jpg' } = Astro.props;
-const { title, description } = meta ?? SEO[page ?? 'inicio'];
+const locale = getLocale(Astro.url);
+const t = useTranslations(locale);
+const { title, description } = meta ?? getSeo(page ?? 'inicio', locale);
+const absolute = (path: string) => new URL(path, Astro.site);
+// Same page in the other language(s); empty for pages that have no twin (404, legal placeholders)
+const languageLinks = noindex ? [] : alternates(Astro.url.pathname);
 const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
 const hasCustomBar = Astro.slots.has('mobile-bar');
@@ -29,7 +35,8 @@ const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'ProfessionalService',
   name: SITE.legalName,
-  url: Astro.site?.toString(),
+  url: absolute(routePath('home', locale)).toString(),
+  inLanguage: LOCALE_META[locale].lang,
   logo: new URL('/integra-logo.svg', Astro.site).toString(),
   image: ogImageUrl.toString(),
   address: {
@@ -41,21 +48,21 @@ const jsonLd = {
     addressCountry: SITE.address.country,
   },
   ...(SITE.profiles.length > 0 && { sameAs: SITE.profiles }),
-  makesOffer: SERVICES.map((service) => ({
+  makesOffer: getServices(locale).map((service) => ({
     '@type': 'Offer',
     itemOffered: {
       '@type': 'Service',
-      name: service.id === 'ventas' ? 'Ventas (SDR / Inside Sales)' : service.name,
-      url: new URL(`/servicios#${service.slug}`, Astro.site).toString(),
+      name: service.id === 'ventas' ? t.seo.salesOffer : service.name,
+      url: absolute(servicesHref(locale, service.slug)).toString(),
     },
   })),
   areaServed: ['US', 'LATAM'],
-  audience: INDUSTRIES.map((industry) => ({ '@type': 'BusinessAudience', audienceType: industry.name })),
+  audience: getIndustries(locale).map((industry) => ({ '@type': 'BusinessAudience', audienceType: industry.name })),
 };
 ---
 
 <!doctype html>
-<html lang={SITE.lang}>
+<html lang={LOCALE_META[locale].lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -67,8 +74,8 @@ const jsonLd = {
       ) : (
         <>
           <link rel="canonical" href={canonical} />
-          <link rel="alternate" hreflang="es-US" href={canonical} />
-          <link rel="alternate" hreflang="x-default" href={canonical} />
+          {languageLinks.map(({ locale: lang, path }) => <link rel="alternate" hreflang={LOCALE_META[lang].lang} href={absolute(path)} />)}
+          {languageLinks.length > 0 && <link rel="alternate" hreflang="x-default" href={absolute(languageLinks[0].path)} />}
         </>
       )
     }
@@ -79,7 +86,8 @@ const jsonLd = {
     <meta name="theme-color" content="#FAF7F6" />
 
     <meta property="og:type" content="website" />
-    <meta property="og:locale" content={SITE.locale} />
+    <meta property="og:locale" content={LOCALE_META[locale].og} />
+    {LOCALES.filter((lang) => lang !== locale).map((lang) => <meta property="og:locale:alternate" content={LOCALE_META[lang].og} />)}
     <meta property="og:site_name" content={SITE.name} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -99,7 +107,7 @@ const jsonLd = {
     <slot name="head" />
   </head>
   <body class="bg-pattern">
-    <a href="#contenido" class="skip-link">Saltar al contenido</a>
+    <a href="#contenido" class="skip-link">{t.skipLink}</a>
     <div class:list={['flex min-h-dvh flex-col overflow-x-clip', (mobileBar || hasCustomBar) && 'pb-[calc(76px+env(safe-area-inset-bottom))] md:pb-0']}>
       <Header active={page} />
       <main id="contenido" class="flex-1">

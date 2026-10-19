@@ -65,6 +65,16 @@ La validación vive en `src/actions/index.ts` (zod) y se repite en el navegador 
 
 > Verificar el formato del embed directamente en GoHighLevel: no se usó un snippet fijo para no depender de suposiciones.
 
+## Idiomas (ES / EN)
+
+- Español en la raíz (`/`, `/servicios`, `/agendar`, `/contacto`) e inglés bajo `/en` (`/en`, `/en/services`, `/en/schedule`, `/en/contact`).
+- Selector ES | EN en el header. Al elegir un idioma se guarda la cookie `lang`.
+- **Detección del idioma del navegador**: `vercel.json` redirige (307) las 4 rutas en español a su versión en inglés cuando el `Accept-Language` del navegador empieza por `en` y no existe la cookie `lang`. Sin cabecera (buscadores) o con cualquier otro idioma se sirve español. Solo se verifica desplegado (no corre en `npm run dev`).
+- Textos: `src/i18n/es.ts` es la fuente; `src/i18n/en.ts` debe tener la misma forma (TypeScript lo exige). Rutas y helpers: `src/i18n/index.ts`.
+- SEO: `<html lang>`, canonical propio, `hreflang` es / en / x-default, Open Graph y JSON-LD por idioma, y sitemap con alternativas.
+- Los slugs de servicios e industrias (`ventas`, `bienes-raices`…) son los mismos en ambos idiomas; solo cambian los slugs de página. El correo del formulario llega siempre en español.
+- Las páginas viven en `src/views/`; `src/pages/` y `src/pages/en/` son envoltorios de una línea.
+
 ## Estructura
 
 ```

@@ -3,6 +3,7 @@ import { defineConfig, envField, fontProviders } from 'astro/config';
 import vercel from '@astrojs/vercel';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
+import { DEFAULT_LOCALE, LOCALES, LOCALE_META, alternates } from './src/i18n/index.ts';
 
 // Public URL used for canonical links, Open Graph and the sitemap.
 // Confirm the final domain with the client and set SITE_URL in Vercel.
@@ -12,8 +13,26 @@ export default defineConfig({
   site,
   trailingSlash: 'never',
   adapter: vercel(),
-  // Legal placeholders are noindex until the client provides the final texts
-  integrations: [sitemap({ filter: (page) => !page.includes('/legal/') })],
+  // Spanish lives at the root and English under /en (no prefix for the default language)
+  i18n: {
+    defaultLocale: DEFAULT_LOCALE,
+    locales: [...LOCALES],
+    routing: { prefixDefaultLocale: false },
+  },
+  integrations: [
+    sitemap({
+      // Legal placeholders are noindex until the client provides the final texts
+      filter: (page) => !page.includes('/legal/'),
+      // Page slugs differ per language, so hreflang pairs come from our own route table
+      serialize(item) {
+        const pairs = alternates(new URL(item.url).pathname);
+        if (pairs.length === 0) return item;
+        const links = pairs.map(({ locale, path }) => ({ url: new URL(path, site).href, lang: LOCALE_META[locale].lang }));
+        const fallback = links.find((link) => link.lang === LOCALE_META[DEFAULT_LOCALE].lang);
+        return { ...item, links: fallback ? [...links, { url: fallback.url, lang: 'x-default' }] : links };
+      },
+    }),
+  ],
   env: {
     schema: {
       // Resend sends the contact form by email (never exposed to the browser)

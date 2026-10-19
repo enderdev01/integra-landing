@@ -1,0 +1,12 @@
+---
+import Legal from '../../../views/Legal.astro';
+import { SITE } from '../../../config/site';
+
+export function getStaticPaths() {
+  return SITE.legal.map((slug) => ({ params: { slug }, props: { slug } }));
+}
+
+const { slug } = Astro.props;
+---
+
+<Legal slug={slug} />

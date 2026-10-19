@@ -2,14 +2,23 @@
 import Logo from '../../assets/brand/integra-logo.svg';
 import Icon from '../ui/Icon.astro';
 import ServiceIcon from '../ui/ServiceIcon.astro';
-import { NAV, type PageId } from '../../config/site';
-import { SERVICES } from '../../content/services';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import { getNav, type PageId } from '../../config/site';
+import { getServices } from '../../content/services';
+import { getLocale, routePath, servicesHref, useTranslations } from '../../i18n';
 
 interface Props {
   active?: PageId;
 }
 
 const { active } = Astro.props;
+const locale = getLocale(Astro.url);
+const t = useTranslations(locale);
+const nav = getNav(locale);
+const services = getServices(locale);
+const homeHref = routePath('home', locale);
+const servicesIndexHref = routePath('services', locale);
+const contactHref = routePath('contact', locale);
 const onContact = active === 'contacto';
 const linkState = (id: PageId) =>
   id === active
@@ -18,15 +27,15 @@ const linkState = (id: PageId) =>
 ---
 
 <header data-header class="site-header sticky top-0 z-50 border-b border-line-warm bg-cream font-serif text-ink">
-  <div class="mx-auto flex min-h-16 w-full max-w-[1320px] items-center gap-3 py-2 pr-3 pl-4 lg:min-h-[104px] lg:gap-14 lg:px-6 lg:py-[18px]">
-    <a href="/" aria-label="Integra, ir al inicio" class="flex min-h-11 shrink-0 items-center">
+  <div class="mx-auto flex min-h-16 w-full max-w-[1320px] items-center gap-3 py-2 pr-3 pl-4 lg:min-h-[104px] lg:gap-7 lg:px-6 xl:gap-14 lg:py-[18px]">
+    <a href={homeHref} aria-label={t.header.homeLabel} class="flex min-h-11 shrink-0 items-center">
       <Logo width={139} height={42} aria-hidden="true" class="h-9 w-auto lg:h-[42px]" />
     </a>
 
-    <nav aria-label="Principal" class="hidden flex-1 lg:block">
-      <ul class="flex items-center gap-9">
+    <nav aria-label={t.header.mainNav} class="hidden flex-1 lg:block">
+      <ul class="flex items-center gap-6 xl:gap-9">
         {
-          NAV.map((item) =>
+          nav.map((item) =>
             item.id === 'servicios' ? (
               <li class="relative flex items-center" data-dropdown>
                 <a
@@ -39,7 +48,7 @@ const linkState = (id: PageId) =>
                 <button
                   type="button"
                   class="dd-toggle ml-0.5 grid h-11 w-8 place-items-center rounded-lg text-muted"
-                  aria-label="Ver servicios"
+                  aria-label={t.header.viewServices}
                   aria-expanded="false"
                   aria-controls="dd-servicios"
                   data-dropdown-toggle
@@ -49,9 +58,9 @@ const linkState = (id: PageId) =>
                 <div class="dd-wrap absolute top-full -left-5 z-[70] pt-2.5">
                   <div id="dd-servicios" class="dd-panel w-[360px] rounded-[18px] border border-[#e3e9ef] bg-white p-2 shadow-[0_24px_48px_-20px_rgb(0_56_92/0.35)]">
                     <ul>
-                      {SERVICES.map((service) => (
+                      {services.map((service) => (
                         <li>
-                          <a href={`/servicios#${service.slug}`} class="dd-item flex min-h-16 items-center gap-3.5 rounded-xl px-3 py-2.5 text-ink">
+                          <a href={servicesHref(locale, service.slug)} class="dd-item flex min-h-16 items-center gap-3.5 rounded-xl px-3 py-2.5 text-ink">
                             <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-lime-soft">
                               <ServiceIcon name={service.id} width={28} />
                             </span>
@@ -63,8 +72,8 @@ const linkState = (id: PageId) =>
                         </li>
                       ))}
                     </ul>
-                    <a href="/servicios" class="mt-1 flex min-h-12 items-center justify-between border-t border-[#e3e9ef] px-3 font-sans text-[15px] font-bold text-blue-ink">
-                      Ver todos los servicios <span aria-hidden="true">→</span>
+                    <a href={servicesIndexHref} class="mt-1 flex min-h-12 items-center justify-between border-t border-[#e3e9ef] px-3 font-sans text-[15px] font-bold text-blue-ink">
+                      {t.header.viewAllServices} <span aria-hidden="true">→</span>
                     </a>
                   </div>
                 </div>
@@ -86,27 +95,31 @@ const linkState = (id: PageId) =>
     </nav>
 
     <a
-      href="/contacto"
+      href={contactHref}
       aria-current={onContact ? 'page' : undefined}
       class:list={[
         'talk-cta relative ml-auto hidden min-h-11 shrink-0 items-center rounded-xl border-2 border-lime-deep px-5 py-1.5 text-[19px] font-medium sm:inline-flex lg:ml-0',
         onContact ? 'bg-lime text-navy' : 'bg-white text-[#5b7410]',
       ]}
     >
-      ¡Hablemos!
+      {t.header.talk}
       <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true" class="absolute right-2.5 -bottom-[11px]">
         <path class="cta-tail" d="M1 0H13L14 11Z" fill={onContact ? '#A3C622' : '#FFFFFF'}></path>
         <path d="M1 0L14 11L13 0" fill="none" stroke="#95B71E" stroke-width="2" stroke-linejoin="round"></path>
       </svg>
     </a>
 
+    <LanguageSwitcher class="ml-auto shrink-0 sm:ml-0" />
+
     <button
       type="button"
-      class="burger ml-auto grid size-12 shrink-0 place-items-center rounded-xl text-ink sm:ml-0 lg:hidden"
-      aria-label="Abrir menú"
+      class="burger grid size-12 shrink-0 place-items-center rounded-xl text-ink lg:hidden"
+      aria-label={t.header.openMenu}
       aria-expanded="false"
       aria-controls="menu-movil"
       data-menu-toggle
+      data-label-open={t.header.openMenu}
+      data-label-close={t.header.closeMenu}
     >
       <Icon name="menu" size={26} class="icon-open" />
       <Icon name="close" size={26} class="icon-close hidden" />
@@ -118,13 +131,13 @@ const linkState = (id: PageId) =>
   <div class="menu-scrim absolute inset-x-0 top-full h-dvh bg-ink/40 lg:hidden" aria-hidden="true" data-menu-scrim></div>
   <nav
     id="menu-movil"
-    aria-label="Menú"
+    aria-label={t.header.mobileNav}
     class="mobile-panel absolute inset-x-0 top-full max-h-[calc(100dvh-65px)] overflow-y-auto overscroll-contain border-t border-line-warm bg-cream px-6 pt-2 pb-6 shadow-[0_24px_40px_-24px_rgb(15_35_70/0.45)] lg:hidden"
     inert
   >
     <ul>
       {
-        NAV.map((item) =>
+        nav.map((item) =>
           item.id === 'servicios' ? (
             <li class="border-b border-line-warm" data-accordion>
               <div class="flex min-h-14 items-center justify-between">
@@ -138,7 +151,7 @@ const linkState = (id: PageId) =>
                 <button
                   type="button"
                   class="dd-toggle -mr-3 grid size-12 place-items-center rounded-xl text-lime-deep"
-                  aria-label="Ver servicios"
+                  aria-label={t.header.viewServices}
                   aria-expanded={active === 'servicios' ? 'true' : 'false'}
                   aria-controls="m-servicios"
                   data-accordion-toggle
@@ -149,9 +162,9 @@ const linkState = (id: PageId) =>
               <div id="m-servicios" class="accordion-panel grid" data-open={active === 'servicios' ? '' : undefined} inert={active !== 'servicios'}>
                 <div class="min-h-0 overflow-hidden">
                   <ul class="accordion-list grid gap-0.5 pb-3">
-                {SERVICES.map((service) => (
+                {services.map((service) => (
                   <li>
-                    <a href={`/servicios#${service.slug}`} class="flex min-h-[52px] items-center gap-3 py-1 pl-1.5 font-sans text-[17px] font-medium text-ink">
+                    <a href={servicesHref(locale, service.slug)} class="flex min-h-[52px] items-center gap-3 py-1 pl-1.5 font-sans text-[17px] font-medium text-ink">
                       <span class="grid size-9 shrink-0 place-items-center rounded-[10px] bg-lime-soft">
                         <ServiceIcon name={service.id} width={22} />
                       </span>
@@ -178,8 +191,8 @@ const linkState = (id: PageId) =>
         )
       }
     </ul>
-    <a href="/contacto" aria-current={onContact ? 'page' : undefined} class="btn-primary mt-5 w-full">
-      ¡Hablemos! <Icon name="arrow-right" size={20} />
+    <a href={contactHref} aria-current={onContact ? 'page' : undefined} class="btn-primary mt-5 w-full">
+      {t.header.talk} <Icon name="arrow-right" size={20} />
     </a>
   </nav>
 </header>
@@ -399,7 +412,7 @@ const linkState = (id: PageId) =>
     document.documentElement.toggleAttribute('data-menu-open', open);
     menu.inert = !open;
     menuToggle.setAttribute('aria-expanded', String(open));
-    menuToggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+    menuToggle.setAttribute('aria-label', (open ? menuToggle.dataset.labelClose : menuToggle.dataset.labelOpen) ?? '');
     menuToggle.querySelector('.icon-open')?.classList.toggle('hidden', open);
     menuToggle.querySelector('.icon-close')?.classList.toggle('hidden', !open);
   };

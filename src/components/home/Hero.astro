@@ -1,7 +1,12 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from '../ui/Icon.astro';
-import { HERO_INTERVAL_MS, HERO_SLIDES } from '../../content/hero';
+import { HERO_INTERVAL_MS, getHeroSlides } from '../../content/hero';
+import { format, getLocale, useTranslations } from '../../i18n';
+
+const locale = getLocale(Astro.url);
+const t = useTranslations(locale);
+const HERO_SLIDES = getHeroSlides(locale);
 
 const topChevrons = Array.from({ length: 6 }, (_, i) => `M${-26 + i * 60} 0h34l50 50-50 50h-34l50-50z`).join('');
 const sideChevrons = Array.from({ length: 8 }, (_, i) => `M0 ${i * 56}l50 40 50-40v28l-50 40-50-40z`).join('');
@@ -14,7 +19,7 @@ const pageTitle = `${kicker} ${connector} ${word} ${closing}`;
 
 <section
   aria-labelledby="hero-title"
-  aria-roledescription="carrusel"
+  aria-roledescription={t.hero.carousel}
   class="mx-auto w-full max-w-[1320px] px-4 pt-4 md:px-6 md:pt-6"
   style={`--hero-interval: ${HERO_INTERVAL_MS}ms`}
   data-carousel
@@ -74,8 +79,8 @@ const pageTitle = `${kicker} ${connector} ${word} ${closing}`;
               <div
                 class="slide-copy flex flex-col"
                 role="group"
-                aria-roledescription="diapositiva"
-                aria-label={`${index + 1} de ${total}`}
+                aria-roledescription={t.hero.slide}
+                aria-label={format(t.hero.slideOf, { n: index + 1, total })}
                 data-slide
                 data-active={index === 0 ? '' : undefined}
                 inert={index !== 0}
@@ -101,23 +106,23 @@ const pageTitle = `${kicker} ${connector} ${word} ${closing}`;
   </div>
 
   <div class="mt-2 flex items-center justify-center" data-carousel-controls>
-    <div role="group" aria-label="Elegir diapositiva" class="flex items-center">
+    <div role="group" aria-label={t.hero.choose} class="flex items-center">
       {
         HERO_SLIDES.map((_, index) => (
-          <button type="button" class="dot grid h-11 w-9 place-items-center" aria-label={`Ir a la diapositiva ${index + 1}`} aria-current={index === 0 ? 'true' : undefined} data-dot={index}>
+          <button type="button" class="dot grid h-11 w-9 place-items-center" aria-label={format(t.hero.goTo, { n: index + 1 })} aria-current={index === 0 ? 'true' : undefined} data-dot={index}>
             <span class="pill" />
           </button>
         ))
       }
     </div>
-    <button type="button" class="toggle ml-1 grid size-11 place-items-center rounded-full text-ink" aria-label="Pausar carrusel" data-carousel-toggle>
+    <button type="button" class="toggle ml-1 grid size-11 place-items-center rounded-full text-ink" aria-label={t.hero.pause} data-carousel-toggle data-label-pause={t.hero.pause} data-label-play={t.hero.play}>
       <Icon name="pause" size={16} class="icon-pause" />
       <Icon name="play" size={16} class="icon-play hidden" />
     </button>
   </div>
 
   <p class="mx-auto mt-3 max-w-[860px] text-base leading-relaxed font-medium text-body md:text-center md:text-[clamp(17px,1.4vw,20px)]">
-    Construimos equipos de ventas, soporte y back office para que tu negocio crezca con estructura, calidad y flexibilidad.
+    {t.hero.tagline}
   </p>
 </section>
 
@@ -275,7 +280,7 @@ const pageTitle = `${kicker} ${connector} ${word} ${closing}`;
     const syncPause = () => {
       const paused = userPaused || holds.size > 0;
       root.toggleAttribute('data-paused', paused);
-      toggle.setAttribute('aria-label', userPaused ? 'Reproducir carrusel' : 'Pausar carrusel');
+      toggle.setAttribute('aria-label', (userPaused ? toggle.dataset.labelPlay : toggle.dataset.labelPause) ?? '');
       toggle.querySelector('.icon-pause')?.classList.toggle('hidden', userPaused);
       toggle.querySelector('.icon-play')?.classList.toggle('hidden', !userPaused);
     };

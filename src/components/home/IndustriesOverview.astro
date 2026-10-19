@@ -1,13 +1,18 @@
 ---
 import Artwork from '../ui/Artwork.astro';
 import Icon from '../ui/Icon.astro';
-import { INDUSTRIES } from '../../content/industries';
+import { getIndustries } from '../../content/industries';
+import { getLocale, servicesHref, useTranslations } from '../../i18n';
+
+const locale = getLocale(Astro.url);
+const t = useTranslations(locale).industriesOverview;
+const industries = getIndustries(locale);
 ---
 
 <section id="industrias" aria-labelledby="ind-title" class="relative scroll-mt-24 pb-16 lg:scroll-mt-32 md:pb-[88px]">
   <div class="mx-auto w-full max-w-[1320px] px-4 md:px-6">
     <h2 id="ind-title" class="reveal text-center font-display text-[clamp(32px,3.4vw,48px)] leading-[1.05] font-bold tracking-[-0.01em] text-copy">
-      Industrias
+      {t.title}
     </h2>
     <div class="relative mt-7 md:mt-10 xl:mx-auto xl:max-w-[960px]">
       <!-- Lime line that crosses behind the cards (desktop only) -->
@@ -18,10 +23,10 @@ import { INDUSTRIES } from '../../content/industries';
       </div>
       <ul class="relative grid grid-cols-1 gap-4 min-[561px]:grid-cols-2 md:gap-5 min-[1101px]:grid-cols-4">
         {
-          INDUSTRIES.map((industry) => (
+          industries.map((industry) => (
             <li>
               <a
-                href={`/servicios#${industry.slug}`}
+                href={servicesHref(locale, industry.slug)}
                 class="ind-card flex h-full flex-col items-start gap-3.5 rounded-[28px] bg-blue px-[22px] pt-[26px] pb-[22px] text-white no-underline shadow-[0_20px_44px_-28px_rgb(0_56_92/0.6)] sm:rounded-[32px] sm:px-[26px] sm:pt-8 sm:pb-[30px]"
               >
                 <Artwork name={industry.icon} size={60} />
@@ -30,7 +35,7 @@ import { INDUSTRIES } from '../../content/industries';
                   {industry.highlights.map((item) => <li>{item}</li>)}
                 </ul>
                 <span class="mt-auto inline-flex min-h-11 items-center gap-2 pt-1.5 font-sans text-[15px] font-bold">
-                  Ver más <Icon name="arrow-right" size={18} class="ind-arrow" />
+                  {t.more} <Icon name="arrow-right" size={18} class="ind-arrow" />
                 </span>
               </a>
             </li>

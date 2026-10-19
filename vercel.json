@@ -1,0 +1,84 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept-language",
+          "value": {
+            "re": "^\\s*[eE][nN]([-_;,\\s].*)?$"
+          }
+        }
+      ],
+      "missing": [
+        {
+          "type": "cookie",
+          "key": "lang"
+        }
+      ],
+      "destination": "/en",
+      "permanent": false
+    },
+    {
+      "source": "/servicios",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept-language",
+          "value": {
+            "re": "^\\s*[eE][nN]([-_;,\\s].*)?$"
+          }
+        }
+      ],
+      "missing": [
+        {
+          "type": "cookie",
+          "key": "lang"
+        }
+      ],
+      "destination": "/en/services",
+      "permanent": false
+    },
+    {
+      "source": "/agendar",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept-language",
+          "value": {
+            "re": "^\\s*[eE][nN]([-_;,\\s].*)?$"
+          }
+        }
+      ],
+      "missing": [
+        {
+          "type": "cookie",
+          "key": "lang"
+        }
+      ],
+      "destination": "/en/schedule",
+      "permanent": false
+    },
+    {
+      "source": "/contacto",
+      "has": [
+        {
+          "type": "header",
+          "key": "accept-language",
+          "value": {
+            "re": "^\\s*[eE][nN]([-_;,\\s].*)?$"
+          }
+        }
+      ],
+      "missing": [
+        {
+          "type": "cookie",
+          "key": "lang"
+        }
+      ],
+      "destination": "/en/contact",
+      "permanent": false
+    }
+  ]
+}

@@ -1,7 +1,10 @@
 ---
 import Icon from '../ui/Icon.astro';
 import { SITE } from '../../config/site';
+import { format, getLocale, legalPath, useTranslations } from '../../i18n';
 
+const locale = getLocale(Astro.url);
+const t = useTranslations(locale);
 const year = new Date().getFullYear();
 ---
 
@@ -9,23 +12,23 @@ const year = new Date().getFullYear();
   <div class="bg-graphite">
     <div class="mx-auto flex w-full max-w-[1320px] flex-wrap items-start gap-x-[72px] gap-y-6 px-5 pt-8 pb-7 sm:px-6 sm:pt-11 sm:pb-10">
       <div class="min-w-0 flex-[1_1_240px]">
-        <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">Contacta a {SITE.legalName}</h2>
+        <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">{format(t.footer.contactTitle, { name: SITE.legalName })}</h2>
         <address class="text-[15px] leading-[1.65] tracking-[0.02em] text-[#e7e8ea] uppercase not-italic">
           {SITE.address.display[0]}<br />{SITE.address.display[1]}
         </address>
       </div>
 
       <div class="min-w-0 flex-[1_1_300px]">
-        <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">Atención a clientes</h2>
+        <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">{t.footer.customerCare}</h2>
         <p class="text-[15px] tracking-[0.02em] text-[#e7e8ea]">
           <a href={SITE.phone.href} class="inline-flex min-h-11 items-center text-white no-underline">{SITE.phone.display}</a><br />
-          <strong class="font-bold uppercase">Llama gratis:</strong>
+          <strong class="font-bold uppercase">{t.footer.tollFree}</strong>
           <a href={SITE.tollFree.href} class="inline-flex min-h-11 items-center text-white no-underline">{SITE.tollFree.display}</a>
         </p>
       </div>
 
       <div class="flex flex-col items-start gap-2 sm:ml-auto sm:items-center">
-        <h2 class="text-[17px] font-semibold">Síguenos</h2>
+        <h2 class="text-[17px] font-semibold">{t.footer.follow}</h2>
         <ul class="flex gap-2">
           {
             SITE.social.map((network) => (
@@ -41,25 +44,25 @@ const year = new Date().getFullYear();
     </div>
   </div>
 
-  <nav aria-label="Legal" class="border-t border-white/10">
+  <nav aria-label={t.footer.legalNav} class="border-t border-white/10">
     <div class="mx-auto flex w-full max-w-[1320px] flex-wrap items-center justify-between gap-x-8 gap-y-3 px-5 pt-5 pb-6 sm:px-6">
       <ul class="grid grid-cols-2 gap-x-4 sm:flex sm:flex-wrap sm:items-center">
         {
-          SITE.legal.map((item, index) => (
+          SITE.legal.map((slug, index) => (
             <li class="flex items-center">
               {index > 0 && (
                 <span aria-hidden="true" class="hidden pr-3.5 text-[#8d9096] sm:inline">
                   /
                 </span>
               )}
-              <a href={item.href} class="inline-flex min-h-11 items-center pr-3.5 text-sm font-bold tracking-[0.04em] text-[#e7e8ea] uppercase no-underline">
-                {item.label}
+              <a href={legalPath(slug, locale)} class="inline-flex min-h-11 items-center pr-3.5 text-sm font-bold tracking-[0.04em] text-[#e7e8ea] uppercase no-underline">
+                {t.legalDocs[slug]}
               </a>
             </li>
           ))
         }
       </ul>
-      <p class="text-[13px] text-[#c9cbcf]">© {year} {SITE.legalName} Todos los derechos reservados.</p>
+      <p class="text-[13px] text-[#c9cbcf]">© {year} {SITE.legalName} {t.footer.rights}</p>
     </div>
   </nav>
 </footer>

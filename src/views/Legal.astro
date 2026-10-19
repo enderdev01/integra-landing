@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE } from '../config/site';
+import { format, getLocale, routePath, useTranslations } from '../i18n';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const locale = getLocale(Astro.url);
+const t = useTranslations(locale);
+const title = t.legalDocs[slug];
+const values = { title, titleLower: title.toLowerCase(), company: SITE.legalName };
+---
+
+<!-- Placeholder until the client provides the legal text; kept out of search results. -->
+<BaseLayout meta={{ title: format(t.legalPage.metaTitle, values), description: format(t.legalPage.metaDescription, values) }} noindex>
+  <section class="mx-auto w-full max-w-[760px] px-4 pt-12 pb-24 md:px-6 md:pt-20">
+    <h1 class="font-display text-[clamp(32px,4vw,48px)] leading-tight font-bold text-blue">{title}</h1>
+    <p class="mt-6 text-lg leading-relaxed text-body">{format(t.legalPage.body, values)}</p>
+    <a href={routePath('contact', locale)} class="btn-primary mt-8">{t.legalPage.cta}</a>
+  </section>
+</BaseLayout>

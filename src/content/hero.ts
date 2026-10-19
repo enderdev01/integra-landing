@@ -2,6 +2,7 @@ import type { ImageMetadata } from 'astro';
 import heroOffice from '../assets/img/hero-office.webp';
 import heroSales from '../assets/img/hero-sales.webp';
 import heroSupport from '../assets/img/hero-support.webp';
+import { bookingHref, useTranslations, type Locale } from '../i18n';
 
 export interface HeroSlide {
   id: string;
@@ -14,29 +15,19 @@ export interface HeroSlide {
 }
 
 // Slides 2 and 3 reuse the client's service copy; pending client approval.
-export const HERO_SLIDES: HeroSlide[] = [
-  {
-    id: 'equipos',
-    image: heroOffice,
-    focus: '60% center',
-    lockup: { kicker: 'Equipos', connector: 'remotos que hacen', word: 'crecer', closing: 'tu operación' },
-    cta: { label: '¡Agenda una llamada!', href: '/agendar' },
-  },
-  {
-    id: 'ventas',
-    image: heroSales,
-    focus: '60% 35%',
-    lockup: { kicker: 'Ventas', connector: 'que mantienen tus', word: 'leads', closing: 'en movimiento' },
-    cta: { label: 'Agenda tu cita de ventas', href: '/agendar?servicio=ventas' },
-  },
-  {
-    id: 'soporte',
-    image: heroSupport,
-    focus: '65% 35%',
-    lockup: { kicker: 'Soporte', connector: 'profesional en', word: 'cada', closing: 'canal de tus clientes' },
-    cta: { label: 'Agenda tu cita de Virtual Assistance', href: '/agendar?servicio=virtual-assistance' },
-  },
+const BASE = [
+  { id: 'equipos', image: heroOffice, focus: '60% center', service: undefined },
+  { id: 'ventas', image: heroSales, focus: '60% 35%', service: 'ventas' },
+  { id: 'soporte', image: heroSupport, focus: '65% 35%', service: 'virtual-assistance' },
 ];
+
+export const getHeroSlides = (locale: Locale): HeroSlide[] => {
+  const { slides } = useTranslations(locale).hero;
+  return BASE.map(({ service, ...base }, index) => {
+    const { cta, ...lockup } = slides[index];
+    return { ...base, lockup, cta: { label: cta, href: bookingHref(locale, service) } };
+  });
+};
 
 /** Time each slide stays on screen while autoplay runs */
 export const HERO_INTERVAL_MS = 5000;

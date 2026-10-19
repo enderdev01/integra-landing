@@ -1,11 +1,11 @@
+import { routePath, servicesHref, useTranslations, type Locale, type RouteKey } from '../i18n';
+
 export type PageId = 'inicio' | 'servicios' | 'industrias' | 'agendar' | 'contacto';
 export type SeoPageId = Exclude<PageId, 'industrias'>;
 
 export const SITE = {
   name: 'Integra',
   legalName: 'Integra Inc.',
-  locale: 'es_US',
-  lang: 'es',
   address: {
     street: 'NW 79th Avenue',
     city: 'Doral',
@@ -31,40 +31,22 @@ export const SITE = {
     'https://www.instagram.com/integra.bpo',
     'https://www.linkedin.com/company/integra-growth-partner/',
   ] as string[],
-  legal: [
-    { label: 'Política de reembolso', href: '/legal/refund-policy' },
-    { label: 'Política de privacidad', href: '/legal/privacy-policy' },
-    { label: 'Términos del servicio', href: '/legal/terms-of-service' },
-    { label: 'Términos de órdenes de compra', href: '/legal/purchase-order-terms' },
-  ],
+  /** Slugs of the legal pages; labels come from the dictionary */
+  legal: ['refund-policy', 'privacy-policy', 'terms-of-service', 'purchase-order-terms'],
 } as const;
 
-export const NAV: { id: PageId; label: string; href: string }[] = [
-  { id: 'inicio', label: 'Inicio', href: '/' },
-  { id: 'servicios', label: 'Servicios', href: '/servicios' },
-  { id: 'industrias', label: 'Industrias', href: '/servicios#industrias' },
-  { id: 'agendar', label: 'Agendar', href: '/agendar' },
+const NAV_ITEMS: { id: PageId; label: 'home' | 'services' | 'industries' | 'schedule'; href: (locale: Locale) => string }[] = [
+  { id: 'inicio', label: 'home', href: (locale) => routePath('home', locale) },
+  { id: 'servicios', label: 'services', href: (locale) => routePath('services', locale) },
+  { id: 'industrias', label: 'industries', href: (locale) => servicesHref(locale, 'industrias') },
+  { id: 'agendar', label: 'schedule', href: (locale) => routePath('schedule', locale) },
 ];
 
-export const SEO: Record<SeoPageId, { title: string; description: string }> = {
-  inicio: {
-    title: 'Integra | Equipos remotos de ventas y Virtual Assistance',
-    description:
-      'Equipos remotos de ventas, Virtual Assistance, diseño web y marketing para bienes raíces, SaaS, firmas legales y salud. Crece con estructura y calidad.',
-  },
-  servicios: {
-    title: 'Ventas, Virtual Assistance, diseño web y marketing | Integra',
-    description:
-      'Ventas, Virtual Assistance, diseño web y marketing que se integran a tu operación. Apoyo para bienes raíces, SaaS, firmas legales y salud.',
-  },
-  agendar: {
-    title: 'Agenda una llamada con Integra',
-    description:
-      'Elige el servicio —ventas, Virtual Assistance, diseño web o marketing— y reserva tu cita con el especialista indicado.',
-  },
-  contacto: {
-    title: 'Contacto | Solicita una propuesta — Integra',
-    description:
-      'Cuéntanos dónde quieres apoyo y te ayudamos a definir el talento, la estructura y el siguiente paso para tu equipo.',
-  },
+export const getNav = (locale: Locale) => {
+  const { nav } = useTranslations(locale);
+  return NAV_ITEMS.map((item) => ({ id: item.id, label: nav[item.label], href: item.href(locale) }));
 };
+
+const SEO_KEY: Record<SeoPageId, RouteKey> = { inicio: 'home', servicios: 'services', agendar: 'schedule', contacto: 'contact' };
+
+export const getSeo = (page: SeoPageId, locale: Locale) => useTranslations(locale).seo[SEO_KEY[page]];

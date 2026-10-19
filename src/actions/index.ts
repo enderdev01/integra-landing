@@ -1,6 +1,7 @@
 import { ActionError, defineAction } from 'astro:actions';
 import { CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL, RESEND_API_KEY } from 'astro:env/server';
 import { z } from 'astro/zod';
+import { buildContactEmail } from '../lib/contact-email';
 
 const SERVICE_VALUES = ['ventas', 'virtual-assistance', 'diseno-web', 'marketing'] as const;
 
@@ -31,16 +32,7 @@ export const server = {
         });
       }
 
-      // Plain text on purpose: user input is never interpreted as HTML
-      const text = [
-        `Nombre: ${lead.name}`,
-        `Correo: ${lead.email}`,
-        `Empresa: ${lead.company}`,
-        `Servicio: ${lead.service}`,
-        `Industria: ${lead.industry || '-'}`,
-        '',
-        lead.message || '(sin mensaje)',
-      ].join('\n');
+      const { subject, html, text } = buildContactEmail(lead);
 
       const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
@@ -49,7 +41,8 @@ export const server = {
           from: CONTACT_FROM_EMAIL ?? 'Integra Web <onboarding@resend.dev>',
           to: [CONTACT_TO_EMAIL],
           reply_to: lead.email,
-          subject: `Nueva solicitud (${lead.service}): ${lead.name} - ${lead.company}`,
+          subject,
+          html,
           text,
         }),
         signal: AbortSignal.timeout(10_000),

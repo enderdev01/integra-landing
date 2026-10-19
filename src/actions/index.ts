@@ -1,5 +1,5 @@
 import { ActionError, defineAction } from 'astro:actions';
-import { GHL_CONTACT_WEBHOOK_URL } from 'astro:env/server';
+import { CONTACT_FROM_EMAIL, CONTACT_TO_EMAIL, RESEND_API_KEY } from 'astro:env/server';
 import { z } from 'astro/zod';
 
 const SERVICE_VALUES = ['ventas', 'virtual-assistance', 'diseno-web', 'marketing'] as const;
@@ -21,24 +21,36 @@ export const server = {
   contact: defineAction({
     accept: 'form',
     input: contactSchema,
-    handler: async ({ website, consent, ...lead }) => {
+    handler: async ({ website, ...lead }) => {
       if (website) return { ok: true };
 
-      if (!GHL_CONTACT_WEBHOOK_URL) {
+      if (!RESEND_API_KEY || !CONTACT_TO_EMAIL) {
         throw new ActionError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'El formulario no está configurado. Escríbenos o agenda una llamada.',
         });
       }
 
-      const response = await fetch(GHL_CONTACT_WEBHOOK_URL, {
+      // Plain text on purpose: user input is never interpreted as HTML
+      const text = [
+        `Nombre: ${lead.name}`,
+        `Correo: ${lead.email}`,
+        `Empresa: ${lead.company}`,
+        `Servicio: ${lead.service}`,
+        `Industria: ${lead.industry || '-'}`,
+        '',
+        lead.message || '(sin mensaje)',
+      ].join('\n');
+
+      const response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_API_KEY}` },
         body: JSON.stringify({
-          ...lead,
-          consent,
-          source: 'web-contacto',
-          submittedAt: new Date().toISOString(),
+          from: CONTACT_FROM_EMAIL ?? 'Integra Web <onboarding@resend.dev>',
+          to: [CONTACT_TO_EMAIL],
+          reply_to: lead.email,
+          subject: `Nueva solicitud (${lead.service}): ${lead.name} - ${lead.company}`,
+          text,
         }),
         signal: AbortSignal.timeout(10_000),
       }).catch(() => null);

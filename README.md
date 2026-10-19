@@ -25,7 +25,9 @@ Definilas en Vercel (Project → Settings → Environment Variables) o en un arc
 | Variable | Tipo | Uso |
 | --- | --- | --- |
 | `SITE_URL` | build | URL pública para canonical, Open Graph y sitemap. Por defecto `https://integrasgp.com` (confirmar dominio). |
-| `GHL_CONTACT_WEBHOOK_URL` | secreta, servidor | Webhook entrante de GoHighLevel que recibe el formulario de Contacto. Sin este valor el formulario muestra un aviso y no envía. |
+| `RESEND_API_KEY` | secreta, servidor | API key de Resend que envía por correo el formulario de Contacto. Sin este valor (o sin `CONTACT_TO_EMAIL`) el formulario muestra un aviso y no envía. |
+| `CONTACT_TO_EMAIL` | secreta, servidor | Correo que recibe las solicitudes del formulario. |
+| `CONTACT_FROM_EMAIL` | secreta, servidor | Remitente, por ejemplo `Integra Web <web@integrasgp.com>`. Requiere dominio verificado en Resend. Opcional: sin él usa `onboarding@resend.dev`, que solo entrega al dueño de la cuenta de Resend. |
 | `PUBLIC_GHL_BOOKING_VENTAS` | pública | URL del widget de reservas de la *Cita de Ventas*. |
 | `PUBLIC_GHL_BOOKING_VA` | pública | URL del widget de la *Cita de Virtual Assistance*. |
 | `PUBLIC_GHL_BOOKING_WEB` | pública | URL del widget de la *Cita de Diseño Web*. |
@@ -35,7 +37,9 @@ Ejemplo de `.env` local:
 
 ```bash
 SITE_URL=https://integrasgp.com
-GHL_CONTACT_WEBHOOK_URL=<url-del-inbound-webhook-de-gohighlevel>
+RESEND_API_KEY=<api-key-de-resend>
+CONTACT_TO_EMAIL=<correo-que-recibe-las-solicitudes>
+CONTACT_FROM_EMAIL=Integra Web <web@integrasgp.com>
 PUBLIC_GHL_BOOKING_VENTAS=<url-del-src-del-iframe-del-calendario-de-ventas>
 PUBLIC_GHL_BOOKING_VA=
 PUBLIC_GHL_BOOKING_WEB=
@@ -47,9 +51,11 @@ Las variables están tipadas y validadas con `astro:env` en `astro.config.mjs`.
 ## Integración con GoHighLevel
 
 ### Formulario de Contacto
-1. En GoHighLevel, crear un *Workflow* con disparador **Inbound Webhook** y copiar su URL en `GHL_CONTACT_WEBHOOK_URL`.
-2. El sitio envía un `POST` JSON con: `name`, `email`, `company`, `service` (`ventas` | `virtual-assistance` | `diseno-web` | `marketing`), `industry`, `message`, `consent`, `source` (`web-contacto`) y `submittedAt` (ISO 8601).
-3. En el workflow, mapear esos campos a un contacto/oportunidad.
+Se envía por correo con Resend (el trigger *Inbound Webhook* de GoHighLevel es premium y cobra por ejecución, por eso no se usa).
+1. En resend.com, crear una API key y copiarla en `RESEND_API_KEY`.
+2. Definir `CONTACT_TO_EMAIL` con la casilla que recibe las solicitudes.
+3. Para enviar desde un dominio propio, verificarlo en Resend (Domains) y definir `CONTACT_FROM_EMAIL`. Sin eso Resend solo entrega al correo dueño de la cuenta.
+4. El correo llega en texto plano con nombre, correo, empresa, servicio, industria y mensaje; el campo `email` del visitante queda como *reply-to*.
 
 La validación vive en `src/actions/index.ts` (zod) y se repite en el navegador para mostrar errores por campo.
 

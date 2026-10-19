@@ -16,8 +16,12 @@ export default defineConfig({
   integrations: [sitemap({ filter: (page) => !page.includes('/legal/') })],
   env: {
     schema: {
-      // GoHighLevel inbound webhook that receives the contact form (never exposed to the browser)
-      GHL_CONTACT_WEBHOOK_URL: envField.string({ context: 'server', access: 'secret', optional: true, url: true }),
+      // Resend sends the contact form by email (never exposed to the browser)
+      RESEND_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+      // Inbox that receives the contact form
+      CONTACT_TO_EMAIL: envField.string({ context: 'server', access: 'secret', optional: true }),
+      // Sender; needs a domain verified in Resend. Falls back to Resend's onboarding sender (only delivers to the Resend account owner)
+      CONTACT_FROM_EMAIL: envField.string({ context: 'server', access: 'secret', optional: true }),
       // Booking widget URL per service, copied from GoHighLevel → Calendars → Share → Embed
       PUBLIC_GHL_BOOKING_VENTAS: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
       PUBLIC_GHL_BOOKING_VA: envField.string({ context: 'client', access: 'public', optional: true, url: true }),

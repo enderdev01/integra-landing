@@ -9,7 +9,7 @@ import { contactHref, format, getLocale, useTranslations } from '../i18n';
 const locale = getLocale(Astro.url);
 const t = useTranslations(locale).schedulePage;
 const services = getServices(locale);
-const cardIconWidth = { ventas: 60, va: 84, web: 60, marketing: 79 } as const;
+const cardIconWidth = { ventas: 60, va: 84, web: 60, marketing: 79, hire: 62 } as const;
 const first = services[0];
 ---
 
@@ -37,7 +37,7 @@ const first = services[0];
       <!-- Step 1: service -->
       <fieldset class="mt-7 md:mt-[72px]" data-service-picker>
         <legend class="mb-3 font-sans text-sm font-bold tracking-[0.12em] text-copy uppercase md:mb-[18px]">{t.step1}</legend>
-        <div class="grid grid-cols-2 gap-2 md:gap-4 lg:grid-cols-4">
+        <div class="grid grid-cols-2 gap-2 md:gap-4 lg:grid-cols-5">
           {
             services.map((service, index) => (
               <label class="svc-card relative flex cursor-pointer flex-col items-start gap-2.5 rounded-[14px] border-2 border-[#d6dee6] bg-white/70 px-3 py-3 text-left md:min-h-[196px] md:rounded-[20px] md:px-5 md:py-[22px]">

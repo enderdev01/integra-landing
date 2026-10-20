@@ -8,7 +8,7 @@ import { getLocale, servicesHref, useTranslations } from '../../i18n';
 const locale = getLocale(Astro.url);
 const t = useTranslations(locale).servicesOverview;
 const services = getServices(locale);
-const iconWidth = { ventas: 92, va: 150, web: 92, marketing: 150 } as const;
+const iconWidth = { ventas: 92, va: 150, web: 92, marketing: 150, hire: 96 } as const;
 ---
 
 <section aria-labelledby="services-title" class="relative mt-10 pb-16 md:mt-[72px] md:pb-28">

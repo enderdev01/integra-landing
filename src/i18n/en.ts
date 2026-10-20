@@ -43,14 +43,14 @@ export const en: Dictionary = {
         'Remote sales teams, Virtual Assistance, web design and marketing for real estate, SaaS, law firms and healthcare. Grow with structure and quality.',
     },
     services: {
-      title: 'Sales, Virtual Assistance, web design and marketing | Integra',
+      title: 'Sales, Virtual Assistance, web design, marketing and Direct Hire | Integra',
       description:
-        'Sales, Virtual Assistance, web design and marketing that plug into your operation. Support for real estate, SaaS, law firms and healthcare.',
+        'Sales, Virtual Assistance, web design, marketing and Direct Hire Recruitment that plug into your operation. Support for real estate, SaaS, law firms and healthcare.',
     },
     schedule: {
       title: 'Book a call with Integra',
       description:
-        'Choose the service —sales, Virtual Assistance, web design or marketing— and book with the right specialist.',
+        'Choose the service —sales, Virtual Assistance, web design, marketing or Direct Hire— and book with the right specialist.',
     },
     contact: {
       title: 'Contact | Request a proposal — Integra',
@@ -71,6 +71,7 @@ export const en: Dictionary = {
         closing: 'customer channel',
         cta: 'Book your Virtual Assistance call',
       },
+      { kicker: 'Hire', connector: 'qualified talent for a', word: 'single', closing: 'fee', cta: 'Find candidates for your business' },
     ],
     tagline: 'We build sales, support and back-office teams so your business grows with structure, quality and flexibility.',
     carousel: 'carousel',
@@ -97,6 +98,7 @@ export const en: Dictionary = {
   servicesPage: {
     jump: 'Jump to a service',
     marketingChip: 'Marketing',
+    hireChip: 'Direct Hire',
     industriesChip: 'Industries',
     // «[Solutions] that [integrate] into your operation»
     h1Highlight1: 'Solutions',
@@ -257,24 +259,29 @@ export const en: Dictionary = {
     },
     web: {
       name: 'Web Design',
-      short: 'Websites, landing pages and redesigns',
+      short: 'Websites, landing pages, domains and professional email',
       lead: 'A professional website that turns visits into opportunities.',
       cta: 'Create my website',
       bookingLead: 'We plan a professional website that turns visits into opportunities.',
-      bullets: ['Website design', 'Landing pages', 'Website redesign', 'Conversion-focused layouts'],
+      bullets: ['Website design', 'Landing pages', 'Website redesign', 'Domain, email and URL management'],
       detail: {
         lead: 'A website that explains who you are and how to take the next step.',
-        summary: 'We design new sites and redesigns that are easy to navigate, aligned with your brand and mobile-ready.',
-        points: ['Corporate websites', 'Landing pages', 'Website redesign', 'Content and calls to action'],
+        summary:
+          'We design new sites and redesigns that are easy to navigate, aligned with your brand and mobile-ready. We also take care of your domain, professional email and URL management.',
+        points: ['Websites and landing pages', 'Website redesign', 'Domain purchase', 'Professional email accounts', 'URL management'],
         more: [
           'We design pages with an easy-to-navigate structure and a presentation aligned with your brand, built to work on computers and mobile devices.',
           'Whether it is a new site or a redesign, we make sure your visitors find the information they need and can contact you easily.',
+          'We also buy your domain, create your company email accounts and manage your URL, so your online presence is ready in one place.',
         ],
         support: [
           { text: 'Website design to present your company and services.' },
           { text: 'Landing pages for specific campaigns and offers.' },
           { text: 'Redesign of existing websites.' },
           { text: 'Content organization and clear calls to action.' },
+          { text: 'Domain purchase for your website.' },
+          { text: 'Professional email accounts on your company domain.' },
+          { text: 'Management of your URL and domain.' },
         ],
         photoAlt: 'Team reviewing the structure of a website in a meeting',
       },
@@ -302,6 +309,31 @@ export const en: Dictionary = {
           { text: 'Support in executing digital marketing initiatives.' },
         ],
         photoAlt: 'Marketing specialist smiling while using a tablet',
+      },
+    },
+    hire: {
+      name: 'Direct Hire Recruitment',
+      short: 'One-time fee recruitment, no monthly commitments',
+      lead: 'One-time fee. No monthly commitments.',
+      cta: 'Candidates for your business',
+      bookingLead: 'We find, screen and present qualified candidates. You hire them directly and pay a single fee.',
+      bullets: ['Candidate search', 'Screening and selection', 'Direct hiring', 'One-time recruitment fee'],
+      detail: {
+        lead: 'One-time fee. No monthly commitments.',
+        summary:
+          'We find, screen and present qualified candidates for your business. You hire them directly and pay a one-time recruitment fee.',
+        points: ['Candidate search', 'Screening and selection', 'Qualified candidates presented', 'No ongoing staffing costs'],
+        more: [
+          'We find, screen and present qualified candidates for your business. You hire them directly and pay a one-time recruitment fee, with no ongoing staffing or management costs.',
+        ],
+        support: [
+          { text: 'Candidate search for the profile your business needs.' },
+          { text: 'Screening and selection before anyone is presented.' },
+          { text: 'Qualified candidates presented for your decision.' },
+          { text: 'Direct hiring by your company, with a one-time recruitment fee.' },
+          { text: 'No ongoing staffing or management costs.' },
+        ],
+        photoAlt: 'Integra team talking in the office during a hiring meeting',
       },
     },
   },

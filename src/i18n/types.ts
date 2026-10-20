@@ -1,6 +1,6 @@
 import type { es } from './es';
 
-export type ServiceId = 'ventas' | 'va' | 'web' | 'marketing';
+export type ServiceId = 'ventas' | 'va' | 'web' | 'marketing' | 'hire';
 
 export interface ServiceCopy {
   name: string;

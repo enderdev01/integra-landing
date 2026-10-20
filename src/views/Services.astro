@@ -5,7 +5,7 @@ import Chevrons from '../components/ui/Chevrons.astro';
 import Artwork from '../components/ui/Artwork.astro';
 import Icon from '../components/ui/Icon.astro';
 import ServiceIcon from '../components/ui/ServiceIcon.astro';
-import { getServices } from '../content/services';
+import { getServices, type ServiceId } from '../content/services';
 import { getIndustries } from '../content/industries';
 import { bookingHref, contactHref, getLocale, useTranslations } from '../i18n';
 
@@ -19,9 +19,11 @@ const icons = {
   va: { width: 120 },
   web: { width: 80 },
   marketing: { width: 116 },
+  hire: { width: 84 },
 } as const;
+const chipLabels: Partial<Record<ServiceId, string>> = { marketing: t.marketingChip, hire: t.hireChip };
 const chips = [
-  ...services.map((service) => ({ href: `#${service.slug}`, label: service.id === 'marketing' ? t.marketingChip : service.name })),
+  ...services.map((service) => ({ href: `#${service.slug}`, label: chipLabels[service.id] ?? service.name })),
   { href: '#industrias', label: t.industriesChip },
 ];
 ---

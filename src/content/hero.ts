@@ -2,6 +2,7 @@ import type { ImageMetadata } from 'astro';
 import heroOffice from '../assets/img/hero-office.webp';
 import heroSales from '../assets/img/hero-sales.webp';
 import heroSupport from '../assets/img/hero-support.webp';
+import heroDirectHire from '../assets/img/hero-direct-hire.webp';
 import { bookingHref, useTranslations, type Locale } from '../i18n';
 
 export interface HeroSlide {
@@ -14,11 +15,12 @@ export interface HeroSlide {
   cta: { label: string; href: string };
 }
 
-// Slides 2 and 3 reuse the client's service copy; pending client approval.
+// Slides 2 to 4 reuse the client's service copy; pending client approval.
 const BASE = [
   { id: 'equipos', image: heroOffice, focus: '60% center', service: undefined },
   { id: 'ventas', image: heroSales, focus: '60% 35%', service: 'ventas' },
   { id: 'soporte', image: heroSupport, focus: '65% 35%', service: 'virtual-assistance' },
+  { id: 'direct-hire', image: heroDirectHire, focus: '60% center', service: 'direct-hire' },
 ];
 
 export const getHeroSlides = (locale: Locale): HeroSlide[] => {

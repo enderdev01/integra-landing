@@ -16,6 +16,7 @@ const SERVICE_LABELS: Record<string, string> = {
   'virtual-assistance': 'Virtual Assistance',
   'diseno-web': 'Diseño Web',
   marketing: 'Marketing Services',
+  'direct-hire': 'Direct Hire Recruitment',
 };
 
 const serviceLabel = (slug: string) => SERVICE_LABELS[slug] ?? slug;

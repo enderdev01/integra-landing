@@ -4,7 +4,7 @@ import { z } from 'astro/zod';
 import { SITE } from '../config/site';
 import { buildContactEmail } from '../lib/contact-email';
 
-const SERVICE_VALUES = ['ventas', 'virtual-assistance', 'diseno-web', 'marketing'] as const;
+const SERVICE_VALUES = ['ventas', 'virtual-assistance', 'diseno-web', 'marketing', 'direct-hire'] as const;
 
 export const contactSchema = z.object({
   name: z.string().trim().min(3, 'Escribe tu nombre y apellido.').max(120),

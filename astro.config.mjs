@@ -44,6 +44,7 @@ export default defineConfig({
       PUBLIC_GHL_BOOKING_VA: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
       PUBLIC_GHL_BOOKING_WEB: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
       PUBLIC_GHL_BOOKING_MARKETING: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
+      PUBLIC_GHL_BOOKING_DIRECT_HIRE: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
     },
   },
   vite: {

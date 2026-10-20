@@ -43,14 +43,14 @@ export const es = {
         'Equipos remotos de ventas, Virtual Assistance, diseño web y marketing para bienes raíces, SaaS, firmas legales y salud. Crece con estructura y calidad.',
     },
     services: {
-      title: 'Ventas, Virtual Assistance, diseño web y marketing | Integra',
+      title: 'Ventas, Virtual Assistance, diseño web, marketing y Direct Hire | Integra',
       description:
-        'Ventas, Virtual Assistance, diseño web y marketing que se integran a tu operación. Apoyo para bienes raíces, SaaS, firmas legales y salud.',
+        'Ventas, Virtual Assistance, diseño web, marketing y Direct Hire Recruitment que se integran a tu operación. Apoyo para bienes raíces, SaaS, firmas legales y salud.',
     },
     schedule: {
       title: 'Agenda una llamada con Integra',
       description:
-        'Elige el servicio —ventas, Virtual Assistance, diseño web o marketing— y reserva tu cita con el especialista indicado.',
+        'Elige el servicio —ventas, Virtual Assistance, diseño web, marketing o Direct Hire— y reserva tu cita con el especialista indicado.',
     },
     contact: {
       title: 'Contacto | Solicita una propuesta — Integra',
@@ -70,6 +70,13 @@ export const es = {
         word: 'cada',
         closing: 'canal de tus clientes',
         cta: 'Agenda tu cita de Virtual Assistance',
+      },
+      {
+        kicker: 'Contrata',
+        connector: 'talento calificado con un',
+        word: 'único',
+        closing: 'pago',
+        cta: 'Encuentra candidatos para tu negocio',
       },
     ],
     tagline: 'Construimos equipos de ventas, soporte y back office para que tu negocio crezca con estructura, calidad y flexibilidad.',
@@ -97,6 +104,7 @@ export const es = {
   servicesPage: {
     jump: 'Ir a un servicio',
     marketingChip: 'Marketing',
+    hireChip: 'Direct Hire',
     industriesChip: 'Industrias',
     // «[Soluciones] que se [integran] a tu operación»
     h1Highlight1: 'Soluciones',
@@ -257,24 +265,29 @@ export const es = {
     },
     web: {
       name: 'Diseño Web',
-      short: 'Sitios web, landing pages y rediseños',
+      short: 'Sitios web, landing pages, dominios y correos profesionales',
       lead: 'Un sitio web profesional que convierte visitas en oportunidades.',
       cta: 'Crear mi sitio web',
       bookingLead: 'Planificamos un sitio web profesional que convierta visitas en oportunidades.',
-      bullets: ['Diseño de sitios web', 'Landing pages', 'Rediseño de sitios', 'Layouts para conversión'],
+      bullets: ['Diseño de sitios web', 'Landing pages', 'Rediseño de sitios', 'Dominio, correos y administración de URL'],
       detail: {
         lead: 'Un sitio web que explica quién eres y cómo dar el siguiente paso.',
-        summary: 'Diseñamos sitios nuevos y rediseños fáciles de navegar, alineados con tu marca y listos para móvil.',
-        points: ['Sitios corporativos', 'Landing pages', 'Rediseño de sitios', 'Contenido y llamadas a la acción'],
+        summary:
+          'Diseñamos sitios nuevos y rediseños fáciles de navegar, alineados con tu marca y listos para móvil. También nos encargamos de tu dominio, tus correos profesionales y la administración de tu URL.',
+        points: ['Sitios web y landing pages', 'Rediseño de sitios', 'Compra de dominio', 'Correos electrónicos profesionales', 'Administración de URL'],
         more: [
           'Diseñamos páginas con una estructura fácil de navegar y una presentación alineada con tu marca, pensadas para funcionar en computadoras y dispositivos móviles.',
           'Ya sea un sitio nuevo o un rediseño, buscamos que tus visitantes encuentren la información que necesitan y puedan contactarte fácilmente.',
+          'Además, nos encargamos de comprar tu dominio, crear los correos electrónicos de tu empresa y administrar tu URL, para que tu presencia en línea quede lista en un solo lugar.',
         ],
         support: [
           { text: 'Diseño de sitios web para presentar tu empresa y servicios.' },
           { text: 'Landing pages para campañas y ofertas específicas.' },
           { text: 'Rediseño de sitios existentes.' },
           { text: 'Organización del contenido y llamadas a la acción claras.' },
+          { text: 'Compra de dominio para tu sitio web.' },
+          { text: 'Creación de correos electrónicos profesionales con el dominio de tu empresa.' },
+          { text: 'Administración de tu URL y dominio.' },
         ],
         photoAlt: 'Equipo revisando la estructura de un sitio web en una reunión',
       },
@@ -302,6 +315,31 @@ export const es = {
           { text: 'Apoyo en la ejecución de iniciativas de marketing digital.' },
         ],
         photoAlt: 'Especialista de marketing sonriendo mientras usa una tablet',
+      },
+    },
+    hire: {
+      name: 'Direct Hire Recruitment',
+      short: 'Reclutamiento con pago único, sin compromisos mensuales',
+      lead: 'Pago único. Sin compromisos mensuales.',
+      cta: 'Candidatos para tu negocio',
+      bookingLead: 'Buscamos, evaluamos y te presentamos candidatos calificados. Tú los contratas directamente y pagas una sola tarifa.',
+      bullets: ['Búsqueda de candidatos', 'Evaluación y selección', 'Contratación directa', 'Tarifa única de reclutamiento'],
+      detail: {
+        lead: 'Pago único. Sin compromisos mensuales.',
+        summary:
+          'Buscamos, evaluamos y te presentamos candidatos calificados para tu negocio. Tú los contratas directamente y pagas una tarifa única de reclutamiento.',
+        points: ['Búsqueda de candidatos', 'Evaluación y selección', 'Presentación de candidatos calificados', 'Sin costos continuos de staffing'],
+        more: [
+          'Buscamos, evaluamos y te presentamos candidatos calificados para tu negocio. Tú los contratas directamente y pagas una tarifa única de reclutamiento, sin costos continuos de staffing ni de gestión.',
+        ],
+        support: [
+          { text: 'Búsqueda de candidatos para el perfil que tu negocio necesita.' },
+          { text: 'Evaluación y selección previa a la presentación.' },
+          { text: 'Presentación de candidatos calificados para tu decisión.' },
+          { text: 'Contratación directa por tu empresa, con una tarifa única de reclutamiento.' },
+          { text: 'Sin costos continuos de staffing ni de gestión.' },
+        ],
+        photoAlt: 'Equipo de Integra conversando en la oficina durante una reunión de selección',
       },
     },
   } as Record<ServiceId, ServiceCopy>,

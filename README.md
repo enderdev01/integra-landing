@@ -31,7 +31,7 @@ Definilas en Vercel (Project → Settings → Environment Variables) o en un arc
 | `PUBLIC_GHL_BOOKING_VA` | pública | URL del widget de la *Cita de Virtual Assistance*. |
 | `PUBLIC_GHL_BOOKING_WEB` | pública | URL del widget de la *Cita de Diseño Web*. |
 | `PUBLIC_GHL_BOOKING_MARKETING` | pública | URL del widget de la *Cita de Marketing Services*. |
-| `PUBLIC_GHL_BOOKING_DIRECT_HIRE` | pública | URL del widget de la *Cita de Direct Hire Recruitment*. |
+| `PUBLIC_GHL_BOOKING_DIRECT_HIRE` | pública | URL del widget de la *Cita de Direct Hire Recruitment*. Opcional: si falta, usa el calendario de Ventas (hoy los calendarios son el mismo). |
 
 Ejemplo de `.env` local:
 

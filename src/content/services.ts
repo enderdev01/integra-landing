@@ -35,7 +35,7 @@ const BASE: { id: ServiceId; slug: string; bookingUrl: string | undefined; photo
   { id: 'va', slug: 'virtual-assistance', bookingUrl: PUBLIC_GHL_BOOKING_VA, photo: { src: svcVa, focus: '50% 30%' } },
   { id: 'web', slug: 'diseno-web', bookingUrl: PUBLIC_GHL_BOOKING_WEB, photo: { src: svcWeb, focus: '50% 30%' } },
   { id: 'marketing', slug: 'marketing', bookingUrl: PUBLIC_GHL_BOOKING_MARKETING, photo: { src: svcMarketing, focus: '50% 30%' } },
-  { id: 'hire', slug: 'direct-hire', bookingUrl: PUBLIC_GHL_BOOKING_DIRECT_HIRE, photo: { src: svcHire, focus: '50% 30%' } },
+  { id: 'hire', slug: 'direct-hire', bookingUrl: PUBLIC_GHL_BOOKING_DIRECT_HIRE ?? PUBLIC_GHL_BOOKING_VENTAS, photo: { src: svcHire, focus: '50% 30%' } },
 ];
 
 export const getServices = (locale: Locale): Service[] => {

@@ -21,9 +21,7 @@ export const en: Dictionary = {
   footer: {
     contactTitle: 'Contact {name}',
     customerCare: 'Customer service',
-    tollFree: 'Toll free:',
     follow: 'Follow us',
-    legalNav: 'Legal',
     rights: 'All rights reserved.',
   },
 

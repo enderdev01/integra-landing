@@ -1,7 +1,7 @@
 ---
 import Icon from '../ui/Icon.astro';
 import { SITE } from '../../config/site';
-import { format, getLocale, legalPath, useTranslations } from '../../i18n';
+import { format, getLocale, useTranslations } from '../../i18n';
 
 const locale = getLocale(Astro.url);
 const t = useTranslations(locale);
@@ -21,9 +21,7 @@ const year = new Date().getFullYear();
       <div class="min-w-0 flex-[1_1_300px]">
         <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">{t.footer.customerCare}</h2>
         <p class="text-[15px] tracking-[0.02em] text-[#e7e8ea]">
-          <a href={SITE.phone.href} class="inline-flex min-h-11 items-center text-white no-underline">{SITE.phone.display}</a><br />
-          <strong class="font-bold uppercase">{t.footer.tollFree}</strong>
-          <a href={SITE.tollFree.href} class="inline-flex min-h-11 items-center text-white no-underline">{SITE.tollFree.display}</a>
+          <a href={SITE.phone.href} class="inline-flex min-h-11 items-center text-white no-underline">{SITE.phone.display}</a>
         </p>
       </div>
 
@@ -44,27 +42,9 @@ const year = new Date().getFullYear();
     </div>
   </div>
 
-  <nav aria-label={t.footer.legalNav} class="border-t border-white/10">
-    <div class="mx-auto flex w-full max-w-[1320px] flex-wrap items-center justify-between gap-x-8 gap-y-3 px-5 pt-5 pb-6 sm:px-6">
-      <ul class="grid grid-cols-2 gap-x-4 sm:flex sm:flex-wrap sm:items-center">
-        {
-          SITE.legal.map((slug, index) => (
-            <li class="flex items-center">
-              {index > 0 && (
-                <span aria-hidden="true" class="hidden pr-3.5 text-[#8d9096] sm:inline">
-                  /
-                </span>
-              )}
-              <a href={legalPath(slug, locale)} class="inline-flex min-h-11 items-center pr-3.5 text-sm font-bold tracking-[0.04em] text-[#e7e8ea] uppercase no-underline">
-                {t.legalDocs[slug]}
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-      <p class="text-[13px] text-[#c9cbcf]">© {year} {SITE.legalName} {t.footer.rights}</p>
-    </div>
-  </nav>
+  <div class="border-t border-white/10">
+    <p class="mx-auto w-full max-w-[1320px] px-5 py-5 text-[13px] text-[#c9cbcf] sm:px-6">© {year} {SITE.legalName} {t.footer.rights}</p>
+  </div>
 </footer>
 
 <style>

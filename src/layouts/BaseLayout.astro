@@ -39,6 +39,7 @@ const jsonLd = {
   inLanguage: LOCALE_META[locale].lang,
   logo: new URL('/integra-logo.svg', Astro.site).toString(),
   image: ogImageUrl.toString(),
+  telephone: SITE.phone.display,
   address: {
     '@type': 'PostalAddress',
     streetAddress: SITE.address.street,

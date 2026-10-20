@@ -16,9 +16,8 @@ export const SITE = {
   },
   /** Public contact inbox; also receives the contact form submissions. */
   email: 'hello@integrasgp.com',
-  // Placeholders from the client design — replace with real numbers before launch.
-  phone: { display: '+0 000 000 0000', href: 'tel:+00000000000' },
-  tollFree: { display: '+0 000 000 0000', href: 'tel:+00000000000' },
+  /** The only contact number */
+  phone: { display: '+1 415 816 6406', href: 'tel:+14158166406' },
   // Footer links to Integra's real profiles.
   social: [
     { label: 'Facebook', href: 'https://www.facebook.com/share/1HbZjYG2Bs/?mibextid=wwXIfr', icon: 'facebook' },

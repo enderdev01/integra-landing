@@ -21,9 +21,7 @@ export const es = {
   footer: {
     contactTitle: 'Contacta a {name}',
     customerCare: 'Atención a clientes',
-    tollFree: 'Llama gratis:',
     follow: 'Síguenos',
-    legalNav: 'Legal',
     rights: 'Todos los derechos reservados.',
   },
 

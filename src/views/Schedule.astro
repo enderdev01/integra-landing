@@ -11,6 +11,18 @@ const t = useTranslations(locale).schedulePage;
 const services = getServices(locale);
 const cardIconWidth = { ventas: 60, va: 84, web: 60, marketing: 79, hire: 62 } as const;
 const first = services[0];
+// One calendar per distinct booking URL: services that share a widget (Direct Hire falls back
+// to Ventas) reuse a single iframe instead of loading the same heavy embed once per service
+const calendars: { slugs: string[]; names: string[]; service: (typeof services)[number] }[] = [];
+for (const service of services) {
+  const shared = service.bookingUrl ? calendars.find((calendar) => calendar.service.bookingUrl === service.bookingUrl) : undefined;
+  if (shared) {
+    shared.slugs.push(service.slug);
+    shared.names.push(service.name);
+  } else {
+    calendars.push({ slugs: [service.slug], names: [service.name], service });
+  }
+}
 ---
 
 <BaseLayout page="agendar">
@@ -82,13 +94,14 @@ const first = services[0];
 
           <div id="calendario" class="relative scroll-mt-24 overflow-hidden rounded-3xl bg-white shadow-[0_24px_60px_-36px_rgb(20_45_85/0.45)]">
             {
-              services.map((service, index) => (
-                <div data-booking={service.slug} data-active={index === 0 ? '' : undefined} inert={index !== 0}>
+              calendars.map(({ slugs, names, service }) => (
+                <div data-booking={slugs.join(' ')} data-active={slugs.includes(first.slug) ? '' : undefined} inert={!slugs.includes(first.slug)}>
                   {service.bookingUrl ? (
                     <iframe
                       data-src={service.bookingUrl}
-                      src={index === 0 ? service.bookingUrl : undefined}
-                      title={format(t.calendarTitle, { name: service.name })}
+                      src={slugs.includes(first.slug) ? service.bookingUrl : undefined}
+                      loading="lazy"
+                      title={format(t.calendarTitle, { name: names.join(' / ') })}
                       class="block h-[760px] w-full border-0"
                       scrolling="no"
                     />
@@ -231,9 +244,14 @@ const first = services[0];
     if (height > 0) frame.style.height = `${Math.ceil(height)}px`;
   });
 
-  // Warm up the other calendars once the page is idle, so switching service is instant
+  // Warm up the other (distinct) calendars once the page is idle, so switching service is instant.
+  // Skipped on Save-Data and 2G connections: each embed is heavy and may never be opened.
+  const connection = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection;
+  const constrained = connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType ?? '');
   const preload = () => document.querySelectorAll<HTMLElement>('[data-booking]').forEach(loadFrame);
-  window.addEventListener('load', () => ('requestIdleCallback' in window ? requestIdleCallback(preload, { timeout: 3000 }) : setTimeout(preload, 1500)), { once: true });
+  if (!constrained) {
+    window.addEventListener('load', () => ('requestIdleCallback' in window ? requestIdleCallback(preload, { timeout: 3000 }) : setTimeout(preload, 1500)), { once: true });
+  }
 
   const select = (slug: string, updateUrl: boolean) => {
     const radio = picker?.querySelector<HTMLInputElement>(`input[value="${CSS.escape(slug)}"]`);
@@ -241,7 +259,7 @@ const first = services[0];
     radio.checked = true;
     document.querySelectorAll<HTMLElement>('[data-summary]').forEach((el) => el.toggleAttribute('data-visible', el.dataset.summary === slug));
     document.querySelectorAll<HTMLElement>('[data-booking]').forEach((panel) => {
-      const active = panel.dataset.booking === slug;
+      const active = (panel.dataset.booking ?? '').split(' ').includes(slug);
       panel.toggleAttribute('data-active', active);
       panel.inert = !active;
       if (active) loadFrame(panel);

@@ -364,10 +364,15 @@ const linkState = (id: PageId) =>
 <script>
   const header = document.querySelector<HTMLElement>('[data-header]');
 
-  // Shadow once the page scrolls under the sticky header
-  const onScroll = () => header?.toggleAttribute('data-scrolled', window.scrollY > 8);
-  onScroll();
-  window.addEventListener('scroll', onScroll, { passive: true });
+  // Shadow once the page scrolls under the sticky header. A top sentinel and an
+  // observer replace a scroll listener: no work per scroll event.
+  if (header) {
+    const sentinel = document.createElement('div');
+    sentinel.setAttribute('aria-hidden', 'true');
+    sentinel.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:8px;pointer-events:none';
+    document.body.prepend(sentinel);
+    new IntersectionObserver(([entry]) => header.toggleAttribute('data-scrolled', !entry.isIntersecting)).observe(sentinel);
+  }
 
   // Desktop services dropdown: hover (fine pointers), click and keyboard
   document.querySelectorAll<HTMLElement>('[data-dropdown]').forEach((dropdown) => {

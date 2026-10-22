@@ -82,12 +82,12 @@ export const en: Dictionary = {
   },
 
   servicesOverview: {
-    // «What can [we] help you [grow]?»
-    titleStart: 'What can ',
-    titleHighlight1: 'we',
-    titleMiddle: ' help you ',
+    // «How Can [We] Help Your Business [Grow]?»
+    titleStart: 'How Can ',
+    titleHighlight1: 'We',
+    titleMiddle: ' Help Your Business ',
     titleBlockStart: '',
-    titleHighlight2: 'grow',
+    titleHighlight2: 'Grow',
     titleEnd: '?',
   },
 
@@ -209,9 +209,16 @@ export const en: Dictionary = {
       bookingLead: 'We build your commercial team to expand capacity and keep opportunities moving.',
       bullets: ['SDRs / Inside Sales', 'Lead qualification', 'Appointment setting', 'Pipeline follow-up'],
       detail: {
-        lead: 'Give every opportunity continuity.',
-        summary: 'Professionals who prospect, qualify and follow up within your process, so your team can focus on closing.',
-        points: ['Prospecting with SDRs and Inside Sales', 'Lead qualification', 'Meeting scheduling', 'Follow-up and an up-to-date CRM'],
+        lead: '',
+        summary:
+          'Our dedicated Inside Sales Agents (ISAs) and Sales Development Representatives (SDRs) provide end-to-end sales support, managing your sales pipeline and helping turn opportunities into revenue.',
+        points: [
+          'Lead prospecting and outbound sales',
+          'Lead qualification and nurturing',
+          'Appointment setting and meeting scheduling',
+          'Sales follow-ups and CRM management',
+          'Sales closing and conversion support',
+        ],
         more: [
           'We support you with a team focused on prospecting, qualifying contacts and commercial follow-up. At Integra we help you expand your sales capacity with professionals who plug into your process and keep your pipeline organized.',
           'This way, your team can spend more time on the conversations and opportunities that need their attention.',

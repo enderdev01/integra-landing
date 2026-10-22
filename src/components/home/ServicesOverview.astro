@@ -36,7 +36,7 @@ const iconWidth = { ventas: 92, va: 150, web: 92, marketing: 150, hire: 96 } as 
     <div class="grid grid-cols-1 gap-14 pt-12 md:grid-cols-2 md:gap-x-[72px] md:gap-y-20 md:pt-24 xl:pr-60 xl:pl-24">
       {
         services.map((service) => (
-          <article class="reveal flex flex-col gap-3.5 md:gap-5">
+          <article class="reveal flex flex-col gap-3.5 md:gap-5 md:last:odd:col-span-2 md:last:odd:mx-auto md:last:odd:w-full md:last:odd:max-w-[calc(50%-36px)]">
             <div class="flex items-center gap-4">
               <ServiceIcon name={service.id} width={iconWidth[service.id]} class="h-auto w-16 shrink-0 md:w-auto" />
               <h3 class="font-display text-[30px] leading-none font-bold tracking-[-0.015em] text-blue md:text-[clamp(40px,4vw,58px)]">{service.name}</h3>

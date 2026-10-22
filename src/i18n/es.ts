@@ -215,9 +215,16 @@ export const es = {
       bookingLead: 'Armamos tu equipo comercial para ampliar capacidad y mantener las oportunidades en movimiento.',
       bullets: ['SDRs / Inside Sales', 'Calificación de leads', 'Appointment setting', 'Seguimiento de pipeline'],
       detail: {
-        lead: 'Dale continuidad a cada oportunidad.',
-        summary: 'Profesionales que prospectan, califican y dan seguimiento dentro de tu proceso, para que tu equipo se enfoque en cerrar.',
-        points: ['Prospección con SDRs e Inside Sales', 'Calificación de leads', 'Agendamiento de reuniones', 'Seguimiento y CRM al día'],
+        lead: '',
+        summary:
+          'Nuestros Inside Sales Agents (ISAs) y Sales Development Representatives (SDRs) dedicados ofrecen apoyo de ventas de principio a fin, gestionan tu pipeline comercial y ayudan a convertir oportunidades en ingresos.',
+        points: [
+          'Prospección de leads y ventas outbound',
+          'Calificación y nutrición de leads',
+          'Agendamiento de citas y reuniones',
+          'Seguimiento de ventas y gestión del CRM',
+          'Cierre de ventas y apoyo a la conversión',
+        ],
         more: [
           'Te apoyamos con un equipo enfocado en prospectar, calificar contactos y dar seguimiento comercial. En Integra te ayudamos a ampliar tu capacidad de ventas con profesionales que se integran a tu proceso y mantienen tu pipeline organizado.',
           'Así, tu equipo puede dedicar más tiempo a las conversaciones y oportunidades que necesitan su atención.',

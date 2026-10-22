@@ -91,9 +91,9 @@ const chips = [
                   {service.name}
                 </h2>
               </div>
-              <p class="sv-lead font-sans font-medium text-ink">{detail.lead}</p>
+              {detail.lead && <p class="sv-lead font-sans font-medium text-ink">{detail.lead}</p>}
               <p class="sv-p">{detail.summary}</p>
-              <ul class="sv-points" role="list">
+              <ul class:list={['sv-points', detail.points.length % 2 === 1 && 'stack']} role="list">
                 {detail.points.map((point) => (
                   <li class="flex items-start gap-2.5">
                     <svg class="mt-px shrink-0" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#95B71E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -381,6 +381,11 @@ const chips = [
     line-height: 1.35;
     font-weight: 500;
     color: var(--color-ink);
+  }
+  /* An odd number of points reads better as one column than as a ragged grid */
+  .sv-points.stack {
+    grid-template-columns: minmax(0, 1fr);
+    font-weight: 600;
   }
 
   /* "Ver todo lo que incluye": native disclosure, crawlable, no JS */

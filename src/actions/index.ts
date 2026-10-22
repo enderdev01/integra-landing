@@ -1,5 +1,5 @@
 import { ActionError, defineAction } from 'astro:actions';
-import { CONTACT_FROM_EMAIL, RESEND_API_KEY } from 'astro:env/server';
+import { CONTACT_FROM_EMAIL, GHL_WEBHOOK_URL, RESEND_API_KEY } from 'astro:env/server';
 import { z } from 'astro/zod';
 import { SITE } from '../config/site';
 import { buildContactEmail } from '../lib/contact-email';
@@ -19,6 +19,47 @@ export const contactSchema = z.object({
   website: z.string().optional(),
 });
 
+type Lead = Omit<z.infer<typeof contactSchema>, 'website'>;
+
+const sendToGhl = async (url: string, lead: Lead) => {
+  const [firstName, ...rest] = lead.name.split(/\s+/);
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      name: lead.name,
+      firstName,
+      lastName: rest.join(' '),
+      email: lead.email,
+      companyName: lead.company,
+      service: lead.service,
+      industry: lead.industry ?? '',
+      message: lead.message ?? '',
+      source: 'Integra website contact form',
+    }),
+    signal: AbortSignal.timeout(10_000),
+  }).catch(() => null);
+  return Boolean(response?.ok);
+};
+
+const sendByEmail = async (apiKey: string, lead: Lead) => {
+  const { subject, html, text } = buildContactEmail(lead);
+  const response = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${apiKey}` },
+    body: JSON.stringify({
+      from: CONTACT_FROM_EMAIL ?? 'Integra Web <onboarding@resend.dev>',
+      to: [SITE.email],
+      reply_to: lead.email,
+      subject,
+      html,
+      text,
+    }),
+    signal: AbortSignal.timeout(10_000),
+  }).catch(() => null);
+  return Boolean(response?.ok);
+};
+
 export const server = {
   contact: defineAction({
     accept: 'form',
@@ -26,34 +67,17 @@ export const server = {
     handler: async ({ website, ...lead }) => {
       if (website) return { ok: true };
 
-      if (!RESEND_API_KEY) {
-        throw new ActionError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: 'El formulario no está configurado. Escríbenos o agenda una llamada.',
-        });
-      }
+      // GoHighLevel is the primary destination; the Resend email is the fallback so a lead is never lost
+      const sentToGhl = GHL_WEBHOOK_URL ? await sendToGhl(GHL_WEBHOOK_URL, lead) : false;
+      if (sentToGhl) return { ok: true };
 
-      const { subject, html, text } = buildContactEmail(lead);
-
-      const response = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${RESEND_API_KEY}` },
-        body: JSON.stringify({
-          from: CONTACT_FROM_EMAIL ?? 'Integra Web <onboarding@resend.dev>',
-          to: [SITE.email],
-          reply_to: lead.email,
-          subject,
-          html,
-          text,
-        }),
-        signal: AbortSignal.timeout(10_000),
-      }).catch(() => null);
-
-      if (!response?.ok) {
-        throw new ActionError({
-          code: 'BAD_GATEWAY',
-          message: 'No pudimos enviar tu solicitud. Inténtalo de nuevo en unos minutos.',
-        });
+      const sentByEmail = RESEND_API_KEY ? await sendByEmail(RESEND_API_KEY, lead) : false;
+      if (!sentByEmail) {
+        throw new ActionError(
+          GHL_WEBHOOK_URL || RESEND_API_KEY
+            ? { code: 'BAD_GATEWAY', message: 'No pudimos enviar tu solicitud. Inténtalo de nuevo en unos minutos.' }
+            : { code: 'INTERNAL_SERVER_ERROR', message: 'El formulario no está configurado. Escríbenos o agenda una llamada.' },
+        );
       }
 
       return { ok: true };

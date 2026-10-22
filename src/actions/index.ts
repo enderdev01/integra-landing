@@ -67,12 +67,13 @@ export const server = {
     handler: async ({ website, ...lead }) => {
       if (website) return { ok: true };
 
-      // GoHighLevel is the primary destination; the Resend email is the fallback so a lead is never lost
-      const sentToGhl = GHL_WEBHOOK_URL ? await sendToGhl(GHL_WEBHOOK_URL, lead) : false;
-      if (sentToGhl) return { ok: true };
-
-      const sentByEmail = RESEND_API_KEY ? await sendByEmail(RESEND_API_KEY, lead) : false;
-      if (!sentByEmail) {
+      // Every lead goes to GoHighLevel (contact + automations) and to Integra's inbox (full details,
+      // including service, industry and message). Either one reaching its destination keeps the lead.
+      const [sentToGhl, sentByEmail] = await Promise.all([
+        GHL_WEBHOOK_URL ? sendToGhl(GHL_WEBHOOK_URL, lead) : false,
+        RESEND_API_KEY ? sendByEmail(RESEND_API_KEY, lead) : false,
+      ]);
+      if (!sentToGhl && !sentByEmail) {
         throw new ActionError(
           GHL_WEBHOOK_URL || RESEND_API_KEY
             ? { code: 'BAD_GATEWAY', message: 'No pudimos enviar tu solicitud. Inténtalo de nuevo en unos minutos.' }

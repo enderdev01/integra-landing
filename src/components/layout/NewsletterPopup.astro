@@ -134,7 +134,8 @@ const t = useTranslations(locale).newsletter;
 
   const KEY = 'integra:newsletter';
   const DAY = 24 * 60 * 60 * 1000;
-  const SHOW_AFTER_MS = 12_000;
+  // Right after the first paint, so the visitor sees the page before the dialog covers it
+  const SHOW_AFTER_MS = 1_500;
   const SNOOZE_MS = 14 * DAY;
   const SUBSCRIBED_MS = 180 * DAY;
 
@@ -193,7 +194,7 @@ const t = useTranslations(locale).newsletter;
       if (event.clientY <= 0 && !event.relatedTarget) open();
     };
 
-    // Opens once per visit: after a short delay, or earlier when a desktop visitor heads for the tab bar
+    // Opens shortly after load; exit intent on desktop covers visitors who leave before the timer fires
     timer = window.setTimeout(open, SHOW_AFTER_MS);
     window.setTimeout(() => document.addEventListener('mouseout', onExitIntent), 5_000);
 

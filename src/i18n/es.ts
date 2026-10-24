@@ -102,6 +102,7 @@ export const es = {
 
   newsletter: {
     dialogLabel: 'Suscripción al newsletter',
+    reopen: 'Suscríbete al newsletter',
     kicker: 'Newsletter',
     title: 'Ideas para hacer crecer tu operación, en tu bandeja',
     lead: 'Una vez al mes: equipos remotos, ventas y marketing explicados sin rodeos. Sin spam.',

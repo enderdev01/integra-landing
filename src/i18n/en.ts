@@ -96,6 +96,7 @@ export const en: Dictionary = {
 
   newsletter: {
     dialogLabel: 'Newsletter signup',
+    reopen: 'Subscribe to our newsletter',
     kicker: 'Newsletter',
     title: 'Ideas to grow your operation, straight to your inbox',
     lead: 'Once a month: remote teams, sales and marketing explained plainly. No spam.',

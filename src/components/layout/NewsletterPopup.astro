@@ -6,7 +6,25 @@ const locale = getLocale(Astro.url);
 const t = useTranslations(locale).newsletter;
 ---
 
-<dialog class="newsletter font-sans" aria-labelledby="nl-title" data-newsletter>
+<button
+  type="button"
+  class="newsletter-launcher font-sans"
+  aria-label={t.reopen}
+  aria-haspopup="dialog"
+  aria-controls="newsletter-dialog"
+  data-newsletter-launcher
+  hidden
+>
+  <span class="newsletter-launcher-label">{t.reopen}</span>
+  <span class="newsletter-launcher-circle">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3 7 9 6 9-6" />
+    </svg>
+  </span>
+</button>
+
+<dialog id="newsletter-dialog" class="newsletter font-sans" aria-labelledby="nl-title" data-newsletter>
   <script type="application/json" data-newsletter-i18n set:html={JSON.stringify({ emailError: t.emailError, network: t.network, serverError: t.serverError, notConfigured: t.notConfigured, successBody: t.successBody })} />
 
   <button type="button" class="close absolute top-3 right-3 z-10 grid size-11 place-items-center rounded-full text-white" aria-label={t.close} data-newsletter-close>
@@ -55,6 +73,52 @@ const t = useTranslations(locale).newsletter;
 </dialog>
 
 <style>
+  .newsletter-launcher {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: calc(96px + env(safe-area-inset-bottom));
+    z-index: 55;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--color-navy);
+    cursor: pointer;
+  }
+  .newsletter-launcher[hidden] {
+    display: none;
+  }
+  .newsletter-launcher-label {
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: var(--color-navy);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    box-shadow: 0 4px 16px rgb(0 28 48 / 0.16);
+  }
+  .newsletter-launcher-circle {
+    display: grid;
+    width: 60px;
+    height: 60px;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-lime);
+    box-shadow: 0 6px 24px rgb(0 28 48 / 0.22);
+    transition: background-color 0.15s ease;
+  }
+  @media (min-width: 768px) {
+    .newsletter-launcher {
+      right: max(24px, env(safe-area-inset-right));
+      bottom: calc(24px + env(safe-area-inset-bottom));
+    }
+  }
+  :global(html[data-menu-open]) .newsletter-launcher {
+    visibility: hidden;
+  }
   .newsletter {
     position: fixed;
     inset: 0;
@@ -93,6 +157,9 @@ const t = useTranslations(locale).newsletter;
     }
   }
   @media (hover: hover) and (pointer: fine) {
+    .newsletter-launcher:hover .newsletter-launcher-circle {
+      background: var(--color-lime-hover);
+    }
     .close:hover {
       background: rgb(255 255 255 / 0.14);
     }
@@ -132,31 +199,9 @@ const t = useTranslations(locale).newsletter;
     successBody: string;
   }
 
-  const KEY = 'integra:newsletter';
-  const DAY = 24 * 60 * 60 * 1000;
-  // Right after the first paint, so the visitor sees the page before the dialog covers it
-  const SHOW_AFTER_MS = 1_500;
-  const SNOOZE_MS = 14 * DAY;
-  const SUBSCRIBED_MS = 180 * DAY;
-
-  // Storage can throw (private mode, blocked cookies): the pop-up then simply behaves as a fresh visit
-  const snoozedUntil = () => {
-    try {
-      return Number(localStorage.getItem(KEY)) || 0;
-    } catch {
-      return 0;
-    }
-  };
-  const snooze = (ms: number) => {
-    try {
-      localStorage.setItem(KEY, String(Date.now() + ms));
-    } catch {
-      /* ignore */
-    }
-  };
-
   const dialog = document.querySelector<HTMLDialogElement>('[data-newsletter]');
-  if (dialog && Date.now() > snoozedUntil()) {
+  const launcher = document.querySelector<HTMLButtonElement>('[data-newsletter-launcher]');
+  if (dialog && launcher) {
     const copy: Copy = JSON.parse(dialog.querySelector('[data-newsletter-i18n]')?.textContent ?? '{}');
     const form = dialog.querySelector<HTMLFormElement>('[data-newsletter-form]')!;
     const fields = dialog.querySelector<HTMLFieldSetElement>('[data-newsletter-fields]')!;
@@ -166,7 +211,6 @@ const t = useTranslations(locale).newsletter;
     const submit = dialog.querySelector<HTMLButtonElement>('[data-newsletter-submit]')!;
     const submitLabel = dialog.querySelector<HTMLElement>('[data-newsletter-submit-label]')!;
     const success = dialog.querySelector<HTMLElement>('[data-newsletter-success]')!;
-    let timer: number | undefined;
 
     const showError = (text?: string) => {
       errorText.textContent = text ?? '';
@@ -179,28 +223,16 @@ const t = useTranslations(locale).newsletter;
       submitLabel.textContent = (sending ? submitLabel.dataset.labelSending : submitLabel.dataset.labelIdle) ?? '';
     };
 
-    const cleanup = () => {
-      clearTimeout(timer);
-      document.removeEventListener('mouseout', onExitIntent);
-    };
     const open = () => {
-      cleanup();
-      // Never stack on top of another modal or interrupt someone who is typing
-      const typing = document.activeElement instanceof HTMLElement && document.activeElement.matches('input, textarea, select');
-      if (dialog.open || document.querySelector('dialog[open]') || typing) return;
+      // Never stack on top of another modal.
+      if (dialog.open || document.querySelector('dialog[open]')) return;
+      launcher.hidden = true;
       dialog.showModal();
     };
-    const onExitIntent = (event: MouseEvent) => {
-      if (event.clientY <= 0 && !event.relatedTarget) open();
-    };
-
-    // Opens shortly after load; exit intent on desktop covers visitors who leave before the timer fires
-    timer = window.setTimeout(open, SHOW_AFTER_MS);
-    window.setTimeout(() => document.addEventListener('mouseout', onExitIntent), 5_000);
-
+    launcher.addEventListener('click', open);
     dialog.addEventListener('close', () => {
-      cleanup();
-      if (success.hidden) snooze(SNOOZE_MS);
+      launcher.hidden = !success.hidden;
+      if (!launcher.hidden) launcher.focus({ preventScroll: true });
     });
     dialog.addEventListener('click', (event) => {
       // Clicks on the backdrop land on the <dialog> element itself
@@ -242,11 +274,15 @@ const t = useTranslations(locale).newsletter;
         return;
       }
 
-      snooze(SUBSCRIBED_MS);
       success.querySelector('[data-newsletter-success-text]')!.textContent = copy.successBody.replace('{email}', email.value.trim());
       form.hidden = true;
       success.hidden = false;
-      success.focus();
+      launcher.hidden = true;
+      if (dialog.open) success.focus();
     });
+
+    // Open on every page load, without timers or persisted dismissal state.
+    launcher.hidden = false;
+    open();
   }
 </script>

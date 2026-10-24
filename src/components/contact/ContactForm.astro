@@ -1,4 +1,5 @@
 ---
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
 import Icon from '../ui/Icon.astro';
 import { getServices } from '../../content/services';
 import { getIndustries } from '../../content/industries';
@@ -84,6 +85,13 @@ const errorText = 'text-[13px] text-danger';
         <p id="f-consent-error" class:list={[errorText, '-mt-2.5 pl-8']} hidden></p>
       </div>
     </fieldset>
+
+    {PUBLIC_TURNSTILE_SITE_KEY && (
+      <>
+        <div class="col-span-full" class:list={['cf-turnstile']} data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} data-language={locale} data-theme="light"></div>
+        <script is:inline src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+      </>
+    )}
 
     <button type="submit" class="btn-primary submit col-span-full min-h-14 w-full" data-submit>
       <span class="spinner hidden" aria-hidden="true"></span>
@@ -265,6 +273,8 @@ const errorText = 'text-[13px] text-danger';
       const { error } = result;
 
       if (error) {
+        // Turnstile tokens are single-use: ask for a fresh one before the visitor retries
+        (window as { turnstile?: { reset: () => void } }).turnstile?.reset();
         if (isInputError(error)) {
           const names = Object.keys(error.fields) as FieldName[];
           const known = names.filter((name) => name in MESSAGES);

@@ -4,6 +4,7 @@ import '../styles/global.css';
 import Header from '../components/layout/Header.astro';
 import Footer from '../components/layout/Footer.astro';
 import MobileActionBar from '../components/layout/MobileActionBar.astro';
+import NewsletterPopup from '../components/layout/NewsletterPopup.astro';
 import { SITE, getSeo, type SeoPageId } from '../config/site';
 import { getServices } from '../content/services';
 import { getIndustries } from '../content/industries';
@@ -30,6 +31,8 @@ const languageLinks = noindex ? [] : alternates(Astro.url.pathname);
 const canonical = new URL(Astro.url.pathname.replace(/\/$/, '') || '/', Astro.site);
 const ogImageUrl = new URL(ogImage, Astro.site);
 const hasCustomBar = Astro.slots.has('mobile-bar');
+// The newsletter pop-up only interrupts the browsing pages, never booking, contact, legal or error pages
+const showNewsletter = page === 'inicio' || page === 'servicios';
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -117,6 +120,7 @@ const jsonLd = {
       <Footer />
     </div>
     {hasCustomBar ? <slot name="mobile-bar" /> : mobileBar && <MobileActionBar />}
+    {showNewsletter && <NewsletterPopup />}
   </body>
 </html>
 

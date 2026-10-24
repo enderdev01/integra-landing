@@ -1,0 +1,251 @@
+---
+import Icon from '../ui/Icon.astro';
+import { getLocale, useTranslations } from '../../i18n';
+
+const locale = getLocale(Astro.url);
+const t = useTranslations(locale).newsletter;
+---
+
+<dialog class="newsletter font-sans" aria-labelledby="nl-title" data-newsletter>
+  <script type="application/json" data-newsletter-i18n set:html={JSON.stringify({ emailError: t.emailError, network: t.network, serverError: t.serverError, notConfigured: t.notConfigured, successBody: t.successBody })} />
+
+  <button type="button" class="close absolute top-3 right-3 z-10 grid size-11 place-items-center rounded-full text-white" aria-label={t.close} data-newsletter-close>
+    <Icon name="close" size={22} />
+  </button>
+
+  <div class="bg-blue px-6 pt-8 pb-6 sm:px-9 sm:pt-10">
+    <p class="inline-block rounded-full bg-lime px-3.5 py-1 text-[12px] font-bold tracking-[0.1em] text-navy uppercase">{t.kicker}</p>
+    <h2 id="nl-title" class="mt-4 font-display text-[clamp(26px,5vw,32px)] leading-[1.12] font-bold tracking-[-0.015em] text-white">{t.title}</h2>
+  </div>
+  <div class="h-1 bg-lime" aria-hidden="true"></div>
+
+  <div class="px-6 pt-6 pb-7 sm:px-9 sm:pb-9">
+    <form novalidate class="grid gap-3.5" data-newsletter-form>
+      <p class="text-[16px] leading-relaxed text-body">{t.lead}</p>
+      <div role="alert" tabindex="-1" class="flex items-start gap-3 rounded-xl border border-[#fecdca] bg-[#fef3f2] px-4 py-3 text-[14px] leading-snug text-[#912018]" data-newsletter-error hidden>
+        <Icon name="alert" size={20} class="mt-px shrink-0" />
+        <span data-newsletter-error-text></span>
+      </div>
+      <fieldset class="contents" data-newsletter-fields>
+        <div class="grid gap-2">
+          <label for="nl-email" class="text-sm font-semibold text-ink">{t.emailLabel}</label>
+          <input id="nl-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="160" placeholder={t.emailPlaceholder} class="field" />
+        </div>
+        <input type="hidden" name="locale" value={locale} />
+        <!-- Honeypot: invisible to people, tempting to bots -->
+        <div class="absolute -left-[9999px]" aria-hidden="true">
+          <label for="nl-website">Website</label>
+          <input id="nl-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+        <button type="submit" class="btn-primary mt-1 min-h-14 w-full" data-newsletter-submit>
+          <span class="spinner hidden" aria-hidden="true"></span>
+          <span data-newsletter-submit-label data-label-idle={t.submit} data-label-sending={t.sending}>{t.submit}</span>
+        </button>
+      </fieldset>
+      <p class="text-center text-[13px] text-subtle">{t.fineprint}</p>
+    </form>
+
+    <div class="grid justify-items-center gap-3 py-2 text-center" tabindex="-1" data-newsletter-success hidden>
+      <span class="grid size-14 place-items-center rounded-full bg-lime-soft text-lime-deep"><Icon name="check" size={30} /></span>
+      <h3 class="font-display text-[26px] leading-tight font-bold text-blue">{t.successTitle}</h3>
+      <p class="text-[16px] leading-relaxed text-body" data-newsletter-success-text></p>
+      <button type="button" class="btn-primary mt-2" data-newsletter-close>{t.successClose}</button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  .newsletter {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    width: min(460px, calc(100vw - 32px));
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 24px;
+    background: #fff;
+    color: var(--color-body);
+    box-shadow: 0 24px 80px rgb(0 28 48 / 0.4);
+    overscroll-behavior: contain;
+  }
+  .newsletter::backdrop {
+    background: rgb(0 28 48 / 0.62);
+  }
+  .close {
+    transition: background-color 0.15s ease;
+  }
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 3px solid rgb(0 56 92 / 0.25);
+    border-top-color: var(--color-navy);
+    animation: nl-spin 0.7s linear infinite;
+  }
+  [data-newsletter-submit][aria-busy='true'] .spinner {
+    display: block;
+  }
+  @keyframes nl-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .close:hover {
+      background: rgb(255 255 255 / 0.14);
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .newsletter[open] {
+      animation: nl-in 0.28s var(--ease-out);
+    }
+    .newsletter[open]::backdrop {
+      animation: nl-fade 0.28s ease;
+    }
+  }
+  @keyframes nl-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.97);
+    }
+  }
+  @keyframes nl-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  :global(html:has(.newsletter[open])) {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  import { actions, isInputError } from 'astro:actions';
+
+  interface Copy {
+    emailError: string;
+    network: string;
+    serverError: string;
+    notConfigured: string;
+    successBody: string;
+  }
+
+  const KEY = 'integra:newsletter';
+  const DAY = 24 * 60 * 60 * 1000;
+  const SHOW_AFTER_MS = 12_000;
+  const SNOOZE_MS = 14 * DAY;
+  const SUBSCRIBED_MS = 180 * DAY;
+
+  // Storage can throw (private mode, blocked cookies): the pop-up then simply behaves as a fresh visit
+  const snoozedUntil = () => {
+    try {
+      return Number(localStorage.getItem(KEY)) || 0;
+    } catch {
+      return 0;
+    }
+  };
+  const snooze = (ms: number) => {
+    try {
+      localStorage.setItem(KEY, String(Date.now() + ms));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-newsletter]');
+  if (dialog && Date.now() > snoozedUntil()) {
+    const copy: Copy = JSON.parse(dialog.querySelector('[data-newsletter-i18n]')?.textContent ?? '{}');
+    const form = dialog.querySelector<HTMLFormElement>('[data-newsletter-form]')!;
+    const fields = dialog.querySelector<HTMLFieldSetElement>('[data-newsletter-fields]')!;
+    const email = form.elements.namedItem('email') as HTMLInputElement;
+    const error = dialog.querySelector<HTMLElement>('[data-newsletter-error]')!;
+    const errorText = dialog.querySelector<HTMLElement>('[data-newsletter-error-text]')!;
+    const submit = dialog.querySelector<HTMLButtonElement>('[data-newsletter-submit]')!;
+    const submitLabel = dialog.querySelector<HTMLElement>('[data-newsletter-submit-label]')!;
+    const success = dialog.querySelector<HTMLElement>('[data-newsletter-success]')!;
+    let timer: number | undefined;
+
+    const showError = (text?: string) => {
+      errorText.textContent = text ?? '';
+      error.hidden = !text;
+      email.setAttribute('aria-invalid', String(Boolean(text && text === copy.emailError)));
+    };
+    const setSending = (sending: boolean) => {
+      fields.disabled = sending;
+      submit.setAttribute('aria-busy', String(sending));
+      submitLabel.textContent = (sending ? submitLabel.dataset.labelSending : submitLabel.dataset.labelIdle) ?? '';
+    };
+
+    const cleanup = () => {
+      clearTimeout(timer);
+      document.removeEventListener('mouseout', onExitIntent);
+    };
+    const open = () => {
+      cleanup();
+      // Never stack on top of another modal or interrupt someone who is typing
+      const typing = document.activeElement instanceof HTMLElement && document.activeElement.matches('input, textarea, select');
+      if (dialog.open || document.querySelector('dialog[open]') || typing) return;
+      dialog.showModal();
+    };
+    const onExitIntent = (event: MouseEvent) => {
+      if (event.clientY <= 0 && !event.relatedTarget) open();
+    };
+
+    // Opens once per visit: after a short delay, or earlier when a desktop visitor heads for the tab bar
+    timer = window.setTimeout(open, SHOW_AFTER_MS);
+    window.setTimeout(() => document.addEventListener('mouseout', onExitIntent), 5_000);
+
+    dialog.addEventListener('close', () => {
+      cleanup();
+      if (success.hidden) snooze(SNOOZE_MS);
+    });
+    dialog.addEventListener('click', (event) => {
+      // Clicks on the backdrop land on the <dialog> element itself
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.querySelectorAll('[data-newsletter-close]').forEach((button) => button.addEventListener('click', () => dialog.close()));
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!email.checkValidity()) {
+        showError(copy.emailError);
+        email.focus();
+        return;
+      }
+      showError();
+
+      const data = new FormData(form);
+      setSending(true);
+      let result: Awaited<ReturnType<typeof actions.newsletter>>;
+      try {
+        result = await actions.newsletter(data);
+      } catch {
+        showError(copy.network);
+        error.focus();
+        return;
+      } finally {
+        setSending(false);
+      }
+
+      if (result.error) {
+        // Server messages are Spanish: pick the copy by error code
+        if (isInputError(result.error)) {
+          showError(copy.emailError);
+          email.focus();
+        } else {
+          showError(result.error.code === 'INTERNAL_SERVER_ERROR' ? copy.notConfigured : copy.serverError);
+          error.focus();
+        }
+        return;
+      }
+
+      snooze(SUBSCRIBED_MS);
+      success.querySelector('[data-newsletter-success-text]')!.textContent = copy.successBody.replace('{email}', email.value.trim());
+      form.hidden = true;
+      success.hidden = false;
+      success.focus();
+    });
+  }
+</script>

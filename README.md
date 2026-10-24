@@ -33,6 +33,7 @@ Definilas en Vercel (Project → Settings → Environment Variables) o en un arc
 | `PUBLIC_GHL_BOOKING_MARKETING` | pública | URL del widget de la *Cita de Marketing Services*. |
 | `PUBLIC_GHL_BOOKING_DIRECT_HIRE` | pública | URL del widget de la *Cita de Direct Hire Recruitment*. Opcional: si falta, usa el calendario de Ventas (hoy los calendarios son el mismo). |
 | `PUBLIC_GHL_SERVICE_FIELD` | pública | Opcional. *Unique Key* del campo «Additional information» del formulario del calendario (el que aparece tras elegir horario). Si se define, cada calendario se carga con `?<clave>=Cita de <servicio>` para autorrellenarlo; Direct Hire y Ventas pasan a ser iframes separados. |
+| `GHL_NEWSLETTER_WEBHOOK_URL` | secreta, servidor | Opcional. URL del *Inbound Webhook* del workflow de GoHighLevel que recibe a los suscriptores del newsletter. Sin ella, el correo de bienvenida (Resend) es el único registro y llega con copia oculta a `SITE.email`. |
 
 Ejemplo de `.env` local:
 
@@ -46,6 +47,7 @@ PUBLIC_GHL_BOOKING_WEB=
 PUBLIC_GHL_BOOKING_MARKETING=
 PUBLIC_GHL_BOOKING_DIRECT_HIRE=
 PUBLIC_GHL_SERVICE_FIELD=<unique-key-del-campo-additional-information>
+GHL_NEWSLETTER_WEBHOOK_URL=<url-del-inbound-webhook-del-newsletter>
 ```
 
 Las variables están tipadas y validadas con `astro:env` en `astro.config.mjs`.
@@ -60,6 +62,12 @@ Se envía por correo con Resend (el trigger *Inbound Webhook* de GoHighLevel es 
 4. El correo llega en texto plano con nombre, correo, empresa, servicio, industria y mensaje; el campo `email` del visitante queda como *reply-to*.
 
 La validación vive en `src/actions/index.ts` (zod) y se repite en el navegador para mostrar errores por campo.
+
+### Newsletter (pop-up)
+Aparece en Inicio y Servicios a los 12 s (o al intentar salir de la pestaña en escritorio) y no vuelve a mostrarse por 14 días tras cerrarlo (180 días tras suscribirse; se guarda en `localStorage`). La acción `newsletter` de `src/actions/index.ts`:
+1. Envía `{ email, language, tags: ['newsletter'], source }` al *Inbound Webhook* de `GHL_NEWSLETTER_WEBHOOK_URL`. En GoHighLevel: workflow con trigger *Inbound Webhook* → *Create/Update Contact* mapeando `email` y agregando el tag `newsletter`.
+2. Envía por Resend el correo de bienvenida con diseño (`src/lib/newsletter-email.ts`, ES/EN según el idioma del visitante) al suscriptor, con `reply-to` a `SITE.email`.
+3. Basta con que uno de los dos funcione para confirmar la suscripción. Sin ninguno configurado, el pop-up avisa que no está disponible.
 
 ### Calendarios (página Agendar)
 1. En GoHighLevel: **Calendars → (calendario) → Share → Embed** y copiar la URL del `src` del iframe.
@@ -106,7 +114,7 @@ src/
 ## Pendientes antes del lanzamiento
 
 - [ ] Página Servicios (en revisión por el cliente).
-- [ ] Contenido real de las páginas legales (`/legal/*` hoy son provisorias y `noindex`).
+- [ ] Contenido real de las páginas legales (`/legal/*` hoy son provisorias y `noindex`); Términos y condiciones muestra «Estamos trabajando en ello».
 - [ ] Teléfonos, redes sociales y dominio definitivos (`src/config/site.ts`, `SITE_URL`).
 - [ ] Fuente Ibrand con licencia web.
 - [ ] Webhook y URLs de calendarios de GoHighLevel.

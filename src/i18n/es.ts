@@ -100,6 +100,26 @@ export const es = {
 
   industriesOverview: { title: 'Industrias', more: 'Ver más' },
 
+  newsletter: {
+    dialogLabel: 'Suscripción al newsletter',
+    kicker: 'Newsletter',
+    title: 'Ideas para hacer crecer tu operación, en tu bandeja',
+    lead: 'Una vez al mes: equipos remotos, ventas y marketing explicados sin rodeos. Sin spam.',
+    emailLabel: 'Tu correo',
+    emailPlaceholder: 'nombre@empresa.com',
+    submit: 'Quiero suscribirme',
+    sending: 'Enviando…',
+    fineprint: 'Puedes darte de baja cuando quieras.',
+    close: 'Cerrar',
+    emailError: 'Usa un correo válido, por ejemplo nombre@empresa.com.',
+    network: 'No pudimos conectar. Revisa tu conexión e inténtalo de nuevo.',
+    serverError: 'No pudimos suscribirte. Inténtalo de nuevo en unos minutos.',
+    notConfigured: 'La suscripción no está disponible por ahora. Escríbenos y te sumamos a mano.',
+    successTitle: '¡Ya estás dentro!',
+    successBody: 'Te enviamos un correo de bienvenida a {email}. Si no lo ves, revisa tu carpeta de spam.',
+    successClose: 'Seguir explorando',
+  },
+
   servicesPage: {
     jump: 'Ir a un servicio',
     marketingChip: 'Marketing',

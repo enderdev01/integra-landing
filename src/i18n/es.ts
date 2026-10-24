@@ -23,12 +23,13 @@ export const es = {
     customerCare: 'Atención a clientes',
     follow: 'Síguenos',
     rights: 'Todos los derechos reservados.',
+    terms: 'Términos y condiciones',
   },
 
   legalDocs: {
     'refund-policy': 'Política de reembolso',
     'privacy-policy': 'Política de privacidad',
-    'terms-of-service': 'Términos del servicio',
+    'terms-of-service': 'Términos y condiciones',
     'purchase-order-terms': 'Términos de órdenes de compra',
   } as Record<string, string>,
 
@@ -88,8 +89,8 @@ export const es = {
   },
 
   servicesOverview: {
-    // «¿Qué [podemos] ayudarte a hacer [crecer]?» — the bracketed words render white
-    titleStart: '¿Qué ',
+    // «¿Cómo [podemos] ayudarte a hacer [crecer]?» — the bracketed words render white
+    titleStart: '¿Cómo ',
     titleHighlight1: 'podemos',
     titleMiddle: ' ayudarte ',
     titleBlockStart: 'a hacer ',
@@ -98,6 +99,26 @@ export const es = {
   },
 
   industriesOverview: { title: 'Industrias', more: 'Ver más' },
+
+  newsletter: {
+    dialogLabel: 'Suscripción al newsletter',
+    kicker: 'Newsletter',
+    title: 'Ideas para hacer crecer tu operación, en tu bandeja',
+    lead: 'Una vez al mes: equipos remotos, ventas y marketing explicados sin rodeos. Sin spam.',
+    emailLabel: 'Tu correo',
+    emailPlaceholder: 'nombre@empresa.com',
+    submit: 'Quiero suscribirme',
+    sending: 'Enviando…',
+    fineprint: 'Puedes darte de baja cuando quieras.',
+    close: 'Cerrar',
+    emailError: 'Usa un correo válido, por ejemplo nombre@empresa.com.',
+    network: 'No pudimos conectar. Revisa tu conexión e inténtalo de nuevo.',
+    serverError: 'No pudimos suscribirte. Inténtalo de nuevo en unos minutos.',
+    notConfigured: 'La suscripción no está disponible por ahora. Escríbenos y te sumamos a mano.',
+    successTitle: '¡Ya estás dentro!',
+    successBody: 'Te enviamos un correo de bienvenida a {email}. Si no lo ves, revisa tu carpeta de spam.',
+    successClose: 'Seguir explorando',
+  },
 
   servicesPage: {
     jump: 'Ir a un servicio',
@@ -202,7 +223,7 @@ export const es = {
   legalPage: {
     metaTitle: '{title} | Integra',
     metaDescription: '{title} de {company}.',
-    body: 'Estamos actualizando este documento. Si necesitas información sobre {titleLower} de {company}, escríbenos y te responderemos a la brevedad.',
+    body: 'Estamos trabajando en ello.',
     cta: 'Ir a Contacto',
   },
 

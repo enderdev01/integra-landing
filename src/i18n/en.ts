@@ -23,12 +23,13 @@ export const en: Dictionary = {
     customerCare: 'Customer service',
     follow: 'Follow us',
     rights: 'All rights reserved.',
+    terms: 'Terms and conditions',
   },
 
   legalDocs: {
     'refund-policy': 'Refund policy',
     'privacy-policy': 'Privacy policy',
-    'terms-of-service': 'Terms of service',
+    'terms-of-service': 'Terms and conditions',
     'purchase-order-terms': 'Purchase order terms',
   },
 
@@ -92,6 +93,26 @@ export const en: Dictionary = {
   },
 
   industriesOverview: { title: 'Industries', more: 'Learn more' },
+
+  newsletter: {
+    dialogLabel: 'Newsletter signup',
+    kicker: 'Newsletter',
+    title: 'Ideas to grow your operation, straight to your inbox',
+    lead: 'Once a month: remote teams, sales and marketing explained plainly. No spam.',
+    emailLabel: 'Your email',
+    emailPlaceholder: 'name@company.com',
+    submit: 'Subscribe me',
+    sending: 'Sending…',
+    fineprint: 'You can unsubscribe at any time.',
+    close: 'Close',
+    emailError: 'Use a valid email, for example name@company.com.',
+    network: 'We could not connect. Check your connection and try again.',
+    serverError: 'We could not subscribe you. Please try again in a few minutes.',
+    notConfigured: 'Signup is unavailable right now. Write to us and we will add you by hand.',
+    successTitle: 'You are in!',
+    successBody: 'We sent a welcome email to {email}. If you do not see it, check your spam folder.',
+    successClose: 'Keep exploring',
+  },
 
   servicesPage: {
     jump: 'Jump to a service',
@@ -196,7 +217,7 @@ export const en: Dictionary = {
   legalPage: {
     metaTitle: '{title} | Integra',
     metaDescription: '{title} — {company}.',
-    body: 'We are updating this document. If you need information about the {titleLower} of {company}, write to us and we will get back to you shortly.',
+    body: 'We are working on it.',
     cta: 'Go to Contact',
   },
 

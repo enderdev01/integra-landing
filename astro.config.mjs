@@ -39,12 +39,23 @@ export default defineConfig({
       RESEND_API_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       // Sender; needs a domain verified in Resend. Falls back to Resend's onboarding sender (only delivers to the Resend account owner)
       CONTACT_FROM_EMAIL: envField.string({ context: 'server', access: 'secret', optional: true }),
+      // GoHighLevel Inbound Webhook URL (Workflows → Inbound Webhook trigger). Receives each contact form lead; server-only because anyone holding it can post leads
+      // Comma-separated team emails copied (cc) on every contact form email; not hard-coded because the repository is public
+      CONTACT_CC_EMAILS: envField.string({ context: 'server', access: 'secret', optional: true }),
+      GHL_WEBHOOK_URL: envField.string({ context: 'server', access: 'secret', optional: true, url: true }),
+      // GoHighLevel Inbound Webhook that receives newsletter subscribers (own workflow: Create contact + tag). Without it the welcome email is the only record
+      GHL_NEWSLETTER_WEBHOOK_URL: envField.string({ context: 'server', access: 'secret', optional: true, url: true }),
+      // Cloudflare Turnstile (anti-bot challenge on the contact form). Set both to enable it; with neither set the form falls back to the honeypot only
+      PUBLIC_TURNSTILE_SITE_KEY: envField.string({ context: 'client', access: 'public', optional: true }),
+      TURNSTILE_SECRET_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
       // Booking widget URL per service, copied from GoHighLevel → Calendars → Share → Embed
       PUBLIC_GHL_BOOKING_VENTAS: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
       PUBLIC_GHL_BOOKING_VA: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
       PUBLIC_GHL_BOOKING_WEB: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
       PUBLIC_GHL_BOOKING_MARKETING: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
       PUBLIC_GHL_BOOKING_DIRECT_HIRE: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
+      // Query-string key of the calendar's "Additional information" field (its Unique Key in GoHighLevel); when set, each calendar is prefilled with the chosen service
+      PUBLIC_GHL_SERVICE_FIELD: envField.string({ context: 'client', access: 'public', optional: true }),
     },
   },
   vite: {

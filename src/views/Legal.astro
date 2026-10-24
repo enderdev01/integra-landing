@@ -11,7 +11,7 @@ const { slug } = Astro.props;
 const locale = getLocale(Astro.url);
 const t = useTranslations(locale);
 const title = t.legalDocs[slug];
-const values = { title, titleLower: title.toLowerCase(), company: SITE.legalName };
+const values = { title, company: SITE.legalName };
 ---
 
 <!-- Placeholder until the client provides the legal text; kept out of search results. -->

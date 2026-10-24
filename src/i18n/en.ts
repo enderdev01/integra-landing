@@ -23,12 +23,13 @@ export const en: Dictionary = {
     customerCare: 'Customer service',
     follow: 'Follow us',
     rights: 'All rights reserved.',
+    terms: 'Terms and conditions',
   },
 
   legalDocs: {
     'refund-policy': 'Refund policy',
     'privacy-policy': 'Privacy policy',
-    'terms-of-service': 'Terms of service',
+    'terms-of-service': 'Terms and conditions',
     'purchase-order-terms': 'Purchase order terms',
   },
 
@@ -196,7 +197,7 @@ export const en: Dictionary = {
   legalPage: {
     metaTitle: '{title} | Integra',
     metaDescription: '{title} — {company}.',
-    body: 'We are updating this document. If you need information about the {titleLower} of {company}, write to us and we will get back to you shortly.',
+    body: 'We are working on it.',
     cta: 'Go to Contact',
   },
 

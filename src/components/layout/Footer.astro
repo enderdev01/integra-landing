@@ -1,7 +1,7 @@
 ---
 import Icon from '../ui/Icon.astro';
 import { SITE } from '../../config/site';
-import { format, getLocale, useTranslations } from '../../i18n';
+import { format, getLocale, legalPath, useTranslations } from '../../i18n';
 
 const locale = getLocale(Astro.url);
 const t = useTranslations(locale);
@@ -43,7 +43,10 @@ const year = new Date().getFullYear();
   </div>
 
   <div class="border-t border-white/10">
-    <p class="mx-auto w-full max-w-[1320px] px-5 py-5 text-[13px] text-[#c9cbcf] sm:px-6">© {year} {SITE.legalName} {t.footer.rights}</p>
+    <div class="mx-auto flex w-full max-w-[1320px] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-5 py-3 text-[13px] text-[#c9cbcf] sm:px-6">
+      <p class="py-2">© {year} {SITE.legalName} {t.footer.rights}</p>
+      <a href={legalPath('terms-of-service', locale)} class="inline-flex min-h-11 items-center text-[#c9cbcf] underline decoration-white/30 underline-offset-4 hover:text-white">{t.footer.terms}</a>
+    </div>
   </div>
 </footer>
 

@@ -68,7 +68,7 @@ Cada solicitud va a GoHighLevel (*Inbound Webhook* → crear contacto; trigger p
 La validación vive en `src/actions/index.ts` (zod) y se repite en el navegador para mostrar errores por campo.
 
 ### Newsletter (pop-up)
-Aparece en Inicio y Servicios a los 12 s (o al intentar salir de la pestaña en escritorio) y no vuelve a mostrarse por 14 días tras cerrarlo (180 días tras suscribirse; se guarda en `localStorage`). La acción `newsletter` de `src/actions/index.ts`:
+Aparece en Inicio y Servicios 1,5 s después de cargar (o antes, si en escritorio intenta salir de la pestaña) y no vuelve a mostrarse por 14 días tras cerrarlo (180 días tras suscribirse; se guarda en `localStorage`). La acción `newsletter` de `src/actions/index.ts`:
 1. Envía `{ email, language, tags: ['newsletter'], source }` al *Inbound Webhook* de `GHL_NEWSLETTER_WEBHOOK_URL`. En GoHighLevel: workflow con trigger *Inbound Webhook* → *Create/Update Contact* mapeando `email` y agregando el tag `newsletter`.
 2. Envía por Resend el correo de bienvenida con diseño (`src/lib/newsletter-email.ts`, ES/EN según el idioma del visitante) al suscriptor, con `reply-to` a `SITE.email`.
 3. Basta con que uno de los dos funcione para confirmar la suscripción. Sin ninguno configurado, el pop-up avisa que no está disponible.

@@ -33,6 +33,10 @@ Definilas en Vercel (Project → Settings → Environment Variables) o en un arc
 | `PUBLIC_GHL_BOOKING_MARKETING` | pública | URL del widget de la *Cita de Marketing Services*. |
 | `PUBLIC_GHL_BOOKING_DIRECT_HIRE` | pública | URL del widget de la *Cita de Direct Hire Recruitment*. Opcional: si falta, usa el calendario de Ventas (hoy los calendarios son el mismo). |
 | `PUBLIC_GHL_SERVICE_FIELD` | pública | Opcional. *Unique Key* del campo «Additional information» del formulario del calendario (el que aparece tras elegir horario). Si se define, cada calendario se carga con `?<clave>=Cita de <servicio>` para autorrellenarlo; Direct Hire y Ventas pasan a ser iframes separados. |
+| `GHL_WEBHOOK_URL` | secreta, servidor | Opcional. URL del *Inbound Webhook* del workflow de GoHighLevel que recibe cada solicitud del formulario de Contacto (crea el contacto). |
+| `CONTACT_CC_EMAILS` | secreta, servidor | Opcional. Correos del equipo, separados por comas, que reciben copia (cc) de cada solicitud de Contacto. Va en una variable porque el repositorio es público. |
+| `PUBLIC_TURNSTILE_SITE_KEY` | pública | Opcional. Site key de Cloudflare Turnstile (anti-bot del formulario de Contacto). Definir junto con `TURNSTILE_SECRET_KEY`. |
+| `TURNSTILE_SECRET_KEY` | secreta, servidor | Opcional. Secret key de Turnstile; el servidor valida el token con `siteverify`. Sin las dos claves el formulario solo usa el honeypot. |
 | `GHL_NEWSLETTER_WEBHOOK_URL` | secreta, servidor | Opcional. URL del *Inbound Webhook* del workflow de GoHighLevel que recibe a los suscriptores del newsletter. Sin ella, el correo de bienvenida (Resend) es el único registro y llega con copia oculta a `SITE.email`. |
 
 Ejemplo de `.env` local:
@@ -55,7 +59,7 @@ Las variables están tipadas y validadas con `astro:env` en `astro.config.mjs`.
 ## Integración con GoHighLevel
 
 ### Formulario de Contacto
-Se envía por correo con Resend (el trigger *Inbound Webhook* de GoHighLevel es premium y cobra por ejecución, por eso no se usa).
+Cada solicitud va a GoHighLevel (*Inbound Webhook* → crear contacto; trigger premium, cobra por ejecución) y por correo con Resend a `SITE.email` (con copia a `CONTACT_CC_EMAILS`). Basta con que uno de los dos destinos funcione para confirmar el envío. Protegido con honeypot, límite de enlaces en el mensaje y Cloudflare Turnstile.
 1. En resend.com, crear una API key y copiarla en `RESEND_API_KEY`.
 2. Las solicitudes llegan a `SITE.email` (`src/config/site.ts`, hoy `hello@integrasgp.com`); para cambiar el destinatario se edita ahí.
 3. Para enviar desde un dominio propio, verificarlo en Resend (Domains) y definir `CONTACT_FROM_EMAIL`. Sin eso Resend solo entrega al correo dueño de la cuenta.

@@ -40,6 +40,8 @@ export default defineConfig({
       // Sender; needs a domain verified in Resend. Falls back to Resend's onboarding sender (only delivers to the Resend account owner)
       CONTACT_FROM_EMAIL: envField.string({ context: 'server', access: 'secret', optional: true }),
       // GoHighLevel Inbound Webhook URL (Workflows → Inbound Webhook trigger). Receives each contact form lead; server-only because anyone holding it can post leads
+      // Comma-separated team emails copied (cc) on every contact form email; not hard-coded because the repository is public
+      CONTACT_CC_EMAILS: envField.string({ context: 'server', access: 'secret', optional: true }),
       GHL_WEBHOOK_URL: envField.string({ context: 'server', access: 'secret', optional: true, url: true }),
       // GoHighLevel Inbound Webhook that receives newsletter subscribers (own workflow: Create contact + tag). Without it the welcome email is the only record
       GHL_NEWSLETTER_WEBHOOK_URL: envField.string({ context: 'server', access: 'secret', optional: true, url: true }),

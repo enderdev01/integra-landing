@@ -1,5 +1,5 @@
 import { ActionError, defineAction } from 'astro:actions';
-import { CONTACT_FROM_EMAIL, GHL_NEWSLETTER_WEBHOOK_URL, GHL_WEBHOOK_URL, RESEND_API_KEY, TURNSTILE_SECRET_KEY } from 'astro:env/server';
+import { CONTACT_CC_EMAILS, CONTACT_FROM_EMAIL, GHL_NEWSLETTER_WEBHOOK_URL, GHL_WEBHOOK_URL, RESEND_API_KEY, TURNSTILE_SECRET_KEY } from 'astro:env/server';
 import { z } from 'astro/zod';
 import { SITE } from '../config/site';
 import { getIndustries } from '../content/industries';
@@ -28,7 +28,11 @@ export const contactSchema = z.object({
   'cf-turnstile-response': z.string().optional(),
 });
 
-const CONTACT_CC_EMAILS = ['m.meza@integrasgp.com', 'g.tellez@integrasgp.com', 'r.roiz@integrasgp.com'];
+// Team members copied on every contact email; kept in an env var because this repository is public
+const contactCc = (CONTACT_CC_EMAILS ?? '')
+  .split(',')
+  .map((email) => email.trim())
+  .filter(Boolean);
 
 type Lead = Omit<z.infer<typeof contactSchema>, 'website' | 'cf-turnstile-response'>;
 
@@ -74,7 +78,7 @@ const sendByEmail = async (apiKey: string, lead: Lead) => {
     body: JSON.stringify({
       from: CONTACT_FROM_EMAIL ?? 'Integra Web <onboarding@resend.dev>',
       to: [SITE.email],
-      cc: CONTACT_CC_EMAILS,
+      ...(contactCc.length > 0 && { cc: contactCc }),
       reply_to: lead.email,
       subject,
       html,

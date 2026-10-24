@@ -32,6 +32,7 @@ Definilas en Vercel (Project → Settings → Environment Variables) o en un arc
 | `PUBLIC_GHL_BOOKING_WEB` | pública | URL del widget de la *Cita de Diseño Web*. |
 | `PUBLIC_GHL_BOOKING_MARKETING` | pública | URL del widget de la *Cita de Marketing Services*. |
 | `PUBLIC_GHL_BOOKING_DIRECT_HIRE` | pública | URL del widget de la *Cita de Direct Hire Recruitment*. Opcional: si falta, usa el calendario de Ventas (hoy los calendarios son el mismo). |
+| `PUBLIC_GHL_SERVICE_FIELD` | pública | Opcional. *Unique Key* del campo «Additional information» del formulario del calendario (el que aparece tras elegir horario). Si se define, cada calendario se carga con `?<clave>=Cita de <servicio>` para autorrellenarlo; Direct Hire y Ventas pasan a ser iframes separados. |
 
 Ejemplo de `.env` local:
 
@@ -44,6 +45,7 @@ PUBLIC_GHL_BOOKING_VA=
 PUBLIC_GHL_BOOKING_WEB=
 PUBLIC_GHL_BOOKING_MARKETING=
 PUBLIC_GHL_BOOKING_DIRECT_HIRE=
+PUBLIC_GHL_SERVICE_FIELD=<unique-key-del-campo-additional-information>
 ```
 
 Las variables están tipadas y validadas con `astro:env` en `astro.config.mjs`.

@@ -45,6 +45,8 @@ export default defineConfig({
       PUBLIC_GHL_BOOKING_WEB: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
       PUBLIC_GHL_BOOKING_MARKETING: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
       PUBLIC_GHL_BOOKING_DIRECT_HIRE: envField.string({ context: 'client', access: 'public', optional: true, url: true }),
+      // Query-string key of the calendar's "Additional information" field (its Unique Key in GoHighLevel); when set, each calendar is prefilled with the chosen service
+      PUBLIC_GHL_SERVICE_FIELD: envField.string({ context: 'client', access: 'public', optional: true }),
     },
   },
   vite: {

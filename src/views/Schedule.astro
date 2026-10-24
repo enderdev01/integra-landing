@@ -3,13 +3,21 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Chevrons from '../components/ui/Chevrons.astro';
 import Icon from '../components/ui/Icon.astro';
 import ServiceIcon from '../components/ui/ServiceIcon.astro';
+import { PUBLIC_GHL_SERVICE_FIELD } from 'astro:env/client';
 import { getServices } from '../content/services';
 import { contactHref, format, getLocale, useTranslations } from '../i18n';
 
 const locale = getLocale(Astro.url);
 const t = useTranslations(locale).schedulePage;
-const services = getServices(locale);
 const cardIconWidth = { ventas: 60, va: 84, web: 60, marketing: 79, hire: 62 } as const;
+// With a field key configured, each service gets its own booking URL prefilled with the service
+// ("Additional information" in the form shown after picking a time); otherwise the URL is untouched
+const services = getServices(locale).map((service) => {
+  if (!service.bookingUrl || !PUBLIC_GHL_SERVICE_FIELD) return service;
+  const url = new URL(service.bookingUrl);
+  url.searchParams.set(PUBLIC_GHL_SERVICE_FIELD, `${t.appointmentOf} ${service.name}`);
+  return { ...service, bookingUrl: url.toString() };
+});
 const first = services[0];
 // One calendar per distinct booking URL: services that share a widget (Direct Hire falls back
 // to Ventas) reuse a single iframe instead of loading the same heavy embed once per service

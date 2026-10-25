@@ -91,6 +91,12 @@ const t = useTranslations(locale).newsletter;
   .newsletter-launcher[hidden] {
     display: none;
   }
+  /* Automatic focus is not keyboard navigation; retain rings for actual keyboard use. */
+  .newsletter-launcher:not([data-keyboard-focus]):focus-visible,
+  .newsletter:not([data-keyboard-focus]) button:focus-visible,
+  .newsletter:not([data-keyboard-focus]) [tabindex='-1']:focus-visible {
+    outline: none;
+  }
   .newsletter-launcher-label {
     padding: 10px 14px;
     border-radius: 999px;
@@ -202,6 +208,17 @@ const t = useTranslations(locale).newsletter;
   const dialog = document.querySelector<HTMLDialogElement>('[data-newsletter]');
   const launcher = document.querySelector<HTMLButtonElement>('[data-newsletter-launcher]');
   if (dialog && launcher) {
+    const setKeyboardFocus = (visible: boolean) => {
+      dialog.toggleAttribute('data-keyboard-focus', visible);
+      launcher.toggleAttribute('data-keyboard-focus', visible);
+    };
+    document.addEventListener('keydown', (event) => {
+      if (['Tab', 'Escape', 'Enter', ' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        setKeyboardFocus(true);
+      }
+    });
+    document.addEventListener('pointerdown', () => setKeyboardFocus(false), { capture: true });
+
     const copy: Copy = JSON.parse(dialog.querySelector('[data-newsletter-i18n]')?.textContent ?? '{}');
     const form = dialog.querySelector<HTMLFormElement>('[data-newsletter-form]')!;
     const fields = dialog.querySelector<HTMLFieldSetElement>('[data-newsletter-fields]')!;

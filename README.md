@@ -15,6 +15,7 @@ Diseño de referencia: canvas "Integra Web v2" (escritorio 1440 px y móvil 390 
 | `npm install` | Instala dependencias |
 | `npm run dev` | Servidor local en `http://localhost:4321` |
 | `npm run check` | Validación de tipos y plantillas (`astro check`) |
+| `npm test` | Pruebas de acciones, validación y correos con proveedores simulados, sin credenciales reales |
 | `npm run build` | Build de producción (`dist/` y `.vercel/output/`) |
 | `npm run preview` | Previsualiza el build |
 
@@ -25,7 +26,7 @@ Definilas en Vercel (Project → Settings → Environment Variables) o en un arc
 | Variable | Tipo | Uso |
 | --- | --- | --- |
 | `SITE_URL` | build | URL pública para canonical, Open Graph y sitemap. Por defecto `https://integrasgp.com` (confirmar dominio). |
-| `RESEND_API_KEY` | secreta, servidor | API key de Resend que envía por correo el formulario de Contacto. Sin este valor el formulario muestra un aviso y no envía. |
+| `RESEND_API_KEY` | secreta, servidor | API key de Resend para el correo de Contacto y la bienvenida del newsletter. Contacto también puede entregar mediante `GHL_WEBHOOK_URL`. El newsletter puede registrar la suscripción en GHL sin esta clave, pero no enviará la bienvenida desde el sitio. |
 | `CONTACT_FROM_EMAIL` | secreta, servidor | Remitente, por ejemplo `Integra Web <web@integrasgp.com>`. Requiere dominio verificado en Resend. Opcional: sin él usa `onboarding@resend.dev`, que solo entrega al dueño de la cuenta de Resend. |
 | `PUBLIC_GHL_BOOKING_VENTAS` | pública | URL del widget de reservas de la *Cita de Ventas*. |
 | `PUBLIC_GHL_BOOKING_VA` | pública | URL del widget de la *Cita de Virtual Assistance*. |
@@ -35,9 +36,10 @@ Definilas en Vercel (Project → Settings → Environment Variables) o en un arc
 | `PUBLIC_GHL_SERVICE_FIELD` | pública | Opcional. *Unique Key* del campo «Additional information» del formulario del calendario (el que aparece tras elegir horario). Si se define, cada calendario se carga con `?<clave>=Cita de <servicio>` para autorrellenarlo; Direct Hire y Ventas pasan a ser iframes separados. |
 | `GHL_WEBHOOK_URL` | secreta, servidor | Opcional. URL del *Inbound Webhook* del workflow de GoHighLevel que recibe cada solicitud del formulario de Contacto (crea el contacto). |
 | `CONTACT_CC_EMAILS` | secreta, servidor | Opcional. Correos del equipo, separados por comas, que reciben copia (cc) de cada solicitud de Contacto. Va en una variable porque el repositorio es público. |
-| `PUBLIC_TURNSTILE_SITE_KEY` | pública | Opcional. Site key de Cloudflare Turnstile (anti-bot del formulario de Contacto). Definir junto con `TURNSTILE_SECRET_KEY`. |
-| `TURNSTILE_SECRET_KEY` | secreta, servidor | Opcional. Secret key de Turnstile; el servidor valida el token con `siteverify`. Sin las dos claves el formulario solo usa el honeypot. |
-| `GHL_NEWSLETTER_WEBHOOK_URL` | secreta, servidor | Opcional. URL del *Inbound Webhook* del workflow de GoHighLevel que recibe a los suscriptores del newsletter. Sin ella, el correo de bienvenida (Resend) es el único registro y llega con copia oculta a `SITE.email`. |
+| `PUBLIC_TURNSTILE_SITE_KEY` | pública | Site key de Cloudflare Turnstile. Requerida para el newsletter y opcional para Contacto. Definir junto con `TURNSTILE_SECRET_KEY`; los cambios requieren reconstruir el sitio. |
+| `TURNSTILE_SECRET_KEY` | secreta, servidor | Secret key de Turnstile. Requerida para el newsletter: no acepta solicitudes si falta o si la verificación no puede completarse. Contacto conserva su protección opcional y su fallback documentado ante una caída de Cloudflare. |
+| `GHL_NEWSLETTER_WEBHOOK_URL` | secreta, servidor | Requerida para habilitar el newsletter. URL del *Inbound Webhook* del workflow de GoHighLevel que recibe a los suscriptores. Sin ella, la acción rechaza la suscripción aunque Resend esté configurado. |
+| `NEWSLETTER_WELCOME_SECRET` | secreta, servidor | Opcional durante la transición. Clave aleatoria de al menos 32 caracteres, solo en el servidor: habilita la bienvenida coordinada por GHL mediante un token firmado. No definir hasta completar el mapeo y activar el callback descrito abajo; nunca copiar esta clave ni `RESEND_API_KEY` a GHL. |
 
 Ejemplo de `.env` local:
 
@@ -52,6 +54,8 @@ PUBLIC_GHL_BOOKING_MARKETING=
 PUBLIC_GHL_BOOKING_DIRECT_HIRE=
 PUBLIC_GHL_SERVICE_FIELD=<unique-key-del-campo-additional-information>
 GHL_NEWSLETTER_WEBHOOK_URL=<url-del-inbound-webhook-del-newsletter>
+PUBLIC_TURNSTILE_SITE_KEY=<site-key-del-widget>
+TURNSTILE_SECRET_KEY=<secret-key-del-widget>
 ```
 
 Las variables están tipadas y validadas con `astro:env` en `astro.config.mjs`.
@@ -66,20 +70,70 @@ Cada solicitud va a GoHighLevel (*Inbound Webhook* → crear contacto; trigger p
 4. El correo llega en texto plano con nombre, correo, empresa, servicio, industria y mensaje; el campo `email` del visitante queda como *reply-to*.
 
 La validación vive en `src/actions/index.ts` (zod) y se repite en el navegador para mostrar errores por campo.
+El envío requiere JavaScript: el botón se habilita al instalar el manejador del formulario. Sin JavaScript se muestra un aviso y se mantiene disponible el enlace para agendar una llamada. El formulario declara POST para no incluir datos personales en la URL. Los errores de red y de la acción reinician Turnstile antes de un reintento.
 
 ### Newsletter (pop-up)
-Aparece en Inicio y Servicios 1,5 s después de cargar (o antes, si en escritorio intenta salir de la pestaña) y no vuelve a mostrarse por 14 días tras cerrarlo (180 días tras suscribirse; se guarda en `localStorage`). La acción `newsletter` de `src/actions/index.ts`:
-1. Envía `{ email, language, tags: ['newsletter'], source }` al *Inbound Webhook* de `GHL_NEWSLETTER_WEBHOOK_URL`. En GoHighLevel: workflow con trigger *Inbound Webhook* → *Create/Update Contact* mapeando `email` y agregando el tag `newsletter`.
-2. Envía por Resend el correo de bienvenida con diseño (`src/lib/newsletter-email.ts`, ES/EN según el idioma del visitante) al suscriptor, con `reply-to` a `SITE.email`.
-3. Basta con que uno de los dos funcione para confirmar la suscripción. Sin ninguno configurado, el pop-up avisa que no está disponible.
+Resend se mantiene como único proveedor de envío de correos; GoHighLevel registra los suscriptores. No se requiere configurar un dominio de envío en GHL para este flujo.
+
+Aparece inmediatamente en cada carga de Inicio y Servicios. No guarda el cierre ni la suscripción en `localStorage`. Al cerrarlo, aparece un botón flotante para volver a abrirlo; después de una suscripción exitosa, ese botón permanece oculto hasta la siguiente carga. La acción `newsletter` de `src/actions/index.ts`:
+1. Requiere ambas claves de Turnstile y valida un token de un solo uso con `action=newsletter`. Si falta, es inválido, corresponde a otro formulario o Cloudflare no responde correctamente, no llama a GHL ni a Resend. El botón permanece deshabilitado hasta completar el desafío y exige un token nuevo después de un error.
+2. Normaliza el correo (sin espacios externos, en minúsculas) y envía `{ email, language, tags: ['newsletter'], source }` al *Inbound Webhook* de `GHL_NEWSLETTER_WEBHOOK_URL`. En GoHighLevel: workflow con trigger *Inbound Webhook* → *Create/Update Contact* mapeando `email` y agregando el tag `newsletter`.
+3. Sin `NEWSLETTER_WELCOME_SECRET`, conserva el envío directo por Resend después de que GHL acepte la solicitud. Con esa clave, agrega `welcome_token` al webhook y **no** envía directamente: GHL coordina una sola entrada por contacto y solicita el envío a `POST /api/newsletter-welcome` con `{ "token": "{{contact.newsletter_welcome_token}}" }`. El token firma el correo, idioma y fecha; la clave nunca sale del servidor. El callback envía la misma plantilla ES/EN de `src/lib/newsletter-email.ts` mediante Resend, con `reply-to` a `SITE.email`.
+4. Ambos caminos usan una clave de idempotencia derivada del correo mediante SHA-256. [Resend la conserva durante 24 horas](https://resend.com/docs/dashboard/emails/idempotency-keys). El token del callback vence a las 20 horas para impedir reejecuciones fuera de esa protección; un token alterado, vencido o con fecha futura se rechaza sin llamar a Resend. Los reintentos simultáneos usan la misma clave incluso entre instancias. Un cambio de contenido bajo esa clave puede impedir el reintento en vez de reenviar.
+5. Si GHL falta o rechaza la solicitud, no confirma éxito ni envía la bienvenida. Un fallo posterior de Resend no revierte la suscripción. En modo callback responde 502 para que GHL pueda reintentar y deja un mensaje sin datos personales. La aceptación de Resend no garantiza la entrega en la bandeja del destinatario.
+
+La respuesta HTTP del webhook confirma la recepción, no la ejecución completa del workflow. Se debe supervisar el workflow en GHL. No se guarda una lista de suscriptores ni un contador de IP por instancia. Turnstile controla bots, no establece un límite de frecuencia por IP.
+
+### Activación y controles externos pendientes
+
+Esta lista requiere acceso autorizado a las cuentas de Cloudflare, GHL y Vercel. No se aplica automáticamente desde el repositorio.
+
+- [ ] Configurar las dos claves de un mismo widget de Turnstile y sus dominios permitidos. No usar claves ficticias de las pruebas en producción.
+- [ ] Confirmar que el workflow de entrada de GHL actualiza contactos por correo y aplica el tag `newsletter`. Revisar contactos duplicados existentes y la preferencia de deduplicación por correo.
+- [ ] Completar y verificar el callback de GHL descrito abajo. **Allow Re-entry** y múltiples oportunidades deben permanecer desactivados en ese workflow. El historial de entrada es por contacto: no sustituye la deduplicación por correo de los contactos del CRM.
+- [x] Mantener Resend como único proveedor de bienvenida. El coordinador de GHL no contiene acciones Send Email ni recibe credenciales de Resend.
+- [ ] Configurar un límite de frecuencia en el firewall del despliegue para solicitudes POST a `/_actions/newsletter` y `/_actions/contact`, incluyendo variantes con barra final. [Vercel permite limitar por IP](https://vercel.com/docs/vercel-firewall/vercel-waf/rate-limiting); verificar condiciones y costos del plan, observar primero en modo Log y después aplicar 429. Sus contadores son regionales, no una garantía global exacta.
+- [ ] Probar un correo nuevo, otro ya suscrito, dos envíos simultáneos con tokens diferentes, un token repetido y una caída de GHL. Confirmar en los registros de GHL y Resend que no hay altas perdidas ni bienvenidas dobles. Repetir el caso de suscriptor existente después de 24 horas para validar la regla permanente, no solo la idempotencia temporal.
+
+#### Callback de GHL y transición (2026-10-25)
+
+Se adaptó el borrador a **Integra Web - Newsletter - Resend callback (DRAFT)**. Se quitaron sus correos nativos de GHL y las marcas posteriores de supuesto envío. Quedó el trigger `newsletter`, reingreso y múltiples oportunidades desactivados, y el guard **sin `newsletter-welcome-sent` AND `Newsletter welcome token` no vacío**. La única acción de envío es un Custom Webhook con cuerpo `{ "token": "{{contact.newsletter_welcome_token}}" }` a `https://integrasgp.com/api/newsletter-welcome`; GHL advierte que esta acción tiene costo por ejecución. Todavía está sin publicar.
+
+Se creó el campo de contacto `Newsletter welcome token` (`contact.newsletter_welcome_token`). La entrada publicada todavía conserva su mapeo original: se descartó un intento de mapear `welcome_token` porque la referencia del webhook no contiene esa propiedad y GHL advertía que quedaría vacía. No habilitar la clave del callback mientras esto siga pendiente.
+
+Orden de puesta en marcha, con acceso y prueba autorizados:
+
+1. Capturar una referencia de webhook con `welcome_token` usando datos de prueba, sin enviar correos. Mapearla al campo del contacto en Create/Update Contact **antes** de agregar el tag `newsletter`, conservando el mapeo de Email. El idioma viaja firmado dentro del token; el campo `Newsletter language` no es necesario para el envío.
+2. Verificar deduplicación por correo y que los suscriptores históricos conserven `newsletter`. No quitar ni volver a aplicar tags en bloque, ni incorporar contactos antiguos manualmente al coordinador.
+3. Desplegar la ruta del callback en Vercel sin definir aún `NEWSLETTER_WELCOME_SECRET`; devuelve 503 y el flujo anterior sigue enviando por Resend.
+4. Publicar el coordinador una vez validado el mapeo. Las altas del código anterior no tienen token y terminan sin callback; su bienvenida sigue saliendo directamente por Resend.
+5. Generar una clave aleatoria solo en el servidor, definir `NEWSLETTER_WELCOME_SECRET` y desplegar esa configuración. A partir de ese momento el sitio entrega tokens y deja de enviar directamente. No cambiar esta clave mientras haya tokens pendientes sin coordinar su invalidación.
+6. Verificar un alta nueva y otra existente, concurrencia y errores. Supervisar los registros de GHL/Resend. Revisar manualmente cualquier callback que permanezca fallando cerca de las 20 horas; no regenerar tokens ni forzar reinscripciones para reintentar sin comprobar el historial de Resend.
+
+No se modificaron dominios ni DNS ni se compartieron claves con GHL. La ruta firmada no es un registro permanente por sí misma: la supresión más allá de 24 horas depende del historial del workflow y de conservar la identidad del contacto. Borrar/recrear contactos o alterar manualmente ese historial puede romper esa garantía.
+
+Verificación previa de producción: Vercel mantiene Ready el commit `12d3fbe70b274346375981d49375ff00e61f845d`, despliegue `GuVDMePLSD3utxXaFWjrP5RSz2j4`, con Instant Rollback disponible. El dominio raíz redirige con 308 a `www.integrasgp.com`; usar directamente `https://www.integrasgp.com/api/newsletter-welcome` al terminar la configuración del callback. Las variables requeridas figuran en Production (solo se verificaron nombres, no se revelaron secretos). La suscripción desde la web actual con el simulador `delivered@resend.dev` fue aceptada, y los registros de GHL confirmaron Create contact, Add Tag y finalización. Esto valida la versión anterior, **no** el callback nuevo. Una segunda solicitud técnica con un token ficticio obtuvo HTTP 200 para capturar el nuevo formato; el mapeo y la activación siguen pendientes.
 
 ### Calendarios (página Agendar)
 1. En GoHighLevel: **Calendars → (calendario) → Share → Embed** y copiar la URL del `src` del iframe.
 2. Pegarla en la variable `PUBLIC_GHL_BOOKING_*` del servicio correspondiente.
-3. Cada calendario se carga solo cuando el usuario elige ese servicio. `/agendar?servicio=ventas|virtual-assistance|diseno-web|marketing` preselecciona la cita; `/contacto?servicio=…&industria=bienes-raices|saas|firmas-legales|salud` preselecciona el formulario.
+3. El calendario inicial se carga primero; los demás se precargan cuando la página está inactiva, salvo con ahorro de datos o conexión 2G. Elegir un servicio también carga su calendario si aún no está cargado. `/agendar?servicio=ventas|virtual-assistance|diseno-web|marketing|direct-hire` preselecciona la cita; `/contacto?servicio=…&industria=bienes-raices|saas|firmas-legales|salud` preselecciona el formulario.
 4. Sin URL configurada, el servicio muestra un aviso que lleva al formulario de Contacto.
 
 > Verificar el formato del embed directamente en GoHighLevel: no se usó un snippet fijo para no depender de suposiciones.
+
+## Pruebas de navegador locales
+
+Para probar todos los caminos del widget sin claves reales, ejecutar `PUBLIC_TURNSTILE_SITE_KEY=audit-test-key npm run build` y servir `dist/client` con `python3 -m http.server 4321 --bind 127.0.0.1 --directory dist/client`. La clave es ficticia: el navegador sustituye el script de Cloudflare con un simulador local. En otra terminal, con `playwright-cli` instalado:
+
+```bash
+playwright-cli -s=integra-regressions open about:blank
+playwright-cli -s=integra-regressions run-code --filename=tests/browser-regressions.js
+playwright-cli -s=integra-regressions close
+npm run build
+```
+
+Estas pruebas verifican el fallback sin JavaScript, el idioma legal, el montaje del desafío al abrir el modal, expiración, reintentos, errores de red y del servidor, envío duplicado y éxito del newsletter. Bloquean o simulan todas las solicitudes fuera del servidor local y no envían consultas reales. Sin una site key, verifican que el newsletter quede deshabilitado con un aviso. El último `npm run build` restaura el build con la configuración habitual: no desplegar el build con la clave ficticia.
 
 ## Idiomas (ES / EN)
 
@@ -103,7 +157,7 @@ src/
 │   ├── contact/      # Formulario con estados (validación, enviando, éxito)
 │   └── ui/           # Íconos de interfaz e íconos de servicio
 ├── config/site.ts    # Datos de contacto, menú y SEO por página
-├── content/services.ts # Los 4 servicios: textos, viñetas y calendario
+├── content/services.ts # Los 5 servicios: textos, viñetas y calendario
 ├── layouts/          # BaseLayout: head SEO, JSON-LD, fuentes
 ├── pages/            # Rutas
 └── styles/global.css # Tokens de marca (Tailwind @theme) y componentes base
@@ -118,7 +172,7 @@ src/
 ## Pendientes antes del lanzamiento
 
 - [ ] Página Servicios (en revisión por el cliente).
-- [ ] Contenido real de las páginas legales (`/legal/*` hoy son provisorias y `noindex`); Términos y condiciones muestra «Estamos trabajando en ello».
+- [ ] Contenido real de Reembolsos y Términos de órdenes de compra (todavía provisorios y `noindex`). Privacidad y Términos del servicio ya muestran los documentos en inglés entregados por el cliente.
 - [ ] Teléfonos, redes sociales y dominio definitivos (`src/config/site.ts`, `SITE_URL`).
 - [ ] Fuente Ibrand con licencia web.
 - [ ] Webhook y URLs de calendarios de GoHighLevel.

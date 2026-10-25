@@ -38,7 +38,7 @@ const LABELLED = /^(SMS|SMS support|Email)$/;
           </p>
           {locale === 'es' && <p class="mt-4 rounded-xl bg-lime-soft px-4 py-3 text-[15px] leading-relaxed text-ink">{t.legalPage.englishNote}</p>}
 
-          <div class="mt-10 space-y-10">
+          <div lang="en" class="mt-10 space-y-10">
             {doc.sections.map((section) => (
               <section>
                 <h2 class="font-display text-[17px] leading-snug font-bold tracking-[0.03em] text-ink">{section.heading}</h2>

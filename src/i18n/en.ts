@@ -109,11 +109,12 @@ export const en: Dictionary = {
     fineprint: 'You can unsubscribe at any time.',
     close: 'Close',
     emailError: 'Use a valid email, for example name@company.com.',
+    verificationError: 'Complete the security check to subscribe. If it does not load, check your connection and reload the page.',
     network: 'We could not connect. Check your connection and try again.',
     serverError: 'We could not subscribe you. Please try again in a few minutes.',
     notConfigured: 'Signup is unavailable right now. Write to us and we will add you by hand.',
     successTitle: 'You are in!',
-    successBody: 'We sent a welcome email to {email}. If you do not see it, check your spam folder.',
+    successBody: 'We received your subscription for {email}. Thanks for joining.',
     successClose: 'Keep exploring',
   },
 
@@ -165,6 +166,7 @@ export const en: Dictionary = {
   },
 
   form: {
+    requiresJavaScript: 'Enable JavaScript to send this form, or book a call using the link below.',
     legend: 'Contact details',
     name: 'Full name',
     email: 'Email address',

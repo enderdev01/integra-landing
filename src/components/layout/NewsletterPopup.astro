@@ -1,4 +1,5 @@
 ---
+import { PUBLIC_TURNSTILE_SITE_KEY } from 'astro:env/client';
 import Icon from '../ui/Icon.astro';
 import { getLocale, useTranslations } from '../../i18n';
 
@@ -25,7 +26,7 @@ const t = useTranslations(locale).newsletter;
 </button>
 
 <dialog id="newsletter-dialog" class="newsletter font-sans" aria-labelledby="nl-title" data-newsletter>
-  <script type="application/json" data-newsletter-i18n set:html={JSON.stringify({ emailError: t.emailError, network: t.network, serverError: t.serverError, notConfigured: t.notConfigured, successBody: t.successBody })} />
+  <script type="application/json" data-newsletter-i18n set:html={JSON.stringify({ emailError: t.emailError, verificationError: t.verificationError, network: t.network, serverError: t.serverError, notConfigured: t.notConfigured, successBody: t.successBody })} />
 
   <button type="button" class="close absolute top-3 right-3 z-10 grid size-11 place-items-center rounded-full text-white" aria-label={t.close} data-newsletter-close>
     <Icon name="close" size={22} />
@@ -38,7 +39,7 @@ const t = useTranslations(locale).newsletter;
   <div class="h-1 bg-lime" aria-hidden="true"></div>
 
   <div class="px-6 pt-6 pb-7 sm:px-9 sm:pb-9">
-    <form novalidate class="grid gap-3.5" data-newsletter-form>
+    <form method="post" novalidate class="grid gap-3.5" data-newsletter-form>
       <p class="text-[16px] leading-relaxed text-body">{t.lead}</p>
       <div role="alert" tabindex="-1" class="flex items-start gap-3 rounded-xl border border-[#fecdca] bg-[#fef3f2] px-4 py-3 text-[14px] leading-snug text-[#912018]" data-newsletter-error hidden>
         <Icon name="alert" size={20} class="mt-px shrink-0" />
@@ -55,7 +56,8 @@ const t = useTranslations(locale).newsletter;
           <label for="nl-website">Website</label>
           <input id="nl-website" name="website" type="text" tabindex="-1" autocomplete="off" />
         </div>
-        <button type="submit" class="btn-primary mt-1 min-h-14 w-full" data-newsletter-submit>
+        {PUBLIC_TURNSTILE_SITE_KEY && <div data-newsletter-turnstile data-sitekey={PUBLIC_TURNSTILE_SITE_KEY} data-language={locale}></div>}
+        <button type="submit" class="btn-primary mt-1 min-h-14 w-full" data-newsletter-submit disabled>
           <span class="spinner hidden" aria-hidden="true"></span>
           <span data-newsletter-submit-label data-label-idle={t.submit} data-label-sending={t.sending}>{t.submit}</span>
         </button>
@@ -199,6 +201,7 @@ const t = useTranslations(locale).newsletter;
 
   interface Copy {
     emailError: string;
+    verificationError: string;
     network: string;
     serverError: string;
     notConfigured: string;
@@ -228,6 +231,13 @@ const t = useTranslations(locale).newsletter;
     const submit = dialog.querySelector<HTMLButtonElement>('[data-newsletter-submit]')!;
     const submitLabel = dialog.querySelector<HTMLElement>('[data-newsletter-submit-label]')!;
     const success = dialog.querySelector<HTMLElement>('[data-newsletter-success]')!;
+    const challenge = form.querySelector<HTMLElement>('[data-newsletter-turnstile]');
+    const turnstile = () => (window as Window & { turnstile?: {
+      render: (container: HTMLElement, options: Record<string, unknown>) => string;
+      reset: (id: string) => void;
+    } }).turnstile;
+    let widgetId: string | undefined;
+    let verified = false;
 
     const showError = (text?: string) => {
       errorText.textContent = text ?? '';
@@ -236,15 +246,55 @@ const t = useTranslations(locale).newsletter;
     };
     const setSending = (sending: boolean) => {
       fields.disabled = sending;
+      submit.disabled = sending || !verified;
       submit.setAttribute('aria-busy', String(sending));
       submitLabel.textContent = (sending ? submitLabel.dataset.labelSending : submitLabel.dataset.labelIdle) ?? '';
     };
+
+    const verificationFailed = () => {
+      verified = false;
+      submit.disabled = true;
+      showError(copy.verificationError);
+    };
+    const mountChallenge = () => {
+      if (!challenge || !dialog.open || widgetId !== undefined || !turnstile()) return;
+      widgetId = turnstile()!.render(challenge, {
+        sitekey: challenge.dataset.sitekey,
+        language: challenge.dataset.language,
+        theme: 'light',
+        size: 'compact',
+        action: 'newsletter',
+        callback: () => {
+          verified = true;
+          submit.disabled = fields.disabled;
+          if (errorText.textContent === copy.verificationError) showError();
+        },
+        'expired-callback': verificationFailed,
+        'timeout-callback': verificationFailed,
+        'error-callback': verificationFailed,
+      });
+    };
+    const resetChallenge = () => {
+      verified = false;
+      submit.disabled = true;
+      if (widgetId !== undefined) turnstile()?.reset(widgetId);
+    };
+    if (challenge && !turnstile()) {
+      const script = document.createElement('script');
+      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      script.async = true;
+      script.addEventListener('load', mountChallenge);
+      script.addEventListener('error', verificationFailed);
+      document.head.append(script);
+    }
+    if (!challenge) showError(copy.notConfigured);
 
     const open = () => {
       // Never stack on top of another modal.
       if (dialog.open || document.querySelector('dialog[open]')) return;
       launcher.hidden = true;
       dialog.showModal();
+      mountChallenge();
     };
     launcher.addEventListener('click', open);
     dialog.addEventListener('close', () => {
@@ -259,9 +309,15 @@ const t = useTranslations(locale).newsletter;
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
+      if (fields.disabled) return;
       if (!email.checkValidity()) {
         showError(copy.emailError);
         email.focus();
+        return;
+      }
+      if (!verified) {
+        showError(challenge ? copy.verificationError : copy.notConfigured);
+        error.focus();
         return;
       }
       showError();
@@ -272,6 +328,7 @@ const t = useTranslations(locale).newsletter;
       try {
         result = await actions.newsletter(data);
       } catch {
+        resetChallenge();
         showError(copy.network);
         error.focus();
         return;
@@ -280,12 +337,13 @@ const t = useTranslations(locale).newsletter;
       }
 
       if (result.error) {
+        resetChallenge();
         // Server messages are Spanish: pick the copy by error code
         if (isInputError(result.error)) {
           showError(copy.emailError);
           email.focus();
         } else {
-          showError(result.error.code === 'INTERNAL_SERVER_ERROR' ? copy.notConfigured : copy.serverError);
+          showError(result.error.code === 'INTERNAL_SERVER_ERROR' ? copy.notConfigured : result.error.code === 'FORBIDDEN' ? copy.verificationError : copy.serverError);
           error.focus();
         }
         return;

@@ -16,7 +16,8 @@ const errorText = 'text-[13px] text-danger';
 
 <div class="font-sans" data-contact>
   <script type="application/json" data-contact-i18n set:html={JSON.stringify({ errors: t.errors, reviewOne: t.reviewOne, reviewMany: t.reviewMany, network: t.network, serverError: t.serverError, successTitle: t.successTitle, successTitleNamed: t.successTitleNamed, notConfigured: t.notConfigured, summaryService: t.summaryService, summaryCompany: t.summaryCompany, summaryIndustry: t.summaryIndustry, param: { service: locale === 'en' ? 'service' : 'servicio' } })} />
-  <form class="contact-form grid grid-cols-1 content-start gap-[22px] sm:grid-cols-2" novalidate aria-labelledby="ct-title" data-contact-form>
+  <noscript><p class="mb-5 text-body">{t.requiresJavaScript}</p></noscript>
+  <form method="post" class="contact-form grid grid-cols-1 content-start gap-[22px] sm:grid-cols-2" novalidate aria-labelledby="ct-title" data-contact-form>
     <div role="alert" tabindex="-1" class="col-span-full flex items-start gap-3 rounded-xl border border-[#fecdca] bg-[#fef3f2] px-4 py-3.5 text-[15px] leading-snug text-[#912018]" data-summary hidden>
       <Icon name="alert" size={20} class="mt-px shrink-0" />
       <span data-summary-text></span>
@@ -93,7 +94,7 @@ const errorText = 'text-[13px] text-danger';
       </>
     )}
 
-    <button type="submit" class="btn-primary submit col-span-full min-h-14 w-full" data-submit>
+    <button type="submit" class="btn-primary submit col-span-full min-h-14 w-full" data-submit disabled>
       <span class="spinner hidden" aria-hidden="true"></span>
       <span data-submit-label data-label-idle={t.submit} data-label-sending={t.sending}>{t.submit}</span>
       <Icon name="arrow-right" class="submit-arrow" />
@@ -264,6 +265,7 @@ const errorText = 'text-[13px] text-danger';
         result = await actions.contact(data);
       } catch {
         // Offline or a non-JSON error body: the client fetch throws
+        (window as { turnstile?: { reset: () => void } }).turnstile?.reset();
         showSummary(copy.network);
         summary.focus();
         return;
@@ -322,5 +324,6 @@ const errorText = 'text-[13px] text-danger';
       success.hidden = false;
       success.focus();
     });
+    submit.disabled = false;
   }
 </script>

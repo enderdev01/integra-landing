@@ -115,11 +115,12 @@ export const es = {
     fineprint: 'Puedes darte de baja cuando quieras.',
     close: 'Cerrar',
     emailError: 'Usa un correo válido, por ejemplo nombre@empresa.com.',
+    verificationError: 'Completa la verificación de seguridad para suscribirte. Si no carga, revisa tu conexión y recarga la página.',
     network: 'No pudimos conectar. Revisa tu conexión e inténtalo de nuevo.',
     serverError: 'No pudimos suscribirte. Inténtalo de nuevo en unos minutos.',
     notConfigured: 'La suscripción no está disponible por ahora. Escríbenos y te sumamos a mano.',
     successTitle: '¡Ya estás dentro!',
-    successBody: 'Te enviamos un correo de bienvenida a {email}. Si no lo ves, revisa tu carpeta de spam.',
+    successBody: 'Recibimos tu suscripción para {email}. Gracias por sumarte.',
     successClose: 'Seguir explorando',
   },
 
@@ -171,6 +172,7 @@ export const es = {
   },
 
   form: {
+    requiresJavaScript: 'Activa JavaScript para enviar este formulario o agenda una llamada con el enlace de abajo.',
     legend: 'Datos de contacto',
     name: 'Nombre completo',
     email: 'Correo electrónico',

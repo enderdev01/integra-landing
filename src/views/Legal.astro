@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import LegalText from '../components/layout/LegalText.astro';
 import { SITE } from '../config/site';
+import { LEGAL_DOCUMENTS } from '../content/legal';
 import { format, getLocale, routePath, useTranslations } from '../i18n';
 
 interface Props {
@@ -12,13 +14,82 @@ const locale = getLocale(Astro.url);
 const t = useTranslations(locale);
 const title = t.legalDocs[slug];
 const values = { title, company: SITE.legalName };
+const doc = LEGAL_DOCUMENTS[slug];
+
+/** "Label: rest" lead-in used by the bullets and the opt-out entries. */
+function splitLead(text: string) {
+  const match = text.match(/^([^:.]{2,40}):\s+(.*)$/s);
+  return match ? { lead: match[1], rest: match[2] } : { lead: '', rest: text };
+}
+
+const LABELLED = /^(SMS|SMS support|Email)$/;
 ---
 
-<!-- Placeholder until the client provides the legal text; kept out of search results. -->
-<BaseLayout meta={{ title: format(t.legalPage.metaTitle, values), description: format(t.legalPage.metaDescription, values) }} noindex>
+<!-- Documents without client text yet stay as a placeholder and out of search results. -->
+<BaseLayout meta={{ title: format(t.legalPage.metaTitle, values), description: format(t.legalPage.metaDescription, values) }} noindex={!doc}>
   <section class="mx-auto w-full max-w-[760px] px-4 pt-12 pb-24 md:px-6 md:pt-20">
     <h1 class="font-display text-[clamp(32px,4vw,48px)] leading-tight font-bold text-blue">{title}</h1>
-    <p class="mt-6 text-lg leading-relaxed text-body">{format(t.legalPage.body, values)}</p>
-    <a href={routePath('contact', locale)} class="btn-primary mt-8">{t.legalPage.cta}</a>
+
+    {
+      doc ? (
+        <>
+          <p class="mt-3 text-[15px] text-subtle">
+            {t.legalPage.updated} {doc.updated}
+          </p>
+          {locale === 'es' && <p class="mt-4 rounded-xl bg-lime-soft px-4 py-3 text-[15px] leading-relaxed text-ink">{t.legalPage.englishNote}</p>}
+
+          <div class="mt-10 space-y-10">
+            {doc.sections.map((section) => (
+              <section>
+                <h2 class="font-display text-[17px] leading-snug font-bold tracking-[0.03em] text-ink">{section.heading}</h2>
+                <div class="mt-3 space-y-4 text-[17px] leading-relaxed text-body">
+                  {section.blocks.map((block) => {
+                    if (block.type === 'list') {
+                      return (
+                        <ul class="list-disc space-y-2.5 pl-6 marker:text-lime-deep">
+                          {block.items.map((item) => {
+                            const { lead, rest } = splitLead(item);
+                            return (
+                              <li>
+                                {lead && <strong class="font-bold text-ink">{lead}: </strong>}
+                                <LegalText text={rest} />
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      );
+                    }
+                    if (block.type === 'lines') {
+                      return (
+                        <address class="not-italic">
+                          {block.lines.map((line) => (
+                            <span class="block">
+                              <LegalText text={line} />
+                            </span>
+                          ))}
+                        </address>
+                      );
+                    }
+                    const { lead, rest } = splitLead(block.text);
+                    const labelled = LABELLED.test(lead);
+                    return (
+                      <p>
+                        {labelled && <strong class="font-bold text-ink">{lead}: </strong>}
+                        <LegalText text={labelled ? rest : block.text} />
+                      </p>
+                    );
+                  })}
+                </div>
+              </section>
+            ))}
+          </div>
+        </>
+      ) : (
+        <>
+          <p class="mt-6 text-lg leading-relaxed text-body">{format(t.legalPage.body, values)}</p>
+          <a href={routePath('contact', locale)} class="btn-primary mt-8">{t.legalPage.cta}</a>
+        </>
+      )
+    }
   </section>
 </BaseLayout>

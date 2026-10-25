@@ -1,0 +1,18 @@
+---
+import { SITE } from '../../config/site';
+
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+
+// Odd indexes of the split are the captured URLs and the support number; they become links.
+const LINK_PATTERN = new RegExp(`(https?://[^\\s]+[^\\s.,;:!?)]|${SITE.phone.display.replace(/[+]/g, '\\+')})`);
+const parts = text.split(LINK_PATTERN).map((value, index) => ({
+  value,
+  href: index % 2 === 0 ? undefined : value === SITE.phone.display ? SITE.phone.href : value,
+}));
+---
+
+{parts.map((part) => (part.href ? <a href={part.href} class="font-semibold text-blue-ink underline underline-offset-2">{part.value}</a> : part.value))}

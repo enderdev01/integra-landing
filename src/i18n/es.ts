@@ -24,6 +24,8 @@ export const es = {
     follow: 'Síguenos',
     rights: 'Todos los derechos reservados.',
     terms: 'Términos y condiciones',
+    privacy: 'Política de privacidad',
+    legalNav: 'Legal',
   },
 
   legalDocs: {
@@ -226,6 +228,8 @@ export const es = {
     metaDescription: '{title} de {company}.',
     body: 'Estamos trabajando en ello.',
     cta: 'Ir a Contacto',
+    updated: 'Última actualización:',
+    englishNote: 'Este documento legal se publica en inglés, tal como fue redactado.',
   },
 
   services: {

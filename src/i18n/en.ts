@@ -24,6 +24,8 @@ export const en: Dictionary = {
     follow: 'Follow us',
     rights: 'All rights reserved.',
     terms: 'Terms and conditions',
+    privacy: 'Privacy policy',
+    legalNav: 'Legal',
   },
 
   legalDocs: {
@@ -220,6 +222,8 @@ export const en: Dictionary = {
     metaDescription: '{title} — {company}.',
     body: 'We are working on it.',
     cta: 'Go to Contact',
+    updated: 'Last updated:',
+    englishNote: '',
   },
 
   services: {

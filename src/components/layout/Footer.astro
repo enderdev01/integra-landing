@@ -45,7 +45,10 @@ const year = new Date().getFullYear();
   <div class="border-t border-white/10">
     <div class="mx-auto flex w-full max-w-[1320px] flex-wrap items-center justify-between gap-x-6 gap-y-1 px-5 py-3 text-[13px] text-[#c9cbcf] sm:px-6">
       <p class="py-2">© {year} {SITE.legalName} {t.footer.rights}</p>
-      <a href={legalPath('terms-of-service', locale)} class="inline-flex min-h-11 items-center text-[#c9cbcf] underline decoration-white/30 underline-offset-4 hover:text-white">{t.footer.terms}</a>
+      <nav aria-label={t.footer.legalNav} class="flex flex-wrap gap-x-6">
+        <a href={legalPath('privacy-policy', locale)} class="inline-flex min-h-11 items-center text-[#c9cbcf] underline decoration-white/30 underline-offset-4 hover:text-white">{t.footer.privacy}</a>
+        <a href={legalPath('terms-of-service', locale)} class="inline-flex min-h-11 items-center text-[#c9cbcf] underline decoration-white/30 underline-offset-4 hover:text-white">{t.footer.terms}</a>
+      </nav>
     </div>
   </div>
 </footer>

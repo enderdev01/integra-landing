@@ -14,7 +14,7 @@ const year = new Date().getFullYear();
       <div class="min-w-0 flex-[1_1_240px]">
         <h2 class="mb-2.5 text-[15px] font-bold tracking-[0.04em] uppercase">{format(t.footer.contactTitle, { name: SITE.legalName })}</h2>
         <address class="text-[15px] leading-[1.65] tracking-[0.02em] text-[#e7e8ea] uppercase not-italic">
-          {SITE.address.display[0]}<br />{SITE.address.display[1]}
+          {SITE.address.display.map((line, index) => (<>{index > 0 && <br />}{line}</>))}
         </address>
       </div>
 

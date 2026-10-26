@@ -7,12 +7,12 @@ export const SITE = {
   name: 'Integra',
   legalName: 'Integra Inc.',
   address: {
-    street: 'NW 79th Avenue',
-    city: 'Doral',
-    region: 'FL',
-    postalCode: '33122',
+    street: '2651 Queen St',
+    city: 'Los Angeles',
+    region: 'CA',
+    postalCode: '90039',
     country: 'US',
-    display: ['NW 79th Avenue', 'Doral, Florida 33122, USA'],
+    display: ['2651 Queen St', 'Los Angeles, CA 90039', 'United States'],
   },
   /** Public contact inbox; also receives the contact form submissions. */
   email: 'hello@integrasgp.com',

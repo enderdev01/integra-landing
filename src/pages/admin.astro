@@ -1,0 +1,198 @@
+---
+import type { ImageMetadata } from 'astro';
+import { IMAGE_SLOTS } from '../lib/image-slots';
+
+export const prerender = false;
+
+// Committed photos shown until a replacement is uploaded
+const defaults = import.meta.glob<{ default: ImageMetadata }>('../assets/img/*.webp', { eager: true });
+const slots = IMAGE_SLOTS.map((slot) => ({ ...slot, fallback: defaults[`../assets/img/${slot.file}`].default.src }));
+
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+Astro.response.headers.set('Cache-Control', 'no-store');
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Admin de imágenes · Integra</title>
+    <style>
+      :root { --blue: #005b94; --lime: #a3c622; --ink: #1f2933; --line: #d9e2ec; }
+      * { box-sizing: border-box; }
+      body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: var(--ink); background: #f5f8fb; }
+      main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; }
+      h1 { margin: 0 0 4px; color: var(--blue); font-size: 1.6rem; }
+      p { margin: 0 0 16px; }
+      button, input { font: inherit; }
+      button { cursor: pointer; border: 0; border-radius: 999px; padding: 8px 18px; font-weight: 600; background: var(--blue); color: #fff; }
+      button.ghost { background: transparent; color: var(--blue); border: 1px solid var(--blue); }
+      button.publish { background: var(--lime); color: #1f2933; }
+      button:disabled { opacity: 0.5; cursor: wait; }
+      input[type='password'] { padding: 8px 12px; border: 1px solid var(--line); border-radius: 8px; min-width: 260px; }
+      .bar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 16px; }
+      .status { min-height: 1.5em; font-weight: 600; }
+      .status.error { color: #b42318; }
+      .grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+      .card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+      .card img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 10px; background: var(--line); }
+      .card h2 { margin: 0; font-size: 1rem; }
+      .tag { font-size: 0.8rem; color: #52606d; }
+      .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+      [hidden] { display: none !important; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Imágenes del sitio</h1>
+
+      <form id="login" class="bar">
+        <label for="password">Contraseña</label>
+        <input id="password" type="password" autocomplete="current-password" required />
+        <button type="submit">Entrar</button>
+      </form>
+
+      <section id="panel" hidden>
+        <p>Sube una foto nueva en cada espacio. Los cambios se ven en el sitio solo después de pulsar <strong>Publicar</strong> (tarda 1–2 minutos).</p>
+        <div class="bar">
+          <button id="publish" class="publish" type="button">Publicar cambios</button>
+          <button id="logout" class="ghost" type="button">Salir</button>
+        </div>
+        <div class="grid">
+          {
+            slots.map((slot) => (
+              <article class="card" data-file={slot.file} data-max={slot.maxWidth} data-fallback={slot.fallback}>
+                <h2>{slot.label}</h2>
+                <img alt={slot.label} src={slot.fallback} />
+                <span class="tag" data-tag>Foto original</span>
+                <div class="actions">
+                  <button type="button" data-upload>Cambiar foto</button>
+                  <button type="button" class="ghost" data-reset hidden>Restaurar original</button>
+                </div>
+                <input type="file" accept="image/*" hidden />
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <p id="status" class="status" role="status"></p>
+    </main>
+
+    <script>
+      const $ = (selector: string, root: ParentNode = document) => root.querySelector(selector) as HTMLElement;
+      const login = $('#login') as HTMLFormElement;
+      const panel = $('#panel');
+      const status = $('#status');
+      const cards = [...document.querySelectorAll<HTMLElement>('.card')];
+      let password = '';
+
+      const say = (text: string, error = false) => {
+        status.textContent = text;
+        status.classList.toggle('error', error);
+      };
+      const api = (path: string, init: RequestInit = {}) =>
+        fetch(path, { ...init, headers: { ...init.headers, Authorization: `Bearer ${password}` } });
+
+      const messages: Record<number, string> = {
+        401: 'Contraseña incorrecta.',
+        413: 'La foto es demasiado pesada.',
+        503: 'El servicio aún no está configurado (faltan variables en Vercel).',
+      };
+      const fail = (response: Response) => say(messages[response.status] ?? 'No se pudo completar la acción. Intenta de nuevo.', true);
+
+      const showOverride = async (card: HTMLElement, present: boolean) => {
+        const image = $('img', card) as HTMLImageElement;
+        const previous = image.dataset.blob;
+        if (present) {
+          const response = await api(`/api/admin/images?file=${card.dataset.file}`);
+          if (response.ok) {
+            image.dataset.blob = URL.createObjectURL(await response.blob());
+            image.src = image.dataset.blob;
+          }
+        } else {
+          delete image.dataset.blob;
+          image.src = card.dataset.fallback!;
+        }
+        if (previous) URL.revokeObjectURL(previous);
+        $('[data-tag]', card).textContent = present ? 'Foto nueva (sin publicar o ya publicada)' : 'Foto original';
+        $('[data-reset]', card).hidden = !present;
+      };
+
+      const load = async () => {
+        const response = await api('/api/admin/images');
+        if (!response.ok) {
+          if (response.status === 401) sessionStorage.removeItem('admin-pw');
+          return fail(response);
+        }
+        const { overrides } = (await response.json()) as { overrides: { file: string }[] };
+        const files = new Set(overrides.map((item) => item.file));
+        login.hidden = true;
+        panel.hidden = false;
+        say('');
+        await Promise.all(cards.map((card) => showOverride(card, files.has(card.dataset.file!))));
+      };
+
+      // Re-encode to webp in the browser: keeps uploads small and matches the site's format
+      const toWebp = async (file: File, maxWidth: number) => {
+        const bitmap = await createImageBitmap(file);
+        const scale = Math.min(1, maxWidth / bitmap.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(bitmap.width * scale);
+        canvas.height = Math.round(bitmap.height * scale);
+        canvas.getContext('2d')!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+        return new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/webp', 0.85));
+      };
+
+      login.addEventListener('submit', (event) => {
+        event.preventDefault();
+        password = ($('#password') as HTMLInputElement).value;
+        sessionStorage.setItem('admin-pw', password);
+        load();
+      });
+
+      $('#logout').addEventListener('click', () => {
+        sessionStorage.removeItem('admin-pw');
+        location.reload();
+      });
+
+      $('#publish').addEventListener('click', async (event) => {
+        const button = event.currentTarget as HTMLButtonElement;
+        button.disabled = true;
+        const response = await api('/api/admin/publish', { method: 'POST' });
+        button.disabled = false;
+        if (response.ok) say('Publicando… los cambios estarán en el sitio en 1–2 minutos.');
+        else fail(response);
+      });
+
+      for (const card of cards) {
+        const input = $('input[type=file]', card) as HTMLInputElement;
+        const url = `/api/admin/images?file=${card.dataset.file}`;
+        $('[data-upload]', card).addEventListener('click', () => input.click());
+        $('[data-reset]', card).addEventListener('click', async () => {
+          const response = await api(url, { method: 'DELETE' });
+          if (!response.ok) return fail(response);
+          await showOverride(card, false);
+          say('Foto original restaurada. Pulsa Publicar para aplicarla.');
+        });
+        input.addEventListener('change', async () => {
+          const file = input.files?.[0];
+          input.value = '';
+          if (!file) return;
+          say('Subiendo…');
+          const webp = await toWebp(file, Number(card.dataset.max)).catch(() => null);
+          if (!webp || webp.type !== 'image/webp') return say('No se pudo procesar esa imagen. Prueba con JPG o PNG.', true);
+          const response = await api(url, { method: 'PUT', body: webp });
+          if (!response.ok) return fail(response);
+          await showOverride(card, true);
+          say('Foto guardada. Pulsa Publicar para verla en el sitio.');
+        });
+      }
+
+      password = sessionStorage.getItem('admin-pw') ?? '';
+      if (password) load();
+    </script>
+  </body>
+</html>

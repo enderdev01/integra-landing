@@ -117,6 +117,21 @@ No se modificaron dominios ni DNS ni se compartieron claves con GHL. Como respal
 
 > Verificar el formato del embed directamente en GoHighLevel: no se usó un snippet fijo para no depender de suposiciones.
 
+## Admin de imágenes (`/admin`)
+
+El cliente cambia las 9 fotos del sitio (4 del hero, 5 de servicios) desde `/admin`, con contraseña. Las fotos se guardan en un bucket **privado** de Cloudflare R2; al pulsar **Publicar** se dispara un deploy hook de Vercel y el build (`scripts/pull-images.mjs`) copia las fotos de R2 sobre `src/assets/img` antes de `astro build`, así `astro:assets` sigue optimizándolas. Sin variables de R2 (o si R2 falla) el build usa las fotos del repo.
+
+Variables en Vercel (todas secretas, opcionales; sin ellas `/admin` responde 401/503):
+
+| Variable | Qué es |
+| --- | --- |
+| `ADMIN_PASSWORD` | Contraseña del admin, mínimo 16 caracteres |
+| `R2_ACCOUNT_ID`, `R2_BUCKET` | Cuenta y bucket de Cloudflare R2 |
+| `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` | Token R2 con permiso Object Read & Write sobre ese bucket |
+| `VERCEL_DEPLOY_HOOK_URL` | Vercel → Settings → Git → Deploy Hooks (rama `main`) |
+
+Un build local con las variables de R2 sobrescribe `src/assets/img`; descarta esos cambios con `git checkout src/assets/img`.
+
 ## Pruebas de navegador locales
 
 Para probar todos los caminos del widget sin claves reales, ejecutar `PUBLIC_TURNSTILE_SITE_KEY=audit-test-key npm run build` y servir `dist/client` con `python3 -m http.server 4321 --bind 127.0.0.1 --directory dist/client`. La clave es ficticia: el navegador sustituye el script de Cloudflare con un simulador local. En otra terminal, con `playwright-cli` instalado:

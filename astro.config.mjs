@@ -43,6 +43,13 @@ export default defineConfig({
       // Comma-separated team emails copied (cc) on every contact form email; not hard-coded because the repository is public
       CONTACT_CC_EMAILS: envField.string({ context: 'server', access: 'secret', optional: true }),
       GHL_WEBHOOK_URL: envField.string({ context: 'server', access: 'secret', optional: true, url: true }),
+      // Image admin (/admin): password (16+ chars), private R2 bucket credentials and the Vercel deploy hook that rebuilds the site
+      ADMIN_PASSWORD: envField.string({ context: 'server', access: 'secret', optional: true }),
+      R2_ACCOUNT_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
+      R2_ACCESS_KEY_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
+      R2_SECRET_ACCESS_KEY: envField.string({ context: 'server', access: 'secret', optional: true }),
+      R2_BUCKET: envField.string({ context: 'server', access: 'secret', optional: true }),
+      VERCEL_DEPLOY_HOOK_URL: envField.string({ context: 'server', access: 'secret', optional: true, url: true }),
       // Required to enable newsletter signup; a welcome email alone never counts as registration
       GHL_NEWSLETTER_WEBHOOK_URL: envField.string({ context: 'server', access: 'secret', optional: true, url: true }),
       // Enables GHL's one-time callback; remains server-only and is never shared with GHL.

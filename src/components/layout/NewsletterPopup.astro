@@ -263,6 +263,8 @@ const t = useTranslations(locale).newsletter;
         language: challenge.dataset.language,
         theme: 'light',
         size: 'compact',
+        // Invisible unless Cloudflare needs the visitor to interact; a passed check leaves no widget in the popup
+        appearance: 'interaction-only',
         action: 'newsletter',
         callback: () => {
           verified = true;
